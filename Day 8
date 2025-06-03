@@ -1,0 +1,54 @@
+Day 8/100: Candy Distribution 
+
+Problem Statement #135:
+
+Given children standing in a line with ratings:
+Each child must get ≥1 candy
+Children with higher ratings than neighbors must get more candies
+Return the minimum total candies needed
+
+Approach
+Two-Pass Greedy Algorithm
+Left-to-Right Pass:
+Give each child 1 more candy than left neighbor if rating is higher
+
+Right-to-Left Pass:
+Ensure each child has more candy than right neighbor if rating is higher
+
+Sum:
+Take maximum from both passes for each child
+
+Here's the code;
+
+class Solution {
+    public int candy(int[] ratings) {
+        int n = ratings.length;
+        int[] candies = new int[n];
+        Arrays.fill(candies, 1);
+        
+        // Left to right pass
+        for (int i = 1; i < n; i++) {
+            if (ratings[i] > ratings[i-1]) {
+                candies[i] = candies[i-1] + 1;
+            }
+        }
+        
+        // Right to left pass
+        for (int i = n-2; i >= 0; i--) {
+            if (ratings[i] > ratings[i+1]) {
+                candies[i] = Math.max(candies[i], candies[i+1] + 1);
+            }
+        }
+        
+        // Sum all candies
+        int total = 0;
+        for (int candy : candies) {
+            total += candy;
+        }
+        return total;
+    }
+}
+
+Complexity Analysis
+Time Complexity: O(n)
+Space Complexity: O(n) 
