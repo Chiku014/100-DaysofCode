@@ -1,0 +1,40 @@
+Day 5/100: Distributing Candies Among Children II
+
+Problem Statement
+LeetCode #2929 
+Given two positive integers n (candies) and limit (max per child), calculate the number of ways to distribute all candies among 3 children such that no child exceeds the limit.
+
+Approach
+Combinatorial Mathematics
+Total Unrestricted Ways: Using stars and bars, the total distributions without limits is C(n+2, 2)
+
+Subtract Invalid Cases:
+Subtract distributions where one child exceeds limit
+Add back cases where two children exceed limit (inclusion-exclusion principle)
+
+Formula:
+Valid = Total - 3*C(n-limit-1, 2) + 3*C(n-2*limit-2, 2) - C(n-3*limit-3, 2)
+
+Here's the code;
+
+public class Solution {
+    public long distributeCandies(int n, int limit) {
+        long total = comb(n + 2); // Total unrestricted distributions
+        long singleViolation = comb(n - limit - 1); // One child exceeds
+        long doubleViolation = comb(n - 2*limit - 2); // Two children exceed
+        long tripleViolation = comb(n - 3*limit - 3); // All three exceed
+        
+        // Inclusion-exclusion principle
+        long valid = total - 3*singleViolation + 3*doubleViolation - tripleViolation;
+        return Math.max(0, valid); // Ensure non-negative
+    }
+    
+    // Helper method to calculate combinations C(a, 2)
+    private long comb(long a) {
+        return a >= 2 ? a * (a - 1) / 2 : 0;
+    }
+}
+
+Complexity Analysis
+Time Complexity: O(1) - Constant time combinatorial calculations
+Space Complexity: O(1) - No additional data structures used
