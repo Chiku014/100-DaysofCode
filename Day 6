@@ -1,0 +1,43 @@
+Day 6/100: Find the Duplicate Number
+
+Problem Statement #287 
+Given an array nums containing n + 1 integers where each integer is between 1 and n (inclusive), find the single duplicate number.
+
+Approach
+Floyd's Tortoise and Hare Algorithm (Cycle Detection)
+Phase 1 - Detect Cycle:
+Use slow (1 step) and fast (2 steps) pointers to find intersection point
+
+Phase 2 - Find Entrance:
+Reset one pointer to start
+Move both at same speed until they meet (duplicate number)
+
+Here's the code;
+
+class Solution {
+    public int findDuplicate(int[] nums) {
+        // Phase 1: Find intersection point
+        int slow = nums[0];
+        int fast = nums[nums[0]];
+        
+        while (slow != fast) {
+            slow = nums[slow];
+            fast = nums[nums[fast]];
+        }
+        
+        // Phase 2: Find entrance to cycle
+        int ptr1 = nums[0];
+        int ptr2 = slow;
+        
+        while (ptr1 != ptr2) {
+            ptr1 = nums[ptr1];
+            ptr2 = nums[ptr2];
+        }
+        
+        return ptr1;
+    }
+}
+
+Complexity Analysis
+Time Complexity: O(n) - Linear traversal of the array
+Space Complexity: O(1) - Only two pointers used
