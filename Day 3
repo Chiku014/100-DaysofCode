@@ -1,0 +1,35 @@
+Day 3/100: Divisible and Non-divisible Sums Difference
+
+Problem Statement #2894
+
+Given two positive integers n and m:
+Calculate num1: Sum of numbers in [1, n] not divisible by m
+Calculate num2: Sum of numbers in [1, n] divisible by m
+Return num1 - num2
+
+Approach
+Mathematical Optimization:
+Calculate total sum of [1, n] using Gauss' formula: n*(n+1)/2
+Compute num2 by summing multiples of m (arithmetic progression)
+Derive num1 as total_sum - num2
+
+Here's the code;
+
+class Solution {
+    public int differenceOfSums(int n, int m) {
+        long totalSum = (long) n * (n + 1) / 2;
+        long num2 = 0;
+        
+        // Sum all multiples of m up to n
+        for (int i = m; i <= n; i += m) {
+            num2 += i;
+        }
+        
+        long num1 = totalSum - num2;
+        return (int) (num1 - num2);
+    }
+}
+
+Complexity
+Time: O(n/m) → Only iterates through multiples of m
+Space: O(1) → Uses constant extra space
