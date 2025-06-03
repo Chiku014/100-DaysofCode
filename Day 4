@@ -1,0 +1,97 @@
+Day 4/100: Maximize Target Nodes in Connected Trees
+
+Problem Statement #3372
+Problem Type: Graph Theory 
+
+We are given:
+Two undirected trees with n and m nodes respectively
+Edge lists edges1 and edges2 describing each tree's connections
+A distance threshold R
+
+Approach
+Precompute Distances:
+For each tree, compute all-pairs shortest paths using BFS (since trees have unique paths between nodes)
+
+Count Targets:
+For each node in both trees, count how many nodes are within distance R
+
+Maximize Connections:
+For each node i in Tree 1, find the node j in Tree 2 where connecting i to j maximizes
+Targets in Tree 1 within R of i
+Plus targets in Tree 2 within R-1 of j (since the connection adds 1 edge)
+
+import java.util.*;
+
+class Solution {
+    public int[] maximizeTargetNodes(int n, int[][] edges1, int m, int[][] edges2, int R) {
+        // Build adjacency lists
+        List<List<Integer>> tree1 = buildTree(n, edges1);
+        List<List<Integer>> tree2 = buildTree(m, edges2);
+        
+        // Precompute distances
+        int[][] dist1 = allPairsDistances(n, tree1);
+        int[][] dist2 = allPairsDistances(m, tree2);
+        
+        // Count targets for each node
+        int[] count1 = countTargets(n, dist1, R);
+        int[] count2 = countTargets(m, dist2, R-1); // R-1 due to connection edge
+        
+        int[] result = new int[n];
+        for (int i = 0; i < n; i++) {
+            int maxAdditional = 0;
+            for (int j = 0; j < m; j++) {
+                maxAdditional = Math.max(maxAdditional, count2[j]);
+            }
+            result[i] = count1[i] + maxAdditional;
+        }
+        return result;
+    }
+    
+    private List<List<Integer>> buildTree(int n, int[][] edges) {
+        List<List<Integer>> adj = new ArrayList<>();
+        for (int i = 0; i < n; i++) adj.add(new ArrayList<>());
+        for (int[] edge : edges) {
+            adj.get(edge[0]).add(edge[1]);
+            adj.get(edge[1]).add(edge[0]);
+        }
+        return adj;
+    }
+    
+    private int[][] allPairsDistances(int n, List<List<Integer>> adj) {
+        int[][] dist = new int[n][n];
+        for (int i = 0; i < n; i++) {
+            Arrays.fill(dist[i], -1);
+            Queue<Integer> q = new LinkedList<>();
+            q.add(i);
+            dist[i][i] = 0;
+            while (!q.isEmpty()) {
+                int u = q.poll();
+                for (int v : adj.get(u)) {
+                    if (dist[i][v] == -1) {
+                        dist[i][v] = dist[i][u] + 1;
+                        q.add(v);
+                    }
+                }
+            }
+        }
+        return dist;
+    }
+    
+    private int[] countTargets(int n, int[][] dist, int R) {
+        int[] counts = new int[n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (dist[i][j] <= R) counts[i]++;
+            }
+        }
+        return counts;
+    }
+}
+
+Complexity Analysis
+Time Complexity: O(n² + m² + n*m)
+
+O(n²) for Tree 1 distance calculations
+O(m²) for Tree 2 distance calculations
+O(n*m) for finding optimal connections
+Space Complexity: O(n² + m²) for storing distance matrices
