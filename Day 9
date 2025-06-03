@@ -1,0 +1,59 @@
+Day 9/100: Maximum Candies You Can Get from Boxes 
+
+Problem Statement #1298
+
+Here's the code;
+
+import java.util.*;
+
+class Solution {
+    public int maxCandies(int[] status, int[] candies, int[][] keys, int[][] containedBoxes, int[] initialBoxes) {
+        int n = status.length;
+        boolean[] hasBox = new boolean[n];
+        boolean[] hasKey = new boolean[n];
+        boolean[] opened = new boolean[n];
+        Queue<Integer> queue = new LinkedList<>();
+        
+        // Initialize with initially available boxes
+        for (int box : initialBoxes) {
+            hasBox[box] = true;
+            if (status[box] == 1) {
+                queue.offer(box);
+                opened[box] = true;
+            }
+        }
+        
+        int totalCandies = 0;
+        
+        while (!queue.isEmpty()) {
+            int currentBox = queue.poll();
+            totalCandies += candies[currentBox];
+            
+            // Collect keys from current box
+            for (int key : keys[currentBox]) {
+                hasKey[key] = true;
+                // If we have the box and can now open it
+                if (hasBox[key] && !opened[key]) {
+                    queue.offer(key);
+                    opened[key] = true;
+                }
+            }
+            
+            // Collect contained boxes
+            for (int box : containedBoxes[currentBox]) {
+                hasBox[box] = true;
+                // If box is open or we have its key
+                if ((status[box] == 1 || hasKey[box]) && !opened[box]) {
+                    queue.offer(box);
+                    opened[box] = true;
+                }
+            }
+        }
+        
+        return totalCandies;
+    }
+}
+
+Complexity Analysis
+Time Complexity: O(n) 
+Space Complexity: O(n)
