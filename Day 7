@@ -1,0 +1,91 @@
+Day 7/100: Largest Color Value in a Directed Graph
+
+Problem Statement #1857
+
+Given a directed graph with colored nodes, find:
+The maximum frequency of any color in all possible paths
+Return -1 if the graph contains cycles
+
+Approach
+Topological Sort with Dynamic Programming
+
+Graph Initialization:
+Build adjacency list and in-degree count
+
+Cycle Detection:
+Use Kahn's algorithm for topological sort
+
+Color Tracking:
+Maintain DP table counting color frequencies along paths
+Update maximum color counts during traversal
+
+Here's the code;
+
+import java.util.*;
+
+class Solution {
+    public int largestPathValue(String colors, int[][] edges) {
+        int n = colors.length();
+        List<List<Integer>> adj = new ArrayList<>();
+        int[] inDegree = new int[n];
+        
+        // Initialize adjacency list
+        for (int i = 0; i < n; i++) {
+            adj.add(new ArrayList<>());
+        }
+        
+        // Build graph and calculate in-degrees
+        for (int[] edge : edges) {
+            int u = edge[0], v = edge[1];
+            adj.get(u).add(v);
+            inDegree[v]++;
+        }
+        
+        // DP table: node → color counts
+        int[][] dp = new int[n][26];
+        Queue<Integer> queue = new LinkedList<>();
+        
+        // Initialize queue with 0 in-degree nodes
+        for (int i = 0; i < n; i++) {
+            if (inDegree[i] == 0) {
+                queue.offer(i);
+                dp[i][colors.charAt(i) - 'a']++;
+            }
+        }
+        
+        int visited = 0;
+        int maxColor = 0;
+        
+        while (!queue.isEmpty()) {
+            int u = queue.poll();
+            visited++;
+            
+            // Update max color for current node
+            for (int c = 0; c < 26; c++) {
+                maxColor = Math.max(maxColor, dp[u][c]);
+            }
+            
+            // Process neighbors
+            for (int v : adj.get(u)) {
+                // Update color counts for neighbor
+                for (int c = 0; c < 26; c++) {
+                    dp[v][c] = Math.max(dp[v][c], dp[u][c]);
+                }
+                
+                // Add current node's color to neighbor
+                int color = colors.charAt(v) - 'a';
+                dp[v][color] = Math.max(dp[v][color], dp[u][color] + 1);
+                
+                if (--inDegree[v] == 0) {
+                    queue.offer(v);
+                }
+            }
+        }
+        
+        return visited == n ? maxColor : -1;
+    }
+}
+
+Complexity Analysis
+Time Complexity: O(n + m) 
+Space Complexity: O(n)
