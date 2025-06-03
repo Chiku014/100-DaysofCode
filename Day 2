@@ -1,0 +1,37 @@
+Day 2/100: Sum of Left Leaves
+
+Problem Statement
+LeetCode #404 | Difficulty: Easy
+Given the root of a binary tree, return the sum of all left leaves.
+
+A leaf has no children.
+A left leaf is a leaf that is the left child of its parent.
+
+Approach
+Recursive Tree Traversal:
+
+Check if the current node's left child is a leaf (no children).
+If yes, add its value to the sum.
+Recursively process both left and right subtrees.
+
+Here's the code;
+
+class Solution {
+    public int sumOfLeftLeaves(TreeNode root) {
+        if (root == null) return 0;
+        
+        int sum = 0;
+        // Check if left child is a leaf
+        if (root.left != null && root.left.left == null && root.left.right == null) {
+            sum += root.left.val;
+        } else {
+            sum += sumOfLeftLeaves(root.left); // Recurse on left subtree
+        }
+        sum += sumOfLeftLeaves(root.right); // Recurse on right subtree
+        return sum;
+    }
+}
+
+Complexity
+Time: O(n) → Visits every node once.
+Space: O(h) → Recursion stack height equals tree height (worst case: O(n) for skewed trees).
