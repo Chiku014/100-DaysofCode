@@ -1,0 +1,39 @@
+Day 10/100: Lexicographically Largest String From the Box 
+
+Problem Statement #3403;
+
+Problem Description
+Given a string word and integer numFriends, split word into numFriends non-empty substrings in all possible ways. From all resulting substrings, return the lexicographically largest one.
+
+Solution Approach
+The solution recognizes that:
+
+When numFriends = 1, the only possible split is the word itself
+For numFriends > 1, the lexicographically largest substring will be the largest possible substring of length up to n - numFriends + 1 (where n is the word length)
+We can find this by checking all possible substrings of appropriate length
+
+Here's the code;
+
+class Solution {
+    public String answerString(String word, int numFriends) {
+        int n = word.length();
+        if (numFriends == 1) {
+            return word;
+        }
+        
+        String maxLexicographicallyString = "";
+        for (int i = 0; i < n; i++) {
+            int maxLengthForCurrentSubstring = n - numFriends + 1;
+            int currentSubstringLength = Math.min(n - i, maxLengthForCurrentSubstring);
+            String currentSubstring = word.substring(i, i + currentSubstringLength);
+            if (maxLexicographicallyString.isEmpty() || 
+                currentSubstring.compareTo(maxLexicographicallyString) > 0) {
+                maxLexicographicallyString = currentSubstring;
+            }
+        }
+        return maxLexicographicallyString;
+    }
+}
+
+Time Complexity: O(n) 
+Space Complexity: O(1)
