@@ -1,0 +1,64 @@
+Day 11/100: Lexicographically Smallest Equivalent String
+
+Problem Statement #1061;
+
+Problem Description:
+Establish equivalence relationships between characters based on paired positions in s1 and s2
+Group these characters following reflexivity, symmetry, and transitivity rules
+For each character in baseStr, replace it with the lexicographically smallest character in its equivalence group
+
+Solution Approach:
+Union-Find Data Structure: Efficiently manages the equivalence classes
+Path Compression: Keeps the tree flat for faster future lookups
+Union by Minimum: Always keeps track of the smallest character in each group
+
+Here's the code;
+
+import java.util.Arrays;
+
+class Solution {
+    private int[] parent;
+    private char[] smallestChar;
+    public String smallestEquivalentString(String s1, String s2, String baseStr) {
+        parent = new int[26];
+        smallestChar = new char[26];
+        for (int i = 0; i < 26; i++) {
+            parent[i] = i;
+            smallestChar[i] = (char) ('a' + i);
+        }
+        for (int i = 0; i < s1.length(); i++) {
+            union(s1.charAt(i), s2.charAt(i));
+        }
+        StringBuilder result = new StringBuilder();
+        for (char c : baseStr.toCharArray()) {
+            result.append(smallestChar[find(c - 'a')]);
+        }
+
+        return result.toString();
+    }
+    private int find(int i) {
+        if (parent[i] == i) {
+            return i;
+        }
+        parent[i] = find(parent[i]);
+        return parent[i];
+    }
+    private void union(char char1, char char2) {
+        int root1 = find(char1 - 'a');
+        int root2 = find(char2 - 'a');
+
+        if (root1 != root2) {
+            if (smallestChar[root1] < smallestChar[root2]) {
+                parent[root2] = root1;  
+            } else {
+                parent[root1] = root2; 
+            }
+            int newRoot = find(root1); 
+            smallestChar[newRoot] = (char) Math.min(smallestChar[root1], smallestChar[root2]);
+        }
+    }
+}
+
+Time and Space Complexity
+Time: O(N α(N)) where N is string length (α is inverse Ackermann function)
+Space: O(1) 
