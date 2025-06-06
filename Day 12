@@ -1,0 +1,43 @@
+Day 12/100: Using a robot to print the lexicographically smallest string.
+
+Problem Statement:
+You are given a string s and a robot that currently holds an empty string t. You can perform one of the following operations until both s and t are empty:
+Remove the first character of string s and give it to the robot. The robot will append this character to the string t.
+Remove the last character of string t and give it to the robot. The robot will write this character on paper.
+
+Here's the code;
+
+import java.util.Stack;
+
+class Solution {
+    public String robotWithString(String s) {
+        int n = s.length();
+        char[] suffixMin = new char[n];
+        suffixMin[n - 1] = s.charAt(n - 1); 
+        for (int i = n - 2; i >= 0; i--) {
+            suffixMin[i] = (char) Math.min(s.charAt(i), suffixMin[i + 1]);
+        }
+        
+        StringBuilder p = new StringBuilder(); 
+        Stack<Character> t = new Stack<>();     
+        
+        for (int i = 0; i < n; i++) {
+            char currentCharFromS = s.charAt(i);
+            char smallestCharComingFromS = suffixMin[i];
+            while (!t.isEmpty() && t.peek() <= smallestCharComingFromS) {
+                p.append(t.pop());
+            }
+            t.push(currentCharFromS); 
+        }
+        
+        while (!t.isEmpty()) {
+            p.append(t.pop());
+        }
+        
+        return p.toString();
+    }
+}
+
+Complexity:
+Time Complexity: O(n)
+Space Complexity: O(n)
