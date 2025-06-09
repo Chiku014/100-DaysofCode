@@ -1,0 +1,45 @@
+Day 15/100: K-th Smallest in Lexicographical Order.
+
+Problem Stement #440
+
+Solution Approach:
+
+The problem can be efficiently solved by using a "depth-first search" (DFS) like approach, but without explicit recursion. We can visualize the numbers as nodes in a tree:
+`1` is the root.
+Its children are `10, 11, ..., 19`.
+The children of `2` are `20, 21, ..., 29`, and so on.
+
+Here's the code;
+
+class Solution {
+    public int findKthNumber(int n, int k) {
+        int current = 1;
+        k--;
+        while (k > 0) {
+            long steps = calculateSteps(n, current, current + 1);
+
+            if (k >= steps) {
+                k -= steps;
+                current++;
+            } else {
+                k--; 
+                current *= 10;
+            }
+        }
+        return current;
+    }
+    private long calculateSteps(int n, long first, long last) {
+        long count = 0;
+        while (first <= n) {
+            count += Math.min(n + 1, last) - first;
+            first *= 10;
+            last *= 10;
+        }
+        return count;
+    }
+}
+
+Complexity:
+
+Time complexity: O((log 10n)^2)
+Space Complexity: O(1)
