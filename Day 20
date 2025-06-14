@@ -1,0 +1,46 @@
+Day 20/100: Maximum Difference by Remapping a Digit
+
+Problem Statement #2566
+
+Problem Description:
+You are given an integer num. 
+Bob will remap one of the 10 possible digits (0 to 9) to another digit. 
+The task is to return the difference between the maximum and minimum values Bob can make by remapping exactly one digit in num.
+
+Solution Approach:
+Convert the Number to a String: This allows easy manipulation of individual digits.
+Generate All Possible Remappings: For each digit in the original number, replace it with every possible digit (0-9) and generate the new number.
+Check for Validity: Skip numbers with leading zeros unless the number itself is zero.
+Track Maximum and Minimum Values: For each valid remapped number, keep track of the highest and lowest values.
+Compute the Difference: Subtract the minimum value from the maximum value to get the result.
+
+Here's the code;
+
+class Solution {
+    public int minMaxDifference(int num) {
+        String s = Integer.toString(num);
+        int max = Integer.MIN_VALUE;
+        int min = Integer.MAX_VALUE;
+
+        for (int d1 = 0; d1 <= 9; d1++) {
+            for (int d2 = 0; d2 <= 9; d2++) {
+                String remapped = s.replace((char)('0' + d1), (char)('0' + d2));
+                if (remapped.length() > 1 && remapped.charAt(0) == '0') {
+                    continue;
+                }
+                int current = Integer.parseInt(remapped);
+                if (current > max) {
+                    max = current;
+                }
+                if (current < min) {
+                    min = current;
+                }
+            }
+        }
+        return max - min;
+    }
+}
+
+Complexity:
+Time Complexity: O(10 * 10 * N)
+Space Complexity:  O(N)
