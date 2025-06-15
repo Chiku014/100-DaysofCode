@@ -1,0 +1,87 @@
+Day 21/100: Max Difference You Can Get From Changing am Integer
+
+Problem Statement #1432
+
+Given an integer num, you can perform the following operation twice:
+Choose a digit x (0 ≤ x ≤ 9).
+Choose another digit y (0 ≤ y ≤ 9).
+Replace all occurrences of x in num with y.
+The results (let’s call them a and b) must not have leading zeros or be zero.
+Return the maximum possible difference between a and b.
+
+Solution Approach:
+
+Maximize a: 
+Replace the leftmost non-9 digit with 9.
+Minimize b:
+If the first digit is not 1, replace it with 1.
+If the first digit is 1, replace the leftmost digit > 1 with 0.
+
+Here's the code;
+
+class Solution {
+    public int maxDiff(int num) {
+        int a = getMax(num);
+        int b = getMin(num);
+        return a - b;
+    }
+    
+    private int getMax(int num) {
+        String s = String.valueOf(num);
+        char[] chars = s.toCharArray();
+        char x = ' ';
+        for (char c : chars) {
+            if (c != '9') {
+                x = c;
+                break;
+            }
+        }
+        if (x == ' ') {
+            return num;
+        }
+        for (int i = 0; i < chars.length; i++) {
+            if (chars[i] == x) {
+                chars[i] = '9';
+            }
+        }
+        return Integer.parseInt(new String(chars));
+    }
+    
+    private int getMin(int num) {
+        String s = String.valueOf(num);
+        char[] chars = s.toCharArray();
+        char x = ' ';
+        char y = ' ';
+        if (chars[0] != '1') {
+            x = chars[0];
+            y = '1';
+        } else {
+            for (char c : chars) {
+                if (c != '0' && c != '1') {
+                    x = c;
+                    y = '0';
+                    break;
+                }
+            }
+            if (x == ' ') {
+                return num;
+            }
+        }
+        for (int i = 0; i < chars.length; i++) {
+            if (chars[i] == x) {
+                chars[i] = y;
+            }
+        }
+        return Integer.parseInt(new String(chars));
+    }
+}
+
+Complexity:
+
+Time Complexity
+getMax(num): O(n)
+getMin(num): O(n)
+
+Overall: O(n) 
+
+Space Complexity: O(n)
