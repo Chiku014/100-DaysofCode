@@ -1,0 +1,50 @@
+Day 22/100: Maximum Difference between Incresing Elements
+
+Problem Statement #2016
+
+Problem Statement :
+Given a 0-indexed array nums, we need to find the maximum difference nums[j] - nums[i] where:
+1. 0 ≤ i < j < n (index i comes before j).
+2. nums[i] < nums[j] (the element at i is smaller than the one at j).
+3. If no such pair exists (e.g., the array is strictly decreasing), return -1.
+
+Key Points:
+1. We must ensure i < j (order matters).
+2. The difference must be positive (nums[j] > nums[i]).
+3. We are not restricted to consecutive elements—any valid pair (i, j) is allowed.
+
+Solution Approach: 
+Initialize:
+maxDiff = -1 (default if no valid pair exists).
+minSoFar = nums[0] (smallest element seen so far).
+
+Traverse the array (from index 1 to n-1):
+
+1. If nums[j] > minSoFar:
+Calculate the difference nums[j] - minSoFar.
+Update maxDiff if this difference is larger.
+
+2. Else (nums[j] ≤ minSoFar):
+Update minSoFar to nums[j] (since a smaller nums[i] could lead to a larger future difference).
+
+Here's the code:
+
+class Solution {
+    public int maximumDifference(int[] nums) {
+        int maxDiff = -1;
+        int minSoFar = nums[0];
+
+        for (int j = 1; j < nums.length; j++) {
+            if (nums[j] > minSoFar) {
+                maxDiff = Math.max(maxDiff, nums[j] - minSoFar);
+            } else {
+                minSoFar = Math.min(minSoFar, nums[j]);
+            }
+        }
+        return maxDiff;
+    }
+}
+
+Complexity:
+Time Complexity: O(n)
+Space Complexity: O(1)
