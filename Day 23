@@ -1,0 +1,66 @@
+Day 23/100: Count the Number of Arrays with K Matching Adjacent Elements
+
+Problem Statement #3405
+
+Problem Explanation:
+1. You are given three integers n, m, and k. A good array is defined as an array arr of size n where:
+2. Each element in arr is within the inclusive range [1, m].
+3. Exactly k indices i (where 1 <= i < n) satisfy the condition arr[i - 1] == arr[i].
+4. The task is to count the number of such good arrays. Since the answer can be very large, return it modulo 10^9 + 7.
+
+Solution Approach:
+Segments View: The array has n-k segments of equal elements
+First Segment: m choices
+Subsequent Segments: m-1 choices each (must differ from previous)
+Combinations: Use C(n-1, k) to place segment boundaries
+
+Special Cases:
+k=0: m * (m-1)^(n-1)
+m < n-k: Impossible → 0
+
+Here's the code:
+
+class Solution {
+  public int countGoodArrays(int n, int m, int k) {
+    final long[][] factAndInvFact = getFactAndInvFact(n);
+    final long[] fact = factAndInvFact[0];
+    final long[] invFact = factAndInvFact[1];
+    return (int) (m * modPow(m - 1, n - k - 1) % MOD * nCk(n - 1, k, fact, invFact) % MOD);
+  }
+
+  private static final int MOD = 1_000_000_007;
+
+  private long modPow(long x, long n) {
+    if (n == 0)
+      return 1;
+    if (n % 2 == 1)
+      return x * modPow(x, n - 1) % MOD;
+    return modPow(x * x % MOD, n / 2);
+  }
+
+  private long[][] getFactAndInvFact(int n) {
+    long[] fact = new long[n + 1];
+    long[] invFact = new long[n + 1];
+    long[] inv = new long[n + 1];
+    fact[0] = invFact[0] = 1;
+    inv[0] = inv[1] = 1;
+    for (int i = 1; i <= n; ++i) {
+      if (i >= 2)
+        inv[i] = MOD - MOD / i * inv[MOD % i] % MOD;
+      fact[i] = fact[i - 1] * i % MOD;
+      invFact[i] = invFact[i - 1] * inv[i] % MOD;
+    }
+    return new long[][] {fact, invFact};
+  }
+
+  private int nCk(int n, int k, long[] fact, long[] invFact) {
+    return (int) (fact[n] * invFact[k] % MOD * invFact[n - k] % MOD);
+  }
+}
+
+Complexity:
+
+Complexity
+Time: O(MAX_N) precompute
+Space: O(MAX_N)
+
