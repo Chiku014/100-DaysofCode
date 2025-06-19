@@ -1,0 +1,49 @@
+Day 25/100: Partion Array such that Maximum Distance is K
+
+Problem Statement #2294
+
+Problem Explanation:
+
+We are given an array of integers nums and an integer k. The task is to partition nums into one or more subsequences such that:
+1. Every element in nums appears in exactly one subsequence.
+2. For each subsequence, the difference between its maximum and minimum elements is at most k.
+3. The number of such subsequences should be minimized.
+4. A subsequence is defined as a sequence that can be derived from another sequence by deleting zero or more elements without changing the order of the remaining elements. 
+5. Importantly, the elements in a subsequence do not need to be contiguous in the original array.
+
+Solution Approach:
+
+To solve this problem efficiently, we can follow these steps:
+Sort the Array: 
+1. Sorting helps in easily managing the range of elements in each subsequence. 
+2. Once sorted, each subsequence will consist of consecutive elements where the difference between the first and last element in the subsequence is at most k.
+
+Greedy Partitioning: 
+1. Iterate through the sorted array and group elements into subsequences where the difference between the current element and the first element of the current subsequence is ≤ k. 
+2. If the difference exceeds k, start a new subsequence with the current element as its first element.
+
+Here's the code;
+
+import java.util.Arrays;
+class Solution {
+    public int partitionArray(int[] nums, int k) {
+        if (nums.length == 0) {
+            return 0;
+        }
+        Arrays.sort(nums);
+        int count = 1;
+        int start = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] - start > k) {
+                count++;
+                start = nums[i];
+            }
+        }
+        return count;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(nlogn) 
+Space Complexity: O(1) or O(n)
