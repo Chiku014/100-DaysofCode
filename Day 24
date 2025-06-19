@@ -1,6 +1,6 @@
 Day 24/100: Divide Array into Arrays with Max Difference
 
-Problem Statement:
+Problem Statement #2966
 1. Given an integer array nums of size n where n is a multiple of 3 and a positive integer k. 
 2. We need to divide the array into n/3 groups of size 3 such that the difference between any two elements in any group is less than or equal to k. 
 3. If it's impossible to satisfy this condition, return an empty array. If there are multiple valid solutions, return any one of them.
