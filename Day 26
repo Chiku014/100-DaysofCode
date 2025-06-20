@@ -1,0 +1,44 @@
+Day 26/100: Maximum Manhattan Distance After K Changes
+
+Problem Statement #3443
+
+Problem Explanation:
+Given a string s consisting of characters 'N', 'S', 'E', 'W' representing movements on an infinite grid.
+And an integer k, we need to find the maximum Manhattan distance from the origin (0, 0) that can be achieved by changing at most k characters in the string.
+
+Solution Approach:
+The solution involves considering four optimal directions where we can maximize the distance by flipping some moves:
+
+Northeast (NE) - Maximize both x and y coordinates
+Northwest (NW) - Maximize y and minimize x (but absolute x increases)
+Southeast (SE) - Maximize x and minimize y (but absolute y increases)
+Southwest (SW) - Minimize both x and y (but absolute values increase)
+
+Here's the code:
+
+class Solution {
+  public int maxDistance(String s, int k) {
+    return Math.max(Math.max(flip(s, k, "NE"), flip(s, k, "NW")),
+                    Math.max(flip(s, k, "SE"), flip(s, k, "SW")));
+  }
+  private int flip(String s, int k, String direction) {
+    int res = 0;
+    int pos = 0;
+    int opposite = 0;
+
+    for (final char c : s.toCharArray()) {
+      if (direction.indexOf(c) >= 0) {
+        ++pos;
+      } else {
+        --pos;
+        ++opposite;
+      }
+      res = Math.max(res, pos + 2 * Math.min(k, opposite));
+    }
+    return res;
+  }
+}
+
+Complexity:
+Time Complexity: O(n)
+Space Complexity: O(1)
