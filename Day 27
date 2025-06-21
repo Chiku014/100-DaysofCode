@@ -1,0 +1,74 @@
+Day 27/100: Minimum Deletions to Make String K-Special
+
+Problem Statement #3085
+
+Problem Statement Explanation:
+
+1. You are given a string word consisting of lowercase English letters and an integer k.
+2. A string is called k-special if the frequency of each character in the string is at most k.
+3. Your task is to determine the minimum number of deletions needed to make word a k-special string.
+
+Solution Approach:
+
+Step 1:
+Count the frequency of each character in the string using an array of size 26 (for lowercase English letters).
+
+Step 2:
+Store all non-zero frequencies in a list and sort it in ascending order.
+
+Step 3:
+Try each unique frequency as the base frequency:
+Delete characters with frequency less than this base frequency (accumulated in prefix sum).
+For characters with frequency greater than the base + k, delete the extra occurrences to bring them down to base + k.
+
+Step 4:
+Also consider the scenario where we simply reduce all frequencies greater than k directly.
+
+Step 5:
+Return the minimum deletions computed from all scenarios.
+
+Here's the code:
+
+class Solution {
+    public int minimumDeletions(String word, int k) {
+        int[] freq = new int[26];
+        for (char c : word.toCharArray()) {
+            freq[c - 'a']++;
+        }
+        List<Integer> frequencies = new ArrayList<>();
+        for (int f : freq) {
+            if (f > 0) {
+                frequencies.add(f);
+            }
+        }
+        Collections.sort(frequencies);
+        int n = frequencies.size();
+        int minDeletions = Integer.MAX_VALUE;
+        int prefixSum = 0;
+        for (int i = 0; i < n; i++) {
+            int currFreq = frequencies.get(i);
+            int deletions = prefixSum;
+            for (int j = i; j < n; j++) {
+                if (frequencies.get(j) > currFreq 
+                + k) {
+                    deletions += frequencies.get(j) - (currFreq + k);
+                }
+            }
+            minDeletions = Math.min(minDeletions, deletions);
+            prefixSum += currFreq;
+        }
+        int allKDeletions = 0;
+        for (int f : frequencies) {
+            if (f > k) {
+                allKDeletions += f - k;
+            }
+        }
+        minDeletions = Math.min(minDeletions, allKDeletions);
+        return minDeletions;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(1)
+Space Complexity: O(1)
