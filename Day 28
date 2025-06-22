@@ -1,0 +1,48 @@
+Day 28/100: Divide a String Into Groups of Size k
+
+Problem Statement #2138
+
+Problem Statement Explanation: 
+
+Given a string s, an integer k, and a character fill, divide the string into groups of size k. 
+If the last group is smaller than k, fill it with fill until it reaches size k.
+
+Solution Approach:
+
+Iterate over the string in steps of size k.
+Extract substrings of length k.
+If the last group is smaller, append the fill character until its length is k.
+Store the groups and return them as a String[].
+
+Here's the code:
+
+import java.util.*;
+
+public class Solution {
+    public String[] divideString(String s, int k, char fill) {
+        List<String> result = new ArrayList<>();
+        int i = 0;
+
+        while (i < s.length()) {
+            int end = Math.min(i + k, s.length());
+            String group = s.substring(i, end);
+
+            if (group.length() < k) {
+                StringBuilder sb = new StringBuilder(group);
+                while (sb.length() < k) {
+                    sb.append(fill);
+                }
+                group = sb.toString();
+            }
+
+            result.add(group);
+            i += k;
+        }
+
+        return result.toArray(new String[0]);
+    }
+}
+
+Complexity:
+Time Complexity: O(n)
+Space Complexity: O(n)
