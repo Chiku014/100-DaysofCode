@@ -1,0 +1,66 @@
+Day 29/100: Sum of k-Mirror Numbers
+
+Problem Statement #2081
+
+Problem Statement
+A k-mirror number is a positive integer without leading zeros that reads the same both forward and backward in base-10 as well as in base-k.
+Given a base k and a number n, return the sum of the n smallest k-mirror numbers.
+
+Solution Approach
+1. Generate palindromic numbers in base-10 in ascending order
+2. Convert each to base-k
+3. Check if base-k representation is also a palindrome
+4. Accumulate the sum until n such numbers are found.
+
+Here's the code:
+
+class Solution {
+    public long kMirror(int k, int n) {
+        long sum = 0;
+        int count = 0;
+
+        for (int length = 1; count < n; length++) {
+            for (long half = (long)Math.pow(10, (length - 1) / 2);
+                 count < n && half < (long)Math.pow(10, (length + 1) / 2);
+                 half++) {
+                long palindrome = createPalindrome(half, length % 2 == 1);
+                if (isKPalindrome(palindrome, k)) {
+                    sum += palindrome;
+                    count++;
+                }
+            }
+        }
+        return sum;
+    }
+
+    private long createPalindrome(long half, boolean isOdd) {
+        long res = half;
+        if (isOdd) half /= 10;
+        while (half > 0) {
+            res = res * 10 + half % 10;
+            half /= 10;
+        }
+        return res;
+    }
+
+    private boolean isKPalindrome(long num, int k) {
+        List<Integer> digits = new ArrayList<>();
+        while (num > 0) {
+            digits.add((int)(num % k));
+            num /= k;
+        }
+        int l = 0, r = digits.size() - 1;
+        while (l < r) {
+            if (!digits.get(l).equals(digits.get(r))) return false;
+            l++;
+            r--;
+        }
+        return true;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(log(num))
+Space Complexity: O(1)
+
