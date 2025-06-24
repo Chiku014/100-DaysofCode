@@ -1,0 +1,71 @@
+Day 30/100: Find All K-Distant Indices in an Array
+
+Problem Statement #2200 
+
+Problem Statement
+You are given a 0-indexed integer array nums and two integers key and k.
+An index i is called a k-distant index if there exists at least one index j such that:
+
+|i - j| <= k  and  nums[j] == key
+
+Return a list of all k-distant indices sorted in increasing order.
+
+Solution Approach
+Step 1: Identify key indices
+We first loop through the array nums and collect all indices j where nums[j] == key. These are the positions that can influence which indices are considered k-distant.
+
+Step 2: Check each index
+For each index i in nums, we check if there exists any collected key index j such that:
+
+|i - j| <= k
+
+If such a j is found, we add i to the result list and move on (no need to check further for this i).
+
+Step 3: Return the result
+Since we process i from 0 to nums.length - 1, the result list is already in sorted (increasing) order as required.
+
+Here's the code;
+
+import java.util.*;
+class Solution {
+    public List<Integer> findKDistantIndices(int[] nums, int key, int k) {
+        List<Integer> result = new ArrayList<>();
+        int n = nums.length;
+
+        List<Integer> keyIndices = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            if (nums[i] == key) {
+                keyIndices.add(i);
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            for (int j : keyIndices) {
+                if (Math.abs(i - j) <= k) {
+                    result.add(i);
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+    public static void main(String args []) {
+        Solution sol = new Solution();
+
+        int[] nums1 = {3, 4, 9, 1, 3, 9, 5};
+        int key1 = 9, k1 = 1;
+        System.out.println(sol.findKDistantIndices(nums1, key1, k1));
+
+        int[] nums2 = {2, 2, 2, 2, 2};
+        int key2 = 2, k2 = 2;
+        System.out.println(sol.findKDistantIndices(nums2, key2, k2));
+    }
+}
+
+Complexity:
+Time Complexity: O(n * m)
+where n = nums.length and m = number of indices where nums[j] == key.
+
+Space Complexity: O(n + m)
+O(m) for storing key indices, O(n) for storing the result
+
+
