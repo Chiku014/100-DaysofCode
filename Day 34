@@ -1,0 +1,42 @@
+Day 34/100: Find Subsequence of Length K with the Largest Sum
+
+Problem Statement #3099
+
+Probelm Explanation:
+
+Given an integer array `nums` and an integer `k`. 
+Find a subsequence of `nums` of length `k` that has the largest sum. 
+A subsequence is derived by deleting some or no elements without changing the order of the remaining elements.
+
+
+Solution Approach:
+Given an integer array nums and an integer k, we need to find a subsequence of length k that has the largest possible sum while maintaining the original order of elements in nums.
+
+Key Insights:
+Subsequence Constraint: A subsequence must preserve the original order of elements, meaning we cannot rearrange the elements.
+Maximize Sum: To maximize the sum, we should include the largest possible elements in the subsequence.
+Order Preservation: Even though we want the largest elements, their original order must be maintained.
+
+Here's the code:
+
+import java.util.*;
+class Solution {
+    public int[] maxSubsequence(int[] nums, int k) {
+        List<int[]> elements = new ArrayList<>();
+        for (int i = 0; i < nums.length; i++) {
+            elements.add(new int[]{nums[i], i});
+        }
+        Collections.sort(elements, (a, b) -> Integer.compare(b[0], a[0]));
+        List<int[]> topK = elements.subList(0, k);
+        Collections.sort(topK, (a, b) -> Integer.compare(a[1], b[1]));
+        int[] result = new int[k];
+        for (int i = 0; i < k; i++) {
+            result[i] = topK.get(i)[0];
+        }   
+        return result;
+    }
+}
+
+Complexity:
+Time	Complexity: O(n log n)
+Space Complexity: O(n)
