@@ -1,0 +1,50 @@
+Day 35/100: Number of Subsequences That Satisfy the Given Sum Condition
+
+Problem Starement #1498
+
+Problem Statement Explanation:
+
+Given an array of integers nums and an integer target.
+Return the number of non-empty subsequences where the sum of the minimum and maximum element in the subsequence is less than or equal to target. 
+Since the answer can be very large, return it modulo 10^9 + 7.
+
+Solution Approach:
+
+A subsequence's min and max are determined by its smallest and largest elements.
+If we sort the array, we can efficiently find valid subsequences using two pointers.
+
+Here's the code:
+
+import java.util.Arrays;
+
+class Solution {
+    public int numSubseq(int[] nums, int target) {
+        Arrays.sort(nums);
+        int n = nums.length;
+        int mod = (int) 1e9 + 7;
+        int[] power = new int[n];
+        power[0] = 1;
+        for (int i = 1; i < n; i++) {
+            power[i] = (power[i - 1] * 2) % mod;
+        }
+
+        int left = 0, right = n - 1;
+        int result = 0;
+
+        while (left <= right) {
+            if (nums[left] + nums[right] <= target) {
+                result = (result + power[right - left]) % mod;
+                left++;
+            } else {
+                right--;
+            }
+        }
+
+        return result;
+    }
+}
+
+Complecity:
+
+Time Complexity: O(n log n)
+Space Complexity: O(n)
