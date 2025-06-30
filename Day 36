@@ -1,0 +1,49 @@
+Day 36/100: Longest Harmonious Subsequence
+
+Problem Statement #594
+
+Problem Statement Explanation:
+
+This repository contains a Java solution for finding the length of the longest harmonious subsequence in an array. 
+A harmonious array is defined as an array where the difference between its maximum value and its minimum value is exactly 1.
+Given an integer array nums, return the length of its longest harmonious subsequence among all its possible subsequences.
+
+Solution Approach:
+
+Frequency Map Creation: We first create a frequency map (using a HashMap) to count how many times each number appears in the array.
+Checking Harmonious Pairs: For each unique number in the map, we check if the number + 1 also exists in the map. If it does, the sum of their frequencies gives the length of a harmonious subsequence.
+Tracking Maximum Length: We keep track of the maximum length encountered during the iteration over the map keys.
+Edge Handling: If no such pair (where the difference is exactly 1) is found, the function returns 0.
+
+Here's the code;
+
+import java.util.HashMap;
+
+class Solution {
+    public int findLHS(int[] nums) {
+        HashMap<Integer, Integer> frequencyMap = new HashMap<>();
+
+        for (int num : nums) {
+            frequencyMap.put(num, frequencyMap.getOrDefault(num, 0) + 1);
+        }
+
+        int maxLength = 0;
+
+        for (int num : frequencyMap.keySet()) {
+            if (frequencyMap.containsKey(num + 1)) {
+                int currentLength = frequencyMap.get(num) + frequencyMap.get(num + 1);
+                if (currentLength > maxLength) {
+                    maxLength = currentLength;
+                }
+            }
+        }
+
+        return maxLength;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
