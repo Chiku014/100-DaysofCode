@@ -1,0 +1,68 @@
+Day 38/100: Find the Original Typed String II
+
+Problem Statement #3333
+
+Problem Statement Explanation;
+
+1. Alice is attempting to type a specific string on her computer.
+2. However, she tends to be clumsy and may press a key for too long, resulting in a character being typed multiple times.
+3. Given the final output string and a positive integer `k`, the task is to find the total number of possible original strings that Alice might have intended to type, where the original string has a length of at least `k`.
+
+Solution Approach;
+
+1. Group Consecutive Characters: Split the input string into groups of consecutive identical characters.
+2. Precompute Combinations: Use dynamic programming to precompute combinations modulo \(10^9 + 7\).
+3. Dynamic Programming: Count the number of ways to form the original string by considering all possible splits of each group.
+
+
+Here's the code;
+
+class Solution {
+  public int possibleStringCount(String word, int k) {
+    List<Integer> groups = getConsecutiveLetters(word);
+    final int totalCombinations =
+        (int) groups.stream().mapToLong(Integer::longValue).reduce(1L, (a, b) -> a * b % MOD);
+    if (k <= groups.size())
+      return totalCombinations;
+
+    int[] dp = new int[k];
+    dp[0] = 1;
+
+    for (int i = 0; i < groups.size(); ++i) {
+      int[] newDp = new int[k];
+      int windowSum = 0;
+      int group = groups.get(i);
+      for (int j = i; j < k; ++j) {
+        newDp[j] = (newDp[j] + windowSum) % MOD;
+        windowSum = (windowSum + dp[j]) % MOD;
+        if (j >= group)
+          windowSum = (windowSum - dp[j - group] + MOD) % MOD;
+      }
+      dp = newDp;
+    }
+
+    final int invalidCombinations = Arrays.stream(dp).reduce(0, (a, b) -> (a + b) % MOD);
+    return (totalCombinations - invalidCombinations + MOD) % MOD;
+  }
+
+  private static final int MOD = 1_000_000_007;
+
+  private List<Integer> getConsecutiveLetters(final String word) {
+    List<Integer> groups = new ArrayList<>();
+    int group = 1;
+    for (int i = 1; i < word.length(); ++i)
+      if (word.charAt(i) == word.charAt(i - 1)) {
+        ++group;
+      } else {
+        groups.add(group);
+        group = 1;
+      }
+    groups.add(group);
+    return groups;
+  }
+}
+
+Complexity;
+
+Time Complexity: O(n*maxWordLength* l)
+Space Complexity: O(n * maxWordLength + maxL²)
