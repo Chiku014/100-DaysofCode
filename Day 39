@@ -1,0 +1,42 @@
+Day 39/100: Find the Kth Charater in String Game 1
+
+Problem Statement #3304
+
+Problem Statement Explanation:
+
+Alice and Bob are playing a game. 
+Initially, Alice has a string `word = "a"`. Bob asks Alice to perform operations where she generates a new string by changing each character in `word` to its next character in the English alphabet (with 'z' wrapping around to 'a') and appends it to the original `word`. 
+The task is to return the k-th character in the resulting string after enough operations.
+
+Solution Approach:
+
+1. Start with the initial string "a".
+2. Repeatedly generate the next part of the string by incrementing each character and append it to the original string.
+3. Continue until the string's length is at least `k`.
+4. Return the k-th character (1-based index).
+
+Here's the code:
+
+class Solution {
+    public char kthCharacter(int k) {
+        StringBuilder word = new StringBuilder("a");
+        while (word.length() < k) {
+            StringBuilder nextPart = new StringBuilder();
+            for (int i = 0; i < word.length(); i++) {
+                char c = word.charAt(i);
+                if (c == 'z') {
+                    nextPart.append('a');
+                } else {
+                    nextPart.append((char)(c + 1));
+                }
+            }
+            word.append(nextPart);
+        }
+        return word.charAt(k - 1);
+    }
+}
+
+Complexity:
+
+Time Complexity: O(k)
+Space Complexity: O(k)
