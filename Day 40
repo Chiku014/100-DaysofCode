@@ -1,0 +1,41 @@
+Day 40/100: Find the Kth Character in String Game II
+
+Problem Statement #3307
+
+Problem Statement Explanation:
+
+Given an initial string "a", perform a series of operations and return the k-th character in the final string.
+
+1. `0` - Append a copy of the current string to itself
+2. `1` - Append the next character version of each character in the current string (with 'z' wrapping to 'a')
+
+Solution Approach:
+
+1. Track Length: Calculate how the string length grows with each operation without building the actual string.
+2. Work Backwards: Determine the origin of the k-th character by reversing the operations:
+   - For operation 0: The second half is a copy of the first half
+   - For operation 1: The second half is a shifted version of the first half
+3. **Count Shifts**: Track how many times characters were shifted during operation 1.
+
+Here's the code:
+
+class Solution {
+    public char kthCharacter (long k, int[] operations) {
+        final int operationsCount = (int) Math.ceil(Math.log(k) / Math.log(2));
+        int increases = 0;
+
+        for (int i = operationsCount - 1; i >= 0; i--) {
+            final long halfSize = 1L << i;
+            if (k > halfSize) {
+                k -= halfSize;
+                increases += operations[i];
+            }
+        }
+        return (char) ('a' + increases % 26);
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(1)
