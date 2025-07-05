@@ -1,0 +1,51 @@
+Day 41/100: Largest Lucky Integer
+
+Problem Statement #1394
+
+Problem Statement Explanation:
+
+Given an array of integers arr, a lucky integer is an integer that has a frequency in the array equal to its value. 
+The solution returns the largest lucky integer in the array. 
+If there is no lucky integer, it returns -1.
+
+Solution Approach:
+
+1. Frequency Counting: We use a HashMap to count the occurrences of each number in the array.
+2. Check Lucky Numbers: For each number in the frequency map, we check if the number's value equals its frequency.
+3. Track Maximum: We keep track of the largest number that satisfies the lucky integer condition.
+4. Return Result: If no lucky number is found, we return -1; otherwise, we return the largest lucky number found.
+
+Here's the code:
+
+import java.util.HashMap;
+import java.util.Map;
+
+class Solution {
+    public int findLucky(int[] arr) {
+        Map<Integer, Integer> frequencyMap = new HashMap<>();
+
+        for (int num : arr) {
+            frequencyMap.put(num, frequencyMap.getOrDefault(num, 0) + 1);
+        }
+
+        int maxLucky = -1;
+
+        for (Map.Entry<Integer, Integer> entry : frequencyMap.entrySet()) {
+            int num = entry.getKey();
+            int freq = entry.getValue();
+
+            if (num == freq) {
+                if (num > maxLucky) {
+                    maxLucky = num;
+                }
+            }
+        }
+
+        return maxLucky;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(n)
