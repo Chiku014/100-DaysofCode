@@ -1,0 +1,81 @@
+Day 42/100: Finding Pairs with a Certain Sum
+
+Problem Statement #1865
+
+Problem Statement Explanantion:
+
+Implement a data structure that supports:
+1. Adding a positive integer to an element in nums2.
+2. Counting pairs (i, j) where nums1[i] + nums2[j] equals a given value.
+
+Solution Approach:
+
+Initialization: Create a frequency map of nums2 elements for O(1) lookups.
+
+Add Operation: 
+1. Update the frequency map when modifying nums2 elements.
+2. Remove entries if count reaches zero.
+
+Count Operation:
+1. For each element in nums1, calculate the complement (target - num).
+2. Sum the counts of these complements from the frequency map.
+
+Here's the code:
+
+import java.util.HashMap;
+import java.util.Map;
+
+class FindSumPairs {
+    private int[] nums1;
+    private int[] nums2;
+    private Map<Integer, Integer> freqMap;
+
+    public FindSumPairs(int[] nums1, int[] nums2) {
+        this.nums1 = nums1;
+        this.nums2 = nums2;
+        this.freqMap = new HashMap<>();
+        for (int num : nums2) {
+            freqMap.put(num, freqMap.getOrDefault(num, 0) + 1);
+        }
+    }
+
+    public void add(int index, int val) {
+        int oldVal = nums2[index];
+        freqMap.put(oldVal, freqMap.get(oldVal) - 1);
+        if (freqMap.get(oldVal) == 0) {
+            freqMap.remove(oldVal);
+        }
+        nums2[index] += val;
+        int newVal = nums2[index];
+        freqMap.put(newVal, freqMap.getOrDefault(newVal, 0) + 1);
+    }
+
+    public int count(int tot) {
+        int res = 0;
+        for (int num : nums1) {
+            int complement = tot - num;
+            res += freqMap.getOrDefault(complement, 0);
+        }
+        return res;
+    }
+}
+
+public class Solution {
+    public static void main(String[] args) {
+        int[] nums1 = {1, 1, 2, 2, 2, 3};
+        int[] nums2 = {1, 4, 5, 2, 5, 4};
+        FindSumPairs findSumPairs = new FindSumPairs(nums1, nums2);
+        System.out.println(findSumPairs.count(7));  // Output: 8
+        findSumPairs.add(3, 2);
+        System.out.println(findSumPairs.count(8));  // Output: 2
+        System.out.println(findSumPairs.count(4));  // Output: 1
+        findSumPairs.add(0, 1);
+        findSumPairs.add(1, 1);
+        System.out.println(findSumPairs.count(7));  // Output: 11
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(n)
