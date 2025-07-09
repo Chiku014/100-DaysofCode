@@ -1,0 +1,62 @@
+Day 45/100: Reschedule Meetings for Maximum Free Time I
+
+Probelm Statement #3439
+
+Problem Statement Explanation:
+
+You're given a list of non-overlapping meetings sorted by start time within an event that spans from time 0 to eventTime. 
+You may reschedule up to k meetings (keeping their durations and relative order) to maximize the longest continuous free time between the meetings.
+
+
+Solution Approach:
+
+Compute gaps between meetings:
+
+1. Before the first meeting
+2. Between meetings
+
+After the last meeting:
+
+Use a sliding window of size k+1 over the gaps array to find the maximum total free time obtainable by merging up to k+1 consecutive gaps.
+
+
+Here's the code:
+
+class Solution {
+    public int maxFreeTime(int eventTime, int k, int[] startTime, int[] endTime) {
+        int n = startTime.length;
+        List<Integer> gaps = new ArrayList<>();
+
+        // Gap before the first meeting
+        gaps.add(startTime[0]);
+
+        // Gaps between meetings
+        for (int i = 1; i < n; i++) {
+            gaps.add(startTime[i] - endTime[i - 1]);
+        }
+
+        // Gap after the last meeting
+        gaps.add(eventTime - endTime[n - 1]);
+
+        // Sliding window to find max sum of k+1 consecutive gaps
+        int windowSum = 0;
+        for (int i = 0; i <= k && i < gaps.size(); i++) {
+            windowSum += gaps.get(i);
+        }
+
+        int maxFreeTime = windowSum;
+
+        for (int i = k + 1; i < gaps.size(); i++) {
+            windowSum += gaps.get(i) - gaps.get(i - k - 1);
+            maxFreeTime = Math.max(maxFreeTime, windowSum);
+        }
+
+        return maxFreeTime;
+    }
+}
+
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(n)
