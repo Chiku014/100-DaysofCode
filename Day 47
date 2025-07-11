@@ -1,0 +1,76 @@
+Day 47/10: Meeting Rooms III
+
+Problem Statement #2402
+
+Problem Statemrnt Explanation:
+
+You are given an integer n, the number of meeting rooms (numbered from 0 to n - 1). 
+And a 2D array meetings where meetings[i] = [start, end] represents the start and end times of a meeting.
+Only one meeting can be held in one room at a time.
+
+If a room is free at the start of the meeting, it must be assigned immediately.
+If not, it waits until the earliest room becomes free.
+
+You must return the room that gets the most meetings. 
+If multiple rooms tie, return the smallest room number.
+
+Solution Approach:
+
+Sort meetings by start time.
+TreeSet to keep track of available rooms.
+Min-Heap to track the soonest available rooms by end time.
+If room is available, assign.
+If not, delay meeting until the first room is available.
+
+Here's the code:
+
+class Solution {
+    public int mostBooked(int n, int[][] meetings) {
+        Arrays.sort(meetings, (a, b) -> a[0] - b[0]);
+
+        int[] count = new int[n]; 
+
+        PriorityQueue<long[]> busy = new PriorityQueue<>((a, b) -> a[0] == b[0] 
+                                                            ? Long.compare(a[1], b[1]) 
+                                                            : Long.compare(a[0], b[0]));
+
+        TreeSet<Integer> available = new TreeSet<>();
+        for (int i = 0; i < n; i++) {
+            available.add(i);
+        }
+
+        for (int[] meeting : meetings) {
+            int start = meeting[0], end = meeting[1];
+
+            while (!busy.isEmpty() && busy.peek()[0] <= start) {
+                available.add((int) busy.poll()[1]);
+            }
+
+            if (!available.isEmpty()) {
+                int room = available.pollFirst();
+                count[room]++;
+                busy.add(new long[]{end, room});
+            } else {
+                long[] curr = busy.poll();
+                long newEnd = curr[0] + (end - start);
+                int room = (int) curr[1];
+                count[room]++;
+                busy.add(new long[]{newEnd, room});
+            }
+        }
+
+        int maxRoom = 0;
+        for (int i = 1; i < n; i++) {
+            if (count[i] > count[maxRoom]) {
+                maxRoom = i;
+            }
+        }
+
+        return maxRoom;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(m log m + m log n)
+Space Complexity: O(n + m)
