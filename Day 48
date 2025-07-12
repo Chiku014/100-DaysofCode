@@ -1,0 +1,57 @@
+Day 48/100: The Earliest and Latest Rounds Where Players Compete
+
+Problem Statement #1900
+
+Problem Statement Explanation: 
+
+There are n players labeled from 1 to n. They are paired up in a single-elimination tournament. 
+In each round:
+1. Players are paired in order: first with last, second with second-last, and so on.
+2. If n is odd, one player advances automatically without playing.
+3. Winners proceed to the next round.
+4. You're given two specific players: firstPlayer and secondPlayer.
+5. Find the earliest and latest rounds in which these two players can compete against each other.
+
+
+Solution Approach:
+
+In each round, players are matched from the ends inward (1 with n, 2 with n-1, etc.).
+We need to simulate all possible ways players can win and reach the next round.
+Use recursion to simulate all possible outcomes and track when firstPlayer and secondPlayer can meet.
+Use memoization (caching results) to avoid recomputation and speed up performance.
+
+Here's the code:
+
+class Solution {
+  public int[] earliestAndLatest(int n, int firstPlayer, int secondPlayer) {
+    int[][][][] mem = new int[n + 1][n + 1][n + 1][2];
+    return solve(firstPlayer, n - secondPlayer + 1, n, mem);
+  }
+  private int[] solve(int l, int r, int k, int[][][][] mem) {
+    if (l == r)
+      return new int[] {1, 1};
+    if (l > r)
+      return solve(r, l, k, mem);
+    if (!Arrays.equals(mem[l][r][k], new int[] {0, 0}))
+      return mem[l][r][k];
+
+    int a = Integer.MAX_VALUE;
+    int b = Integer.MIN_VALUE;
+    
+    for (int i = 1; i <= l; ++i)
+      for (int j = l - i + 1; j <= r - i; ++j) {
+        if (i + j > (k + 1) / 2 || i + j < l + r - k / 2)
+          continue;
+        int[] res = solve(i, j, (k + 1) / 2, mem);
+        a = Math.min(a, res[0] + 1);
+        b = Math.max(b, res[1] + 1);
+      }
+
+    return mem[l][r][k] = new int[] {a, b};
+  }
+}
+
+Complexity:
+
+Time Complexity: O(n^4)
+Space Complexity: O(n^2)
