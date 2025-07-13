@@ -1,0 +1,45 @@
+Day 49/100: Maximum Matching of Players With Trainers
+
+Problem Statement #2410
+
+Problem Statement Explanation:
+
+You are given two integer arrays `players` and `trainers`. 
+A player can be matched with a trainer if the player's ability is less than or equal to the trainer's capacity. 
+Return the maximum number of matchings that can be formed.
+
+Solution Approach:
+
+Sort both `players` and `trainers`.
+Use a two-pointer greedy approach.
+Match the smallest possible player with the smallest capable trainer.
+
+Here's the code:
+
+import java.util.Arrays;
+
+class Solution {
+    public int matchPlayersAndTrainers(int[] players, int[] trainers) {
+        Arrays.sort(players);
+        Arrays.sort(trainers);
+        
+        int i = 0, j = 0, matches = 0;
+
+        while (i < players.length && j < trainers.length) {
+            if (players[i] <= trainers[j]) {
+                matches++;
+                i++;
+                j++;
+            } else {
+                j++;
+            }
+        }
+        return matches;
+    }
+}
+
+
+Complexity:
+
+Time Complexity: O(n log n + m log m)
+Space Complexity: O(1)
