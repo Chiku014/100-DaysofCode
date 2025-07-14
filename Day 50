@@ -1,0 +1,50 @@
+Day 50/100: Convert Binary Number in a Linked List to Integer
+
+Problem Statemnet #1290
+
+Problem Statement Explanation:
+
+Given head which is a reference node to a singly-linked list. 
+Where the value of each node is either 0 or 1, return the decimal value of the binary number represented by the linked list.
+
+Solution Approach:
+
+Initialize a result variable to 0
+Traverse the linked list from head to tail
+
+For each node:
+Multiply the current result by 2 (equivalent to left-shifting in binary)
+Add the current node's value (0 or 1)
+Move to the next node
+
+Return the final decimal result
+
+Mathematical Foundation:
+Reading binary 101 from left to right:
+
+Start with 0
+Process '1': 0 × 2 + 1 = 1
+Process '0': 1 × 2 + 0 = 2
+Process '1': 2 × 2 + 1 = 5
+
+Here;s the code:
+
+class Solution {
+    public int getDecimalValue(ListNode head) {
+        int result = 0;
+        
+        // Traverse the linked list
+        while (head != null) {
+            // Left shift result by 1 (multiply by 2) and add current bit
+            result = result * 2 + head.val;
+            head = head.next;
+        }
+        
+        return result;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(1)
