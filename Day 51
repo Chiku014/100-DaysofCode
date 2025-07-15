@@ -1,0 +1,67 @@
+class Solution {
+    public boolean isValid(String word) {
+        // Check if word has at least 3 characters
+        if (word.length() < 3) {
+            return false;
+        }
+        
+        boolean hasVowel = false;
+        boolean hasConsonant = false;
+        
+        // Create a boolean array to mark vowels for quick lookup
+        boolean[] isVowel = new boolean[26];
+        for (char c : "aeiou".toCharArray()) {
+            isVowel[c - 'a'] = true;
+        }
+        
+        // Check each character in the word
+        for (char c : word.toCharArray()) {
+            if (Character.isLetter(c)) {
+                // Check if it's a vowel or consonant
+                if (isVowel[Character.toLowerCase(c) - 'a']) {
+                    hasVowel = true;
+                } else {
+                    hasConsonant = true;
+                }
+            } else if (!Character.isDigit(c)) {
+                // If it's not a letter and not a digit, it's invalid
+                return false;
+            }
+        }
+        
+        // Word is valid if it has both vowel and consonant
+        return hasVowel && hasConsonant;
+    }
+}
+
+// Alternative cleaner solution using Java 8 Streams
+class Solution2 {
+    public boolean isValid(String word) {
+        return word.length() >= 3 && 
+               word.chars().allMatch(Character::isLetterOrDigit) &&
+               word.chars().anyMatch(c -> isVowel((char) c)) &&
+               word.chars().anyMatch(c -> isConsonant((char) c));
+    }
+    
+    private boolean isVowel(char c) {
+        return "aeiouAEIOU".indexOf(c) != -1;
+    }
+    
+    private boolean isConsonant(char c) {
+        return Character.isLetter(c) && !isVowel(c);
+    }
+}
+
+// Test examples
+public class TestSolution {
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        
+        // Test cases
+        System.out.println(solution.isValid("234Adas")); // true
+        System.out.println(solution.isValid("b3"));      // false (< 3 chars, no vowel)
+        System.out.println(solution.isValid("a3$e"));    // false (contains '$', no consonant)
+        System.out.println(solution.isValid("UuE"));     // false (no consonant)
+        System.out.println(solution.isValid("abc"));     // true
+    }
+}
