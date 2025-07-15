@@ -1,34 +1,86 @@
+Day 51/100: Valid Word
+
+Probelem Statement #3136
+
+Probelm Statement Explanation: 
+
+Given a string word, determine if it is valid according to the following criteria:
+Minimum Length: Contains at least 3 characters
+Character Types: Contains only digits (0-9) and English letters (uppercase/lowercase)
+Vowel Requirement: Includes at least one vowel ('a', 'e', 'i', 'o', 'u' and their uppercase)
+Consonant Requirement: Includes at least one consonant (any English letter that is not a vowel)
+Return true if the word satisfies all conditions, false otherwise.
+
+Solution Approach:
+
+The most efficient approach is to validate all conditions in a single pass through the string:
+
+Early Exit: Check length first - if < 3, immediately return false
+Character Classification: For each character, determine if it's:
+
+Valid (letter or digit)
+Vowel (if it's a letter)
+Consonant (if it's a letter but not vowel)
+
+Track Requirements: Use boolean flags to track vowel and consonant presence
+Final Validation: Return true only if both vowel and consonant flags are set
+
+Here's the code:
+
 class Solution {
     public boolean isValid(String word) {
-        // Check if word has at least 3 characters
         if (word.length() < 3) {
             return false;
-        }
-        
+        } 
         boolean hasVowel = false;
         boolean hasConsonant = false;
         
-        // Create a boolean array to mark vowels for quick lookup
         boolean[] isVowel = new boolean[26];
         for (char c : "aeiou".toCharArray()) {
             isVowel[c - 'a'] = true;
         }
         
-        // Check each character in the word
         for (char c : word.toCharArray()) {
             if (Character.isLetter(c)) {
-                // Check if it's a vowel or consonant
+
                 if (isVowel[Character.toLowerCase(c) - 'a']) {
                     hasVowel = true;
                 } else {
                     hasConsonant = true;
                 }
             } else if (!Character.isDigit(c)) {
-                // If it's not a letter and not a digit, it's invalid
                 return false;
             }
         }
+        return hasVowel && hasConsonant;
+    }
+}
+class Solution2 {
+    public boolean isValid(String word) {
+        return word.length() >= 3 && 
+               word.chars().allMatch(Character::isLetterOrDigit) &&
+               word.chars().anyMatch(c -> isVowel((char) c)) &&
+               word.chars().anyMatch(c -> isConsonant((char) c));
+    }
+    private boolean isVowel(char c) {
+        return "aeiouAEIOU".indexOf(c) != -1;
+    }
+    private boolean isConsonant(char c) {
+        return Character.isLetter(c) && !isVowel(c);
+    }
+}
+public class TestSolution {
+    public static void main(String[] args) {
+        Solution solution = new Solution();
         
+        // Test cases
+        System.out.println(solution.isValid("234Adas")); 
+        System.out.println(solution.isValid("b3"));      
+        System.out.println(solution.isValid("a3$e"));    
+        System.out.println(solution.isValid("UuE"));  
+        System.out.println(solution.isValid("abc"));     
+    }
+}
         // Word is valid if it has both vowel and consonant
         return hasVowel && hasConsonant;
     }
@@ -65,3 +117,8 @@ public class TestSolution {
         System.out.println(solution.isValid("abc"));     // true
     }
 }
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(1)
