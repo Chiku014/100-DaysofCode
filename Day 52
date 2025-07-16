@@ -1,0 +1,45 @@
+Day 52/100: Find the Maximum Length of Valid Subsequence I
+
+Problem Statement #3201
+
+Problem Statement Explanation:
+
+You are given an integer array nums. 
+A subsequence sub of nums with length x is called valid if it satisfies: (sub[0] + sub[1]) % 2 == (sub[1] + sub[2]) % 2 == … == (sub[x – 2] + sub[x – 1]) % 2. 
+Return the length of the longest valid subsequence of nums. 
+
+Solution Approach:
+
+The main solution uses dynamic programming with a 2D array dp[i][j] where:
+
+i represents the parity (0 or 1) of the last element
+j represents the parity we want for the next element
+
+Here's the code:
+
+class Solution {
+    public int maximumLength(int[] nums) {
+        int[][] dp = new int[2][2];
+
+        for (int num : nums) {
+            int mod = num % 2;
+            for (int y = 0; y < 2; y++) {
+                dp[mod][y] = dp[y][mod] + 1;
+            }
+        }
+
+        int max = 0;
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                max = Math.max(max, dp[i][j]);
+            }
+        }
+
+        return max;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(1)
