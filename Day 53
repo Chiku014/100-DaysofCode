@@ -1,0 +1,73 @@
+Day 53/100: Find the Maximum Length of Valid Subsequence II
+
+Probelm Statement #3202
+
+Problem Statemnt Explanation:
+
+You are given an integer array nums and a positive integer k.
+A subsequence sub of nums with length x is called valid if it satisfies:
+(sub[0] + sub[1]) % k == (sub[1] + sub[2]) % k == ... == (sub[x - 2] + sub[x - 1]) % k
+
+Solution Approach:
+
+Approach 1: Pair-based DP
+
+For each element at index i, check all previous elements at index j
+Calculate (nums[i] + nums[j]) % k to get the modulo pattern
+Extend the subsequence: dp[i][val] = dp[j][val] + 1
+Track the maximum number of pairs found
+Return maxPairs + 1 (subsequence length = pairs + 1)
+
+Approach 2: State-based DP
+dp[i][j] represents the maximum length where:
+
+Last element mod k = i
+Next desired element mod k = j
+
+For each number, update all possible transitions
+Return the maximum value in the DP table
+
+Here's the code:
+
+class Solution {
+    public int maximumLength(int[] nums, int k) {
+        int[][] dp = new int[nums.length + 1][k + 1];  // Fixed: lengrh -> length
+        int longest = 0;
+
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = 0; j < i; j++) {
+
+                int val = (nums[i] + nums[j]) % k;
+
+                dp[i][val] = dp[j][val] + 1;
+
+                longest = Math.max(longest, dp[i][val]);
+            }
+        }
+        return longest + 1;
+    }
+}
+
+class Solution2 {
+    public int maximumLength(int[] nums, int k) {
+        int[][] dp = new int[k][k];
+        
+        for (int num : nums) {
+            int mod = num % k;
+            for (int j = 0; j < k; j++) {
+                dp[mod][j] = dp[j][mod] + 1;
+            }
+        }
+        int maxLen = 0;
+        for (int i = 0; i < k; i++) {
+            for (int j = 0; j < k; j++) {
+                maxLen = Math.max(maxLen, dp[i][j]);  
+            }
+        }
+        return maxLen;
+    }
+}
+
+Complexity:
+Time Complexity: O(n × k)
+Space Complexity: O(k²)
