@@ -1,0 +1,82 @@
+Day 54/100: Minimum Difference in Sums After Removal of Elements
+
+Problem Statement #2163
+
+Problem Statement Explanation:
+
+You are given an integer array nums of length 3 * n. You need to remove exactly n elements from nums. 
+The remaining 2 * n elements are then split into two equal parts: the first n elements and the last n elements.
+The goal is to find the minimum possible difference between the sum of the first n elements and the sum of the last n elements.
+
+Solution Approach:
+
+Of course, here's a more concise version.
+
+Solution Approach:
+
+The strategy is to test every valid split point i in the array. For each split, we want the smallest possible sum for the first n elements (taken from the prefix nums[0...i]) and the largest possible sum for the last n elements (taken from the suffix nums[i+1...3n-1]).
+
+We precompute these optimal sums:
+
+prefixMin[i]: The sum of the n smallest elements in the prefix nums[0...i]. 
+This is calculated by iterating from the left using a max-heap.
+
+suffixMax[i]: The sum of the n largest elements in the suffix nums[i...3n-1]. 
+This is calculated by iterating from the right using a min-heap.
+
+Finally, we find the minimum difference by calculating prefixMin[i] - suffixMax[i+1] for all valid split points i.
+
+Here's the code:
+
+import java.util.Collections;
+import java.util.PriorityQueue;
+
+class Solution {
+    public long minimumDifference(int[] nums) {
+        int n = nums.length / 3;
+        int totalLength = 3 * n;
+
+        long[] prefixMin = new long[totalLength];
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Collections.reverseOrder());
+        long prefixSum = 0;
+
+        for (int i = 0; i < totalLength; i++) {
+            prefixSum += nums[i];
+            maxHeap.add(nums[i]);
+
+            if (maxHeap.size() > n) {
+                prefixSum -= maxHeap.poll();
+            }
+            if (maxHeap.size() == n) {
+                prefixMin[i] = prefixSum;
+            }
+        }
+        long[] suffixMax = new long[totalLength];
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+        long suffixSum = 0;
+
+        for (int i = totalLength - 1; i >= 0; i--) {
+            suffixSum += nums[i];
+            minHeap.add(nums[i]);
+            
+            if (minHeap.size() > n) {
+                suffixSum -= minHeap.poll();
+            }
+            if (minHeap.size() == n) {
+                suffixMax[i] = suffixSum;
+            }
+        }
+        long minDifference = Long.MAX_VALUE;
+        for (int i = n - 1; i < 2 * n; i++) {
+            long difference = prefixMin[i] - suffixMax[i + 1];
+            minDifference = Math.min(minDifference, difference);
+        }
+
+        return minDifference;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(NlogN)
+Space Complexity: O(N)
