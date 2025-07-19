@@ -1,0 +1,54 @@
+Day 55/100: Remove Sub-Folders from the Filesystem
+
+Problem Statemnt #1233
+
+Problem Statement Explanation:
+
+You're given an array of folder paths.
+The goal is to find all the "parent" folders and remove any folder that is a sub-folder of another one in the list.
+For example, given ["/a", "/a/b", "/c/d", "/c/d/e", "/c/f"], the folders /a/b and /c/d/e should be removed. 
+The final output should be ["/a", "/c/d", "/c/f"].
+A key detail is that /a/b is a sub-folder of /a, but /ab is not, because a true sub-folder path must start with the parent path followed immediately by a /.
+
+Solution Approach:
+
+The most elegant solution doesn't require building a complex tree structure like a Trie. 
+Instead, we can solve it with a simple sort and a single pass.
+
+Sort the Paths: First, we sort the entire array of folder paths lexicographically. 
+This is the magic step! Sorting ensures that any parent folder (e.g., "/a") will always appear in the array just before its sub-folders (e.g., "/a/b", "/a/c").
+Iterate and Filter: We initialize our result list and add the very first folder from the sorted array (it's guaranteed to be a valid parent). 
+Then, we iterate from the second folder onwards. For each folder, we compare it against the last folder we added to our result list.
+If the current folder starts with the last_added_folder + "/", we know it's a sub-folder and we simply ignore it.
+If it does not, it's a new parent folder, so we add it to our result list.
+
+Here's the code:
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+class Solution {
+    public List<String> removeSubfolders(String[] folder) {
+        Arrays.sort(folder);
+
+        List<String> result = new ArrayList<>();
+        result.add(folder[0]);
+
+        for (int i = 1; i < folder.length; i++) {
+            String currentFolder = folder[i];
+            String lastRoot = result.get(result.size() - 1);
+
+            if (!currentFolder.startsWith(lastRoot + "/")) {
+                result.add(currentFolder);
+            }
+        }
+
+        return result;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(NlogN)
+Space Complexity: O(NlogN)
