@@ -1,0 +1,42 @@
+Day 57/100:  Delete Characters to Make Fancy String
+
+Problem Statement #1957
+
+Problem Statement Explanation:
+
+Given a string s, a fancy string is defined as a string where no three consecutive characters are identical. 
+The task is to delete the minimum number of characters from s to make it fancy. 
+You must return the resulting string after these deletions. 
+The answer is always unique.
+
+Solution Approach:
+
+Use a StringBuilder to construct the final string.
+Iterate over each character in the input string.
+
+For each character:
+If the current result has fewer than two characters, always add it.
+
+Otherwise, check the last two characters already added:
+If both are the same as the current character, skip adding this character to prevent creating three in a row.
+If not, append the character.
+Return the constructed string as the answer.
+
+Here's the code:
+
+class Solution {
+    public String makeFancyString(String s) {
+        StringBuilder sb = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            if (sb.length() < 2 || sb.charAt(sb.length() - 1) != c || sb.charAt(sb.length() - 2) != c) {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: o(n)
