@@ -1,0 +1,58 @@
+Day 58/100: Maximum Erasure Value
+
+Problem Statement #1695
+
+Problem Statement Explanation:
+
+You are given an array of positive integers nums. 
+You want to erase exactly one subarray containing only unique elements. 
+The score you get is the sum of the elements in that subarray.
+Your goal is to find the maximum score you can achieve.
+
+Example:
+Input: nums = [4, 2, 4, 5, 6]
+Output: 17
+Explanation: The optimal subarray with unique elements is [2, 4, 5, 6], and its sum is 2 + 4 + 5 + 6 = 17.
+
+Solution Approach:
+
+This problem is a perfect candidate for the sliding window pattern. 
+We can maintain a "window" (a subarray) that contains only unique elements and find the one with the maximum sum.
+We'll use two pointers, left and right, to define the boundaries of our current window.
+A HashSet will be used to store the elements within the current window. 
+This gives us an efficient way (O(1) on average) to check if an element already exists in the window.
+We'll also keep track of the currentSum of elements in the window and a maxSum to store the highest score found so far.
+
+Here's the code:
+
+import java.util.HashSet;
+import java.util.Set;
+
+class Solution {
+    public int maximumUniqueSubarray(int[] nums) {
+        int left = 0;
+        int maxSum = 0;
+        int currentSum = 0;
+        Set<Integer> windowElements = new HashSet<>();
+
+        // Changed "rigth" to "right"
+        for (int right = 0; right < nums.length; right++) { 
+            while (windowElements.contains(nums[right])) {
+                currentSum -= nums[left];
+                windowElements.remove(nums[left]);
+                left++;
+            }
+            windowElements.add(nums[right]);
+            currentSum += nums[right];
+
+            // Changed "maxsum" to "maxSum"
+            maxSum = Math.max(maxSum, currentSum); 
+        }
+        return maxSum;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(N)
