@@ -1,0 +1,63 @@
+Day 59/100: Maximum Score From Removing Substrings
+
+Problem Statement #1717
+
+Problem Statement Explanation:
+
+You are given a string s and two integers x and y. You can perform two types of operations any number of times:
+Remove the substring "ab" and gain x points.
+Remove the substring "ba" and gain y points.
+Your goal is to return the maximum score you can get by performing these operations.
+
+Solution Approach:
+
+This problem is solved using a greedy strategy.
+It's always best to first remove all occurrences of the substring that offers a higher score, as this maximizes your points and prevents disrupting more valuable pairs.
+The approach uses two passes with a stack-like data structure (e.g., a StringBuilder).
+High-Priority Pass: Scan the string to find and remove all instances of the higher-scoring pair.
+Low-Priority Pass: On the string that remains, perform a second scan to find and remove all instances of the lower-scoring pair.
+
+Here's the code:
+
+import java.lang.StringBuilder;
+
+class Solution {
+    public int maximumGain(String s, int x, int y) {
+        if (x < y) {
+            int temp = x;
+            x = y;
+            y = temp;
+            s = new StringBuilder(s).reverse().toString();
+        }
+
+        long totalScore = 0;
+
+        StringBuilder sbAfterFirstPass = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            if (c == 'b' && sbAfterFirstPass.length() > 0 && sbAfterFirstPass.charAt(sbAfterFirstPass.length() - 1) == 'a') {
+                sbAfterFirstPass.deleteCharAt(sbAfterFirstPass.length() - 1);
+                totalScore += x;
+            } else {
+                sbAfterFirstPass.append(c);
+            }
+        }
+
+        StringBuilder sbAfterSecondPass = new StringBuilder();
+        String remainingString = sbAfterFirstPass.toString();
+        for (char c : remainingString.toCharArray()) {
+            if (c == 'a' && sbAfterSecondPass.length() > 0 && sbAfterSecondPass.charAt(sbAfterSecondPass.length() - 1) == 'b') {
+                sbAfterSecondPass.deleteCharAt(sbAfterSecondPass.length() - 1);
+                totalScore += y;
+            } else {
+                sbAfterSecondPass.append(c);
+            }
+        }
+
+        return (int) totalScore;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(N)
