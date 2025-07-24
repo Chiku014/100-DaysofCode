@@ -1,0 +1,128 @@
+Day 60/100: Minimum Score After Removals on a Tree
+
+Problem Statement #2322
+
+Problem Stement Explanation:
+
+There is an undirected connected tree with n nodes labeled from 0 to n - 1 and n - 1 edges.
+You are given a 0-indexed integer array nums of length n where nums[i] represents the value of the ith node. You are also given a 2D integer array edges of length n - 1 where edges[i] = [ai, bi] indicates that there is an edge between nodes ai and bi in the tree.
+Remove two distinct edges of the tree to form three connected trees. For a connected tree, the value of the tree is the XOR of values of all the nodes in the tree.
+Return the minimum possible score of the three trees after removing two distinct edges.
+The score is defined as the difference between the largest and smallest XOR values among the three trees.
+
+Solition Approach:
+
+Tree Structure: When we remove 2 edges from a tree with n nodes, we get exactly 3 connected components.
+XOR Properties: We can precompute subtree XOR values using DFS traversal.
+Edge Relationships: Two edges can have different relationships:
+
+Nested: One removed subtree contains the other
+Independent: The removed subtrees are separate
+
+Here's the code:
+
+import java.util.*;
+
+public class Solution {
+    private List<Integer>[] graph;
+    private int[] nums;
+    private int[] subtreeXor;
+    private Set<Integer>[] descendants;
+    private int totalXor;
+    private int minScore = Integer.MAX_VALUE;
+    
+    public int minimumScore(int[] nums, int[][] edges) {
+        int n = nums.length;
+        this.nums = nums;
+        this.graph = new ArrayList[n];
+        this.subtreeXor = new int[n];
+        this.descendants = new HashSet[n];
+        
+        for (int i = 0; i < n; i++) {
+            graph[i] = new ArrayList<>();
+            descendants[i] = new HashSet<>();
+        }
+        for (int[] edge : edges) {
+            graph[edge[0]].add(edge[1]);
+            graph[edge[1]].add(edge[0]);
+        }
+        
+        totalXor = 0;
+        for (int num : nums) {
+            totalXor ^= num;
+        }
+        dfs(0, -1);
+        
+        for (int i = 0; i < edges.length; i++) {
+            for (int j = i + 1; j < edges.length; j++) {
+                calculateScore(edges[i], edges[j]);
+            }
+        }
+        
+        return minScore;
+    }
+    
+    private void dfs(int node, int parent) {
+        subtreeXor[node] = nums[node];
+        
+        for (int child : graph[node]) {
+            if (child != parent) {
+                dfs(child, node);
+                subtreeXor[node] ^= subtreeXor[child];
+                descendants[node].add(child);
+                descendants[node].addAll(descendants[child]);
+            }
+        }
+    }
+    
+    private void calculateScore(int[] edge1, int[] edge2) {
+        int[] parentChild1 = getParentChild(edge1);
+        int[] parentChild2 = getParentChild(edge2);
+        
+        if (parentChild1 == null || parentChild2 == null) return;
+        
+        int parent1 = parentChild1[0], child1 = parentChild1[1];
+        int parent2 = parentChild2[0], child2 = parentChild2[1];
+        
+        int xor1, xor2, xor3;
+
+        if (descendants[child1].contains(child2)) {
+            xor1 = subtreeXor[child2];
+            xor2 = subtreeXor[child1] ^ subtreeXor[child2];
+            xor3 = totalXor ^ subtreeXor[child1];
+        } else if (descendants[child2].contains(child1)) {
+
+            xor1 = subtreeXor[child1];
+            xor2 = subtreeXor[child2] ^ subtreeXor[child1];
+            xor3 = totalXor ^ subtreeXor[child2];
+        } else {
+            xor1 = subtreeXor[child1];
+            xor2 = subtreeXor[child2];
+            xor3 = totalXor ^ subtreeXor[child1] ^ subtreeXor[child2];
+        }
+    
+        int maxXor = Math.max(xor1, Math.max(xor2, xor3));
+        int minXor = Math.min(xor1, Math.min(xor2, xor3));
+        int score = maxXor - minXor;
+        
+        minScore = Math.min(minScore, score);
+    }
+    
+    private int[] getParentChild(int[] edge) {
+        int u = edge[0], v = edge[1];
+        
+        if (descendants[u].contains(v)) {
+            return new int[]{u, v}; 
+        } else if (descendants[v].contains(u)) {
+            return new int[]{v, u}; 
+        }
+        
+        return null; 
+    }
+}
+
+
+Complexity:
+
+Time Complexity: O(n²)
+Space Complexity: O(n²)
