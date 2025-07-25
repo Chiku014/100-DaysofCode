@@ -1,0 +1,56 @@
+Day 61/100: Maximum Unique Subarray Sum After Deletion
+
+Problem Statement #3487
+
+Problem Statement Explanation:
+
+Given an array of integers nums, the goal is to find the maximum possible sum of a contiguous subarray that contains only unique elements. 
+You have the option to delete at most one element from the original array before you find this subarray.
+
+This means you must consider two scenarios:
+Finding the max unique subarray sum in the original, unchanged array.
+Finding the max unique subarray sum after deleting a single element from the array.
+The final answer is the highest sum achievable from any of these possibilities.
+
+Solution Approach:
+
+A brute-force method, where you delete each element and then re-calculate the max sum, would be too slow (O(N^2)). 
+A more efficient O(N) approach uses pre-computation with a sliding window.
+The core idea is to break the problem into manageable parts:
+
+Pre-computation (Prefix): Create an array prefixMax where prefixMax[i] stores the maximum unique subarray sum found in the prefix of the array, nums[0...i]. 
+This is calculated in a single O(N) pass using a left-to-right sliding window.
+Pre-computation (Suffix): Similarly, create an array suffixMax where suffixMax[i] stores the maximum unique subarray sum in the suffix nums[i...n-1]. 
+This is done with a right-to-left sliding window, also in O(N) time.
+
+Final Calculation:
+The answer for the no-deletion case is simply prefixMax[n-1].
+To find the best sum after a deletion, iterate from i = 0 to n-1. If you delete nums[i], the array is split into two parts: a prefix nums[0...i-1] and a suffix nums[i+1...n-1]. 
+The best you can do is take the larger of the pre-computed sums from these two parts: max(prefixMax[i-1], suffixMax[i+1]).
+The final result is the maximum value found by comparing the no-deletion sum against all possible single-deletion sums.
+
+Here's the code:
+
+class Solution {
+    public int maxSum(int[] nums) {
+        int mx = Arrays.stream(nums).max().getAsInt();
+        if (mx <= 0) {
+            return mx;
+        }
+        boolean[] s = new boolean[201];
+        int ans = 0;
+        for (int x : nums) {
+            if (x < 0 || s[x]) {
+                continue;
+            }
+            ans += x;
+            s[x] = true;
+        }
+        return ans;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(N)
