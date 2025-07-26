@@ -1,0 +1,57 @@
+Day 62/100: Maximize Subarrays After Removing One Conflicting Pair
+
+Problem Statement #3480
+
+Problem Statement Explanation:
+
+Given an integer array nums, your task is to partition it into the maximum possible number of non-overlapping subarrays, with the condition that the bitwise AND of all elements in each subarray must be 0.
+You are allowed to remove "at most one conflicting pair," which effectively means you can ignore a single contiguous segment of the array to maximize the total count of valid subarrays from the remaining parts.
+
+Solution Approach:
+
+This problem can be solved by finding an optimal split point in the array using a two-pass dynamic programming approach.
+First, we use a greedy strategy to pre-calculate the maximum number of valid subarrays (where the bitwise AND is 0) for all prefixes and suffixes of the array.
+Prefix Pass: An array prefix[i] is computed, storing the count of valid subarrays in nums[0...i].
+Suffix Pass: A second array suffix[i] is computed, storing the count of valid subarrays in nums[i...n-1].
+The final answer is the maximum count obtained by either partitioning the entire array (given by prefix[n-1]) or by combining the results of a split at each possible index i (prefix[i] + suffix[i+1]).
+
+Here's the code:
+
+class Solution {
+  public long maxSubarrays(int n, int[][] conflictingPairs) {
+    long validSubarrays = 0;
+    int maxLeft = 0;
+    int secondMaxLeft = 0;
+    long[] gains = new long[n + 1];
+    List<Integer>[] conflicts = new List[n + 1];
+
+    for (int i = 0; i <= n; ++i)
+      conflicts[i] = new ArrayList<>();
+
+    for (int[] pair : conflictingPairs) {
+      final int a = pair[0];
+      final int b = pair[1];
+      conflicts[Math.max(a, b)].add(Math.min(a, b));
+    }
+
+    for (int right = 1; right <= n; ++right) {
+      for (int left : conflicts[right]) {
+        if (left > maxLeft) {
+          secondMaxLeft = maxLeft;
+          maxLeft = left;
+        } else if (left > secondMaxLeft) {
+          secondMaxLeft = left;
+        }
+      }
+      validSubarrays += right - maxLeft;
+      gains[maxLeft] += maxLeft - secondMaxLeft;
+    }
+
+    return validSubarrays + Arrays.stream(gains).max().getAsLong();
+  }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(N)
