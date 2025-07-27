@@ -1,0 +1,46 @@
+Day 63/100: Count Hills and Valleys in an Array
+
+Problem Statement #2210
+
+Problem Statement Explanation:
+
+Given a 0-indexed integer array nums, you need to count the number of "hills" and "valleys".
+An index i is part of a hill if its neighbors on both the left and right have values strictly smaller than nums[i].
+An index i is part of a valley if its neighbors on both the left and right have values strictly larger than nums[i].
+The key constraint is that adjacent elements with the same value belong to the same hill or valley. 
+This means we should only consider the nearest distinct neighbors.
+
+Solution Approach:
+
+The main challenge is handling consecutive duplicate numbers.
+A straightforward approach is to first "clean" the array by removing these adjacent duplicates.
+
+Filter Duplicates: Create a new list or array that contains only the elements of nums without any consecutive duplicates. For example, [2, 4, 1, 1, 6, 5] becomes [2, 4, 1, 6, 5].
+Iterate and Count: Iterate through the cleaned list from the second element to the second-to-last element (i.e., indices 1 to n-2, where n is the size of the cleaned list).
+Check Condition: For each element nums[i], check if it satisfies the hill or valley condition with its direct neighbors nums[i-1] and nums[i+1].
+Hill: nums[i] > nums[i-1] && nums[i] > nums[i+1]
+Valley: nums[i] < nums[i-1] && nums[i] < nums[i+1]
+Increment a counter for each hill or valley found.
+
+Here's the Code:
+
+class Solution {
+  public int countHillValley(int[] nums) {
+    int ans = 0;
+    int left = nums[0];
+
+    for (int i = 1; i + 1 < nums.length; ++i)
+      if (left < nums[i] && nums[i] > nums[i + 1] || 
+          left > nums[i] && nums[i] < nums[i + 1]) { 
+        ++ans;
+        left = nums[i];
+      }
+
+    return ans;
+  }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(N)
