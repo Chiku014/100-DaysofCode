@@ -1,0 +1,47 @@
+Day 64/100: Count Number of Maximum Bitwise-OR Subsets
+
+Problem Statement #2044
+
+Problem Statement Explanation:
+
+Given an array of integers nums, we need to perform two main tasks:
+Find the Maximum Bitwise-OR: First, determine the highest possible value you can get by taking the bitwise OR of elements from any non-empty subset of nums.
+Count the Subsets: Count how many different non-empty subsets produce this maximum value.
+
+Solution Approach:
+
+The small constraint on the input size (nums.length <= 16) strongly suggests a solution with exponential time complexity, like generating all possible subsets. 
+A backtracking (or recursive Depth First Search) approach is a perfect fit.
+The overall strategy is:
+
+Calculate the target maximum OR value.
+Use a backtracking function to explore every possible subset.
+Count how many of these subsets have an OR equal to the target maximum OR.
+
+Here's the Code:
+
+class Solution {
+  public int countMaxOrSubsets(int[] nums) {
+    final int ors = Arrays.stream(nums).reduce((a, b) -> a | b).getAsInt();
+    dfs(nums, 0, 0, ors);
+    return ans;
+  }
+
+  private int ans = 0;
+
+  private void dfs(int[] nums, int i, int path, final int ors) {
+    if (i == nums.length) {
+      if (path == ors)
+        ++ans;
+      return;
+    }
+
+    dfs(nums, i + 1, path, ors);
+    dfs(nums, i + 1, path | nums[i], ors);
+  }
+}
+
+Complexity:
+
+Time Complexity: O(2^N)
+Space Complexity: O(N)
