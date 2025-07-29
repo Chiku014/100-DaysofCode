@@ -1,0 +1,58 @@
+Day 65/100: Smallest Subarrays With Maximum Bitwise OR
+
+Problem Statement #2411
+
+Problem Statement Explanation:
+
+You are given a 0-indexed integer array nums.
+The bitwise OR of a subarray nums[i...j] is nums[i] | nums[i+1] | ... | nums[j] where | denotes the bitwise OR operator.
+For each i from 0 to nums.length - 1, find the length of the smallest subarray starting at i that has the maximum possible bitwise OR.
+In other words, for each i, find the smallest j such that j >= i and the bitwise OR of nums[i...j] is equal to the bitwise OR of nums[i...nums.length - 1].
+Return an integer array ans of length nums.length where ans[i] is the length of the smallest subarray starting at i with the maximum bitwise OR.
+
+Solution Approach:
+
+For any starting index i, the maximum possible bitwise OR is achieved by OR-ing all numbers from nums[i] to the end of the array. 
+Our goal is to find the shortest subarray starting at i that achieves this same OR value.
+We can solve this efficiently by iterating backward from the end of the array. 
+We maintain an array, last_seen, to store the most recent index where each bit (from 0 to 30) was encountered.
+
+When processing index i:
+We first update the last_seen array with the bits from nums[i].
+The subarray starting at i must extend far enough to include at least one number for every bit that contributes to the maximum OR. 
+This means its endpoint must be the furthest index recorded in our last_seen array.
+The length of the smallest subarray for i is this furthest index minus i, plus one.
+
+Here's the code:
+
+import java.util.Arrays;
+
+class Solution {
+    public int[] smallestSubarrays(int[] nums) {
+        int n = nums.length;
+        int[] ans = new int[n];
+        int[] last_seen = new int[31];
+        Arrays.fill(last_seen, -1);
+
+        for (int i = n - 1; i >= 0; i--) {
+            for (int b = 0; b <= 30; b++) {
+                if (((nums[i] >> b) & 1) == 1) {
+                    last_seen[b] = i;
+                }
+            }
+            int max_end_idx = i;
+            for (int b = 0; b <= 30; b++) {
+                if (last_seen[b] != -1) {
+                    max_end_idx = Math.max(max_end_idx, last_seen[b]);
+                }
+            }   
+            ans[i] = max_end_idx - i + 1;
+        }
+        return ans;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(N)
