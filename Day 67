@@ -1,0 +1,48 @@
+Day 67/100: Bitwise ORs of Subarrays
+
+Problem Statement #898
+
+Problem Statement Explanation:
+
+The goal is to find the number of unique values you can get by taking the bitwise OR of all elements within every possible contiguous subarray of a given integer array arr.
+A contiguous subarray is a sequence of one or more consecutive elements from the array.
+
+Solution Approach:
+
+A naive solution that checks every possible subarray would be too slow (O(N^2)), as the input array size can be large. 
+A more efficient approach uses dynamic programming.
+
+The core idea is to iterate through the array, and at each element arr[i], we find all possible OR values for subarrays that end at arr[i].
+Let's maintain a set, current_ors, which holds all unique OR values for subarrays ending at the current position. 
+When we move to the next number, num, the new set of ORs (next_ors) is formed by:
+
+The number num itself (representing the subarray [num]).
+The result of num | prev_or for every value prev_or in current_ors.
+
+Here's the code:
+
+import java.util.HashSet;
+import java.util.Set;
+
+class Solution {
+    public int subarrayBitwiseORs(int[] arr) {
+        Set<Integer> results = new HashSet<>();
+        Set<Integer> currentOrs = new HashSet<>();
+        for (int num : arr) {
+            Set<Integer> nextOrs = new HashSet<>();
+            nextOrs.add(num);
+            for (int prevOr : currentOrs) {
+                nextOrs.add(prevOr | num);
+            }
+            currentOrs = nextOrs;
+            results.addAll(currentOrs);
+        }
+        return results.size();
+    }
+}
+
+
+Complexity:
+
+Time Complexity: O(N⋅W)
+Space Complexity: O(N⋅W)
