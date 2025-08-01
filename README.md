@@ -7,7 +7,9 @@ For the next 100 days, I will be solving one problem per day on LeetCode and doc
 📜 How This Repository is Organized
 📂 Word Document: Contains all screenshots of the problems I solved.
 
-📝 README (This file): Logs my daily progress and problem details.
+📝 README: Logs my daily progress and problem details.
+
+LeetCode: https://leetcode.com/u/Kiran014/
 
 
 📈 Goals
