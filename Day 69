@@ -1,0 +1,74 @@
+Day 69/100: Rearranging Fruits
+
+Problem Statement #2561
+
+Problem Statement Explanation:
+
+You are given two baskets, basket1 and basket2, each containing n fruits. 
+The fruits are represented by integers. Your goal is to make the contents of both baskets identical.
+
+To achieve this, you can perform a swap operation:
+Pick one fruit from basket1 and swap it with any fruit from basket2.
+The cost of swapping fruit1 with fruit2 is min(fruit1, fruit2).
+Your task is to find the minimum total cost to make the two baskets identical. If it's impossible to do so, you should return -1.
+
+Solution Approach:
+Check Feasibility: 
+First, we verify if a solution is possible. We sum the counts of each fruit type across both baskets. 
+If any fruit's total count is odd, it's impossible to split them evenly, so we return -1.
+
+Identify Fruits to Swap: 
+Next, we determine which fruits are misplaced. 
+For each fruit type, its target count in a balanced basket is total_count 
+2. We find all fruits that are in "excess" in either basket (i.e., above the target count). 
+We collect half of these excess fruits into a single list, as this represents one side of the swaps we need to perform.
+
+Calculate Minimum Cost: 
+The core logic is to find the cheapest way to perform the necessary swaps. 
+For each fruit s that we need to move, we have two options:
+
+Direct Swap: 
+Pair it with a larger fruit, costing s.
+
+Indirect Swap: 
+Use the globally cheapest fruit (min_fruit) as an intermediary, costing 2 * min_fruit.
+
+Here's the code:
+
+class Solution {
+  public long minCost(int[] basket1, int[] basket2) {
+    long ans = 0;
+    List<Integer> swapped = new ArrayList<>();
+    Map<Integer, Integer> count = new HashMap<>();
+
+    for (final int b : basket1)
+      count.merge(b, 1, Integer::sum);
+
+    for (final int b : basket2)
+      count.merge(b, -1, Integer::sum);
+
+    for (Map.Entry<Integer, Integer> entry : count.entrySet()) {
+      final Integer num = entry.getKey();
+      final Integer freq = entry.getValue();
+      if (freq % 2 != 0)
+        return -1;
+      for (int i = 0; i < Math.abs(freq) / 2; ++i)
+        swapped.add(num);
+    }
+
+    final int minNum =
+        Math.min(Arrays.stream(basket1).min().getAsInt(), Arrays.stream(basket2).min().getAsInt());
+    Collections.sort(swapped);
+
+    for (int i = 0; i < swapped.size() / 2; ++i)
+      ans += Math.min(minNum * 2, swapped.get(i));
+    return ans;
+  }
+}
+
+Complexity:
+
+Time Complexity: O(NlogN)
+Space Complexity: O(N)
+
+We'll always choose the cheaper option. So, after sorting our list of fruits to swap, the total cost is the sum of min(s, 2 * min_fruit) for each fruit s in the list.
