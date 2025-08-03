@@ -1,0 +1,67 @@
+Day 70/100: Maximum Fruits Harvested After at Most K Steps
+
+Problem Statement #2106
+
+Problem Statement Explanation:
+
+Imagine you're standing on a number line at a specific point called startPos. 
+Along this line, there are fruit trees at various positions, each with a certain number of fruits. 
+You're given a maximum number of steps, k, that you can take.
+Your goal is to figure out the best path to walk (left or right) to collect the maximum possible number of fruits, without exceeding your step limit k. 
+When you visit a position with a tree, you instantly collect all of its fruits.
+
+Solution Approach:
+
+This problem is about finding an optimal continuous range of fruit trees, which makes it a great candidate for the sliding window technique.
+The core idea is to maintain a "window" of fruit trees that we are considering harvesting. 
+This window is defined by a left and a right pointer. 
+We expand the window by moving right and check if we can actually harvest all the fruits within it using k or fewer steps.
+The most important part is calculating the cost (steps) to harvest everything in a window from position p_left to p_right. 
+The most efficient path involves traveling to the nearest end of the window (p_left or p_right) from startPos, and then walking across the entire window's length.
+
+This gives us a simple formula for the total steps:
+steps = min(|startPos - p_left|, |startPos - p_right|) + (p_right - p_left)
+
+Here's the code:
+
+import java.lang.Math;
+
+class Solution {
+    public int maxTotalFruits(int[][] fruits, int startPos, int k) {
+        int n = fruits.length;
+
+        long[] prefixSum = new long[n + 1];
+        for (int i = 0; i < n; i++) {
+            prefixSum[i + 1] = prefixSum[i] + fruits[i][1];
+        }
+
+        int maxFruits = 0;
+        int left = 0;
+
+        for (int right = 0; right < n; right++) {
+            int p_left = fruits[left][0];
+            int p_right = fruits[right][0];
+
+            long steps = Math.min(Math.abs(startPos - p_left), Math.abs(startPos - p_right)) + (p_right - p_left);
+            
+            while (steps > k && left <= right) {
+                left++;
+                if (left > right) {
+                    break;
+                }
+                p_left = fruits[left][0];
+                steps = Math.min(Math.abs(startPos - p_left), Math.abs(startPos - p_right)) + (p_right - p_left);
+            }
+
+            long currentFruits = prefixSum[right + 1] - prefixSum[left];
+            maxFruits = Math.max(maxFruits, (int)currentFruits);
+        }
+
+        return maxFruits;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(N)
