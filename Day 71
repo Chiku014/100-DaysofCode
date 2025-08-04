@@ -1,0 +1,60 @@
+Day 71/100: Fruit Into Baskets
+
+Problem statement #904
+
+Problem Statement Explanation:
+
+Imagine you're walking down a single row of fruit trees, represented by an array like [1, 2, 1, 3, 2, 2]. 
+You have two baskets, and each basket can only hold one type of fruit. 
+For example, one basket for apples (type 1) and another for oranges (type 2). 
+You can start at any tree and must pick exactly one fruit from every tree you pass as you move to the right. 
+You have to stop as soon as you encounter a third type of fruit because you don't have a basket for it.
+The goal is to find the maximum total number of fruits you can collect in a single continuous run.
+
+Solution Approach:
+
+
+Define a Window: Use two pointers, left and right, to create a "window" over the array of fruits.
+Expand the Window: Move the right pointer to include more fruits, tracking the count of each fruit type in a HashMap.
+Maintain Validity: If the window ever contains more than two types of fruit, shrink it from the left by moving the left pointer forward until the window is valid again (contains two or fewer fruit types).
+Track Maximum: After each expansion, the window is valid. Calculate its size and update a variable that stores the maximum size found so far.
+
+Here's the code:
+
+import java.util.HashMap;
+import java.util.Map;
+
+class Solution {
+    public int totalFruit(int[] fruits) {
+        if (fruits == null || fruits.length == 0) {
+            return 0;
+        }
+
+        int maxFruits = 0;
+        int windowStart = 0;
+        Map<Integer, Integer> fruitFrequencyMap = new HashMap<>();
+
+        for (int windowEnd = 0; windowEnd < fruits.length; windowEnd++) {
+            int rightFruit = fruits[windowEnd];
+            fruitFrequencyMap.put(rightFruit, fruitFrequencyMap.getOrDefault(rightFruit, 0) + 1);
+
+            while (fruitFrequencyMap.size() > 2) {
+                int leftFruit = fruits[windowStart];
+                fruitFrequencyMap.put(leftFruit, fruitFrequencyMap.get(leftFruit) - 1);
+                if (fruitFrequencyMap.get(leftFruit) == 0) {
+                    fruitFrequencyMap.remove(leftFruit);
+                }
+                windowStart++;
+            }
+
+            maxFruits = Math.max(maxFruits, windowEnd - windowStart + 1);
+        }
+
+        return maxFruits;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(1)
