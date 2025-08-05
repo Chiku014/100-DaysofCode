@@ -1,0 +1,63 @@
+Day 72/100: Fruits Into Baskets II
+
+Problem Statement #3477
+
+Problem Statement Explanation:
+
+You are given two arrays of integers, fruits and baskets, each of length n, where:
+
+fruits[i] represents the quantity of the ith type of fruit
+baskets[j] represents the capacity of the jth basket
+
+Rules for placing fruits:
+
+Each fruit type must be placed in the leftmost available basket with a capacity greater than or equal to the quantity of that fruit type.
+Each basket can hold only one type of fruit.
+If a fruit type cannot be placed in any basket, it remains unplaced.
+
+Solution Approach:
+
+Use a boolean array used[] to track which baskets are already occupied.
+
+For each fruit (processed left to right):
+Scan baskets from left to right to find the first available basket with sufficient capacity.
+If found: mark basket as used.
+If not found: increment unplaced counter.
+Return the total count of unplaced fruits.
+
+Here's the code:
+
+class Solution {
+    public int numOfUnplacedFruits(int[] fruits, int[] baskets) {
+        int n = fruits.length;
+        boolean[] used = new boolean[n]; // Track which baskets are used
+        int unplaced = 0; // Count of unplaced fruits
+        
+        // Process each fruit from left to right
+        for (int fruit : fruits) {
+            boolean placed = false;
+            
+            // Try to place fruit in leftmost available basket
+            for (int j = 0; j < n; j++) {
+                // Check if basket is available and has sufficient capacity
+                if (!used[j] && baskets[j] >= fruit) {
+                    used[j] = true; // Mark basket as used
+                    placed = true;
+                    break;
+                }
+            }
+            
+            // If fruit couldn't be placed, increment unplaced count
+            if (!placed) {
+                unplaced++;
+            }
+        }
+        
+        return unplaced;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n²)
+Space Complexity: O(n)
