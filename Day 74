@@ -1,0 +1,67 @@
+Day 74/100: Maximum Fruits Collection Solution
+
+Problem Statement #3363
+
+Problem Statement Explanation:
+
+You are given an array nums, and two operations:
+Operation 1: Choose an element x and replace it with ceil(x / 2).
+Operation 2: Choose an element x and replace it with x - k.
+You can use Operation 1 up to op1 times and Operation 2 up to op2 times. You can apply both operations on the same element, but each usage is counted separately.
+Your task is to return the minimum possible sum of the array after performing at most op1 and op2 operations (in any order, on any elements).
+
+Solution Approach:
+
+This problem requires choosing the best way to apply the operations to minimize the total sum. The main challenge is deciding:
+Which elements to apply the operations on,
+In what order,
+And how many times.
+We use recursion with memoization (top-down DP) to explore all combinations of applying operations.
+
+Here's the Code:
+
+class Solution {
+    public int minArraySum(int[] nums, int k, int op1, int op2) {
+        Integer[][][] memo = new Integer[nums.length][op1 + 1][op2 + 1];
+        return dfs(nums, 0, op1, op2, k, memo);
+    }
+
+    private int dfs(int[] nums, int i, int op1, int op2, int k, Integer[][][] memo) {
+        if (i == nums.length) return 0;
+        if (memo[i][op1][op2] != null) return memo[i][op1][op2];
+
+        int original = nums[i];
+        int result = original + dfs(nums, i + 1, op1, op2, k, memo); // no ops
+
+        if (op1 > 0) {
+            int half = (original + 1) / 2;
+            result = Math.min(result, half + dfs(nums, i + 1, op1 - 1, op2, k, memo));
+        }
+
+        if (op2 > 0 && original >= k) {
+            int subtracted = original - k;
+            result = Math.min(result, subtracted + dfs(nums, i + 1, op1, op2 - 1, k, memo));
+        }
+
+        if (op1 > 0 && op2 > 0) {
+            int halfThenSub = (original + 1) / 2;
+            if (halfThenSub >= k) {
+                result = Math.min(result, (halfThenSub - k) + dfs(nums, i + 1, op1 - 1, op2 - 1, k, memo));
+            }
+
+            if (original >= k) {
+                int subThenHalf = ((original - k) + 1) / 2;
+                result = Math.min(result, subThenHalf + dfs(nums, i + 1, op1 - 1, op2 - 1, k, memo));
+            }
+        }
+
+        memo[i][op1][op2] = result;
+        return result;
+    }
+}
+
+
+Complexity:
+
+Time Complexity: O(n^2)
+Space Complexity: O(n^2)
