@@ -1,0 +1,72 @@
+Day 75/100: Soup Servings
+
+Problem Statement #808
+
+Problem Statement Explanation:
+
+You are given two types of soup, A and B, both starting with an initial volume of N ml. 
+You can perform one of four types of servings with equal probability (0.25).
+
+Serve 100ml of soup A and 0ml of soup B.
+Serve 75ml of soup A and 25ml of soup B.
+Serve 50ml of soup A and 50ml of soup B.
+Serve 25ml of soup A and 75ml of soup B.
+
+The process stops once one of the soups becomes empty. 
+The goal is to calculate the final probability of the following two events combined:
+
+
+The probability that soup A will be empty first.
+Half of the probability that soup A and soup B become empty at the same time.
+
+
+Solution Approach:
+
+This problem is solved using top-down dynamic programming (memoization).
+
+Scaling the Problem:
+First, we simplify the problem by noting that all serving amounts are multiples of 25. 
+We can scale down all volumes by a factor of 25, defining one "unit" as 25ml.
+
+Initial State: We start with M = ceil(N / 25.0) units of each soup.
+Operations: The four servings become (4, 0), (3, 1), (2, 2), and (1, 3) units of (A, B).
+
+DP with Memoization
+We use a recursive function, calculate(a, b), to find the probability given a units of soup A and b units of soup B. A 2D array, memo, stores results to avoid redundant calculations.
+
+Recursive Relation: The probability for any state (a,b) is the average of the four possible outcomes:
+P(a, b) = 0.25 * (P(a-4, b) + P(a-3, b-1) + P(a-2, b-2) + P(a-1, b-3))
+
+Base Cases: The recursion terminates based on the problem's goal:
+If a <= 0 and b <= 0 (both empty): return 0.5.
+If a <= 0 (A empties first): return 1.0.
+If b <= 0 (B empties first): return 0.0.
+
+Large N Optimization
+On average, more of soup A is served than soup B. 
+This means for large N, the probability of A emptying first (or at the same time) rapidly approaches 1. 
+To prevent timeouts on large inputs, we use a cutoff.
+
+The Trick: For N >= 4800, the probability is so close to 1 that we can simply return 1.0.
+
+Here's the code:
+
+class Solution {
+    private double[][] memo;
+
+    public double soupServings(int n) {
+        if ( n>= 4800) {
+            return 1.0;
+        }
+        int m = (n + 24) / 25;
+        this.memo = new double[m + 1][m + 1];
+        return calculate(m, m);
+        return prob;
+    }
+
+}
+
+Complexity:
+
+Time Complexity: O(1)
+Space Complexity: O(1)
