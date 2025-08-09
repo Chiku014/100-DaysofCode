@@ -1,0 +1,30 @@
+Day 76/100: Power of Two
+
+Problem Statement #231
+
+Problem Statement Explanation:
+
+Given an integer n, write a function to determine if it is a power of two.
+Formally, an integer n is a power of two if there exists an integer x such that n=2^x.
+
+Solution Approach:
+
+
+The key insight for the most efficient solution lies in the binary representation of numbers that are powers of two.
+A positive integer is a power of two if and only if its binary representation contains exactly one 1.
+
+Here's the code:
+
+class Solution {
+    public boolean isPowerOfTwo(int n) {
+        return n > 0 && (n & (n - 1)) == 0;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(1)
+Space Complexity: O(1)
+
+
+
