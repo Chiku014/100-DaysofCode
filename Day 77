@@ -4,6 +4,63 @@ Problem Statement #869
 
 Problem statement Explanation:
 
+The core idea of this problem is to check if the digits of the input number n can be rearranged to form a power of two.
+A key insight is that two numbers are reorderings of each other if and only if they have the exact same count of each digit. 
+For example, 46 and 64 are reorderings because both contain one '4' and one '6'.
+
+So, instead of generating all possible permutations of n's digits (which would be very slow), we can take a much smarter approach:
+Identify the "digit signature" of our input number n. A simple way to create a signature is to sort the digits. 
+For n = 46, the sorted digit string is "46".
+Compare this signature against the signature of every relevant power of two.
+If we find a power of two that has the same signature as n, we've found our match.
+
+Solution Approach:
+
+The core idea is to use a digit signature. 
+Two numbers are reorderings of each other if they have the exact same digits, meaning their sorted digit strings will be identical. 
+For example, the signature for both 46 and 64 is the sorted string "46".
+
+The algorithm is to:
+
+1. Create the signature for n by sorting its digits.
+2. Loop through powers of two (from 2^0 to 2^29) and create a signature for each one.
+3. If any power of two's signature matches the signature of n, return true.
+
+If the loop finishes with no matches, it means no such reordering is possible, so we return false. 
+This avoids the slow process of generating every permutation of n.
+
+Here's the code:
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+class Solution {
+    private static final Set<String> powerOf2Digs = new HashSet<>();
+    static {
+        for (int i = 0; i < 30; i++){
+            int powerOf2 = 1 << i;
+            String fingerprint = countSort(powerOf2);
+            powerOf2Digs.add(fingerprint);
+        }
+    }
+
+    public boolean reorderedPowerOf2(int n){
+        String nFingerprint = countSort(n);
+        return powerOf2Digs.contains(nFingerprint);
+    }
+    private static String countSort(int num){
+        char[] chars = String.valueOf(num).toCharArray();
+        Arrays.sort(chars);
+        return new String(chars);
+    }
+}
+
+Complexity:
+
+Time Complexity: O(logn⋅log(logn))
+Space Complexity: O(logn)
+
 
 
 
