@@ -1,0 +1,87 @@
+Day 78/100: Range Product Queries of Powers
+
+Problem Statement #2438
+
+Problem Statement Explanation:
+
+You are given a positive integer n and a 2D array of queries.
+
+First, you need to construct an array called powers. 
+This powers array is the shortest sorted list of powers of 2 that add up to n. 
+This is essentially the binary decomposition of n. 
+For example, if n = 15, its binary form is 1111, which means n = 8 + 4 + 2 + 1. So, powers = [1, 2, 4, 8].
+
+For each query [left, right], you must find the product of all elements in the powers array from index left to right (inclusive). 
+Since the product can be very large, you need to return the result modulo 1,000,000,007
+
+Solution Approach:
+
+The core strategy is to convert the range product problem into a much faster range sum problem.
+Get Exponents from n: First, we find the powers of 2 that sum to n by looking at the set bits ('1's) in its binary representation. 
+Instead of storing the large power values (e.g., 8, 16, 32), we just store their exponents (e.g., 3, 4, 5).
+This means the product of a range of powers is simply 2 raised to the sum of their exponents in that range.
+Calculate Efficiently: To get the sum of exponents for any query [left, right] quickly, we use prefix sums. 
+This lets us find any range sum in constant O(1) time.
+
+Here's the code:
+
+import java.util.ArrayList;
+import java.util.List;
+
+class Solution {
+    private static final int MOD = 1_000_000_007;
+
+    public int[] productQueries(int n, int[][] queries) {
+        List<Integer> exponents = new ArrayList<>();
+        for (int i = 0; i < 31; i++) {
+            if (((n >> i) & 1) == 1) {
+                exponents.add(i);
+            }
+        }
+
+        int k = exponents.size();
+        long[] prefixSumExponents = new long[k + 1];
+        for (int i = 0; i < k; i++) {
+            prefixSumExponents[i + 1] = prefixSumExponents[i] + exponents.get(i);
+        }
+
+        int[] result = new int[queries.length];
+        for (int i = 0; i < queries.length; i++) {
+            int left = queries[i][0];
+            int right = queries[i][1];
+
+            long totalExponent = prefixSumExponents[right + 1] - prefixSumExponents[left];
+
+            result[i] = (int) power(2, totalExponent);
+        }
+
+        return result;
+    }
+
+    private long power(long base, long exp) {
+        long res = 1;
+        base %= MOD;
+        while (exp > 0) {
+            if (exp % 2 == 1) {
+                res = (res * base) % MOD;
+            }
+            base = (base * base) % MOD;
+            exp /= 2;
+        }
+        return res;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(logn+Q)
+Space Complexity: O(logn)
+
+
+
+
+
+
+
+
+
