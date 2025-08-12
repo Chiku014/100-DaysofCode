@@ -1,0 +1,50 @@
+Day 79/100: Ways to Express an Integer as Sum of Powers
+
+Problem Statement #2787
+
+Problem Statement Explanation:
+
+Given two positive integers n and x, we need to find the number of ways to express n as a sum of the x-th power of unique positive integers.
+In other words, we are looking for the number of sets of unique positive integers {n_1, n_2, ..., n_k} such that
+
+Solution Approach
+This problem can be effectively solved using dynamic programming. 
+It's a classic combinatorial problem that maps perfectly to the 0/1 Knapsack pattern.
+
+Analogy to 0/1 Knapsack:
+Knapsack Capacity: The target integer n.
+
+Items: The x-th powers of unique positive integers (1^x, 2^x, 3^x, dots).
+Item "Weight": The value of the power (e.g., the weight of item a is a^x).
+Goal: Find the number of ways to choose items (powers) to perfectly fill the knapsack (sum up to n). 
+The "0/1" part comes from the "unique" constraint—we can either use the power of a number (like 3^2) once or not at all.
+
+Here's the code:
+
+class Solution {
+    public int numberOfWays(int n, int x) {
+        final int MOD = 1_000_000_007;
+        int[] dp = new int[n + 1];
+        int ax;
+
+        dp[0] = 1;
+
+        for (int a = 1; (ax = (int) Math.pow(a, x)) <= n; ++a)
+        for (int i =n; i >= ax; --i) {
+            dp[i] += dp[i - ax];
+            dp[i] %= MOD;
+        }
+        return dp[n];
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n⋅n^1/x)
+Space Complexity: O(n)
+
+
+
+
+
+
