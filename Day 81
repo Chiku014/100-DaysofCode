@@ -1,0 +1,60 @@
+Day 81/100: Largest 3-Same-Digit Number in String
+
+Problem Statement #2264
+
+Problem Statement Explanation:
+
+You are given a string num representing a large integer. 
+Your task is to find the largest "good" integer that is a substring of num.
+
+A "good" integer has two properties:
+It is a substring of num with a length of 3.
+It consists of only one unique digit (e.g., "333", "777").
+If one or more "good" integers are found, return the largest one. 
+If no "good" integer exists, return an empty string ""
+
+Solution Approach:
+
+The most efficient way to solve this is with a single pass through the string. 
+The goal is to find the largest digit that forms a "good" three-digit substring.
+Initialize a Tracker: We'll use a character variable, say maxChar, to keep track of the largest digit found so far that forms a "good" integer. 
+We can initialize it to a null character \0, which has a lower ASCII value than '0'.
+
+
+Iterate Through the String: We loop from the first character up to the third-to-last character of num. 
+This allows us to always have a three-character window (i, i+1, i+2).
+Check for "Good" Substring: Inside the loop, for each position i, we check if the characters at num[i], num[i+1], and num[i+2] are all identical.
+Update Maximum Digit: If they are identical, we've found a "good" integer. We then compare its digit (num[i]) with our current maxChar. If the new digit is larger, we update maxChar.
+Construct the Result: After the loop finishes, we check maxChar.
+If maxChar is still the initial null character, it means no "good" integer was found, so we return an empty string "".
+Otherwise, we build a new string by repeating maxChar three times and return it.
+This approach avoids creating multiple substrings and performing string comparisons within the loop, making it very efficient.
+
+Here's the code:
+
+class Solution {
+    public String largestGoodInteger(String num) {
+        char maxChar = 0;
+        for (int i = 0; i <= num.length() - 3; i++) {
+            if (num.charAt(i) == num.charAt(i + 1) && num.charAt(i) == num.charAt(i + 2)) {
+                if (num.charAt(i) > maxChar) {
+                    maxChar = num.charAt(i);
+                }
+            }
+        }
+        if (maxChar == 0) {
+            return "";
+        }
+        return new String (new char[]{maxChar, maxChar, maxChar});
+    }
+}
+
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+
+
+
