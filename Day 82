@@ -1,0 +1,35 @@
+Day 82/100: Power of Four
+
+Problem Statement #342
+
+Problem Statement Explanation:
+
+Given an integer n, the task is to write a function that determines if it is a power of four. 
+An integer n is a power of four if there exists an integer x such that n=4^x.
+
+Solution Approach:
+
+The problem can be solved in constant time (O(1)) by combining three conditions in a single check. 
+A number n is a power of four only if it is:
+Positive (n > 0).
+
+A power of two, which is efficiently checked using the bitwise expression (n & (n - 1)) == 0. 
+This ensures n has only one 1 bit in its binary form.
+
+Distinguishable from other powers of two. This is handled by a mathematical property: for any power of four n, the value (n - 1) is always divisible by 3. 
+This condition filters out numbers like 2, 8, 32, etc.
+
+Here's the code:
+
+class Solution {
+    public boolean isPowerOfFour(int n) {
+        return n > 0 && (n & (n - 1)) == 0 && (n - 1) % 3 == 0;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(1)
+Space Complexity: O(1)
+
+
