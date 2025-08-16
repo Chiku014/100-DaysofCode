@@ -1,0 +1,41 @@
+Day 83/100: Maximum 69 Numbers
+
+Problem Statement #1323
+
+Problem Statement Explanation:
+
+You're given a positive integer num that consists of only the digits 6 and 9. 
+You can change at most one digit (a 6 to a 9, or a 9 to a 6). 
+The goal is to return the maximum possible number you can get after making at most one change.
+
+Example 1:
+Input: num = 9669
+Output: 9969
+Explanation: Changing the first '6' to a '9' results in the largest number.
+
+Example 2:
+Input: num = 9999
+Output: 9999
+Explanation: No '6's exist to change, so the number is already at its maximum.
+
+Solution Approach
+To get the largest possible number, you want to make the most significant change possible. 
+Since '9' is greater than '6', the best strategy is to find the leftmost '6' and convert it to a '9'. This increases the number's value by the largest amount. 
+If there are no '6's, the number is already maximized, and we don't need to do anything.
+The algorithm is straightforward:
+
+Convert the input number num into a string or a character array. 
+This makes it easy to inspect and modify individual digits.
+
+Iterate through the digits from left to right.
+Find the first occurrence of the digit '6'.
+Change that '6' to a '9' and immediately stop the search, as we only get to make one change.
+Convert the modified character array or string back into an integer and return it.
+
+Complexity:
+
+Time Complexity: O(D)
+Space Complexity: O(D)
+
+
+
