@@ -1,0 +1,65 @@
+Day 84/100: New 21 Game
+
+Problem Statement #837
+
+Problem Statement Explanation:
+
+Problem Statement Explanation:
+
+You are playing a game that starts with a score of 0. 
+In each turn, you draw a random integer from 1 to maxPts (inclusive) and add it to your score. 
+You stop drawing as soon as your score is k or greater.
+
+Solution Approach:
+
+We define dp[i] as the probability of reaching a score of exactly i. 
+The key insight is that the probability of reaching any score i is the average of the probabilities of the last maxPts scores, since you could have drawn a card from any of them to land on i.
+Instead of re-summing the previous maxPts probabilities at each step, we maintain their sum in a variable (windowSum).
+ As we calculate each new dp[i], we update this sum in constant time by adding the new probability and subtracting the one that just fell out of the window's range.
+The final answer is the sum of all probabilities dp[i] for the winning scores, which are from k to n. 
+This approach reduces the time complexity from O(n⋅maxPts) to an efficient O(n).
+
+Here's the code:
+
+class Solution {
+    public double new21Game(int n, int k, int maxPts) {
+        if (k == 0 || n >= k + maxPts) {
+            return 1.0;
+        }
+
+        double[] dp = new double[n + 1];
+        dp[0] = 1.0;
+
+        double windowSum = 1.0;
+        double ans = 0.0;
+
+        for (int i = 1; i <= n; i++) {
+            dp[i] = windowSum / maxPts;
+
+            if (i < k) {
+                windowSum += dp[i];
+            } else {
+                ans += dp[i];
+            }
+            
+            if (i >= maxPts) {
+                windowSum -= dp[i - maxPts];
+            }
+        }
+        
+        return ans;
+    }
+}
+
+Complexity:
+
+
+Time Complexity: O(n)
+pace Complexity: O(n)
+
+
+
+
+
+
+
