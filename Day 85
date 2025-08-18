@@ -1,0 +1,103 @@
+Day 85/100: 24 Game
+
+Problem Statement #679
+
+Problem Statement Explanation:
+
+Today's problem is LeetCode 679: 24 Game. You are given an array of four integers.
+Your task is to determine if you can use these four numbers and the arithmetic operations (+, −, ∗, /) to form the number 24. 
+You must use each number exactly once, and the division operator represents real division (not integer division).
+
+For example, given the input [4, 1, 8, 7], a possible solution is (8 - 4) * (7 - 1) = 4 * 6 = 24, so the answer is true.
+
+Solution Approach:
+
+The problem is solved using backtracking. Since the input is always four numbers, we can explore every possible combination of operations and groupings.
+
+The recursive function works as follows:
+Pick Two Numbers: From the current list of numbers, select any two, let's call them a and b.
+Perform All Operations: Apply all possible arithmetic operations on them (a+b, a−b, b−a, a×, a/b, b/a).
+Recurse: For each result, create a new, smaller list by replacing a and b with the result. 
+Call the function recursively on this new list.
+
+Base Case: When only one number remains in the list, check if it equals 24. 
+Due to floating-point math, we check if it's within a small margin of error.
+
+If any recursive path returns true, a solution exists. 
+If all possibilities are exhausted without finding a solution, we backtrack and return false.
+
+Here's the code:
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+class Solution {
+    private static final double EPSILON = 1e-6;
+
+    public boolean judgePoint24(int[] cards) {
+        List<Double> list = new ArrayList<>();
+        for (int card : cards) {
+            list.add((double) card);
+        }
+        return solve(list);
+    }
+
+    private boolean solve(List<Double> nums) {
+        if (nums.size() == 1) {
+            return Math.abs(nums.get(0) - 24.0) < EPSILON;
+        }
+
+        for (int i = 0; i < nums.size(); i++) {
+            for (int j = 0; j < nums.size(); j++) {
+                if (i == j) {
+                    continue;
+                }
+
+                List<Double> nextRoundNums = new ArrayList<>();
+                for (int k = 0; k < nums.size(); k++) {
+                    if (k != i && k != j) {
+                        nextRoundNums.add(nums.get(k));
+                    }
+                }
+
+                double a = nums.get(i);
+                double b = nums.get(j);
+
+                nextRoundNums.add(a + b);
+                if (solve(nextRoundNums)) return true;
+                nextRoundNums.remove(nextRoundNums.size() - 1);
+
+                nextRoundNums.add(a - b);
+                if (solve(nextRoundNums)) return true;
+                nextRoundNums.remove(nextRoundNums.size() - 1);
+                
+                nextRoundNums.add(a * b);
+                if (solve(nextRoundNums)) return true;
+                nextRoundNums.remove(nextRoundNums.size() - 1);
+
+                if (Math.abs(b) > EPSILON) {
+                    nextRoundNums.add(a / b);
+                    if (solve(nextRoundNums)) return true;
+                    nextRoundNums.remove(nextRoundNums.size() - 1);
+                }
+            }
+        }
+        
+        return false;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(1)
+Space Complexity: O(1)
+
+
+
+
+
+
+
+
+
