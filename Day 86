@@ -1,0 +1,65 @@
+Day 86/100: Number of Zero-Filled Subarrays
+
+Problem Statement #2348
+
+Problem Statement Explanation: 
+
+Given an integer array nums, the task is to find the total number of contiguous subarrays that are filled only with zeros.
+A subarray is a contiguous non-empty sequence of elements within an array.
+
+For example, if nums = [1, 3, 0, 0, 2, 0, 0, 0]:
+
+
+The first block of zeros is [0, 0]. 
+It contains the subarrays: [0], [0], and [0, 0]. (3 subarrays)
+The second block of zeros is [0, 0, 0]. 
+It contains the subarrays: [0], [0], [0], [0, 0], [0, 0], and [0, 0, 0]. (6 subarrays)
+The total is 3 + 6 = 9
+
+Solution Approach:
+
+The key insight is to focus on contiguous blocks of zeros. 
+Instead of checking every possible subarray, we can count the length of each zero-filled block and calculate how many subarrays it contributes.
+A continuous block of k zeros contains a total of 1 + 2 + 3 + ... + k subarrays. 
+This sum can be calculated efficiently using the triangular number formula: k * (k + 1) / 2.
+
+The algorithm is as follows:
+
+Initialize a running total totalSubarrays = 0 and a counter for the current block consecutiveZeros = 0.
+Iterate through the input array nums.
+If the current element is 0, increment consecutiveZeros.
+If the current element is not 0, it marks the end of a potential zero block. 
+We calculate the number of subarrays from the consecutiveZeros count using the formula and add it to totalSubarrays.
+We then reset consecutiveZeros to 0.
+After the loop finishes, we must perform one final calculation to account for any trailing block of zeros that extends to the end of the array.
+
+Here's the code:
+
+class Solution {
+    public long zeroFilledSubarray(int[] nums) {
+        long totalZeroSubarrays = 0;
+        long consecutiveZeros = 0;
+
+        for (int num : nums) {
+            if (num == 0) {
+                consecutiveZeros++;
+            } else {
+                totalZeroSubarrays += (consecutiveZeros * (consecutiveZeros + 1)) / 2;
+                consecutiveZeros = 0;
+            }
+        }
+
+        totalZeroSubarrays += (consecutiveZeros * (consecutiveZeros + 1)) / 2;
+
+        return totalZeroSubarrays;
+    }
+}
+
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+
+
