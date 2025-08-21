@@ -1,0 +1,90 @@
+Day 88/100: Count Submatrices With All Ones
+
+Problem Statement #1504
+
+Problem Statement Explanation:
+
+Given an m x n binary matrix mat, your task is to return the total number of submatrices that contain only ones.
+
+Example
+Consider the matrix:
+
+mat = [[1, 0, 1],
+       [1, 1, 0],
+       [1, 1, 0]]
+
+
+The correct output is 13. This total is composed of:
+6 submatrices of size 1x1
+2 submatrices of size 1x2
+3 submatrices of size 2x1
+1 submatrix of size 2x2
+1 submatrix of size 3x1
+
+
+Solution Approach:
+
+The core idea is to transform the 2D problem into a series of 1D histogram problems.
+
+Histogram Formation: 
+For each row, we create a histogram where the height of the bar at column j, h[j], is the number of consecutive 1s above and including the current cell mat[i][j].
+
+Counting with a Monotonic Stack: 
+For the histogram of each row, we calculate dp[j]: 
+The total number of submatrices (rectangles) ending at column j. 
+This is done efficiently using a monotonic stack to find p, the index of the first bar to the left of j that is shorter than h[j].
+
+Here's the Code:
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+
+class Solution {
+    public int numSubmat(int[][] mat) {
+        if (mat == null || mat.length == 0 || mat[0].length == 0) {
+            return 0;
+        }
+
+        int m = mat.length;
+        int n = mat[0].length;
+        int totalCount = 0;
+        int[] h = new int[n];
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (mat[i][j] == 1) {
+                    h[j]++;
+                } else {
+                    h[j] = 0;
+                }
+            }
+
+            int[] dp = new int[n];
+            Deque<Integer> stack = new ArrayDeque<>();
+
+            for (int j = 0; j < n; j++) {
+                while (!stack.isEmpty() && h[stack.peek()] >= h[j]) {
+                    stack.pop();
+                }
+
+                int p = stack.isEmpty() ? -1 : stack.peek();
+                
+                int newSubmatrices = h[j] * (j - p);
+                int extendingSubmatrices = (p >= 0) ? dp[p] : 0;
+                
+                dp[j] = newSubmatrices + extendingSubmatrices;
+                stack.push(j);
+            }
+            
+            for (int count : dp) {
+                totalCount += count;
+            }
+        }
+        return totalCount;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(m*n)
+Space Complexity: O(n)
