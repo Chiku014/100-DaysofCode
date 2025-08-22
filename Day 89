@@ -1,0 +1,105 @@
+Day 89/100: Find the Minimum Area to Cover All Ones I 
+
+Problem Statement #3195
+
+Problem Statement Explanation:
+
+You are given a 2D binary array grid. You need to find the minimum area of a rectangle that covers all the 1's in the grid. 
+The rectangle's sides must be parallel to the grid's axes.
+In simpler terms, we need to find the smallest rectangle that can enclose every single '1' in the grid and calculate its area.
+
+Example:
+Consider the following grid:
+
+[[0, 1, 0],
+ [1, 0, 1],
+ [0, 0, 0]]
+The 1's are at coordinates (0, 1), (1, 0), and (1, 2).
+To cover all these 1's, we need to find the bounding box:
+The topmost 1 is in row 0.
+The bottommost 1 is in row 1.
+The leftmost 1 is in column 0.
+The rightmost 1 is in column 2.
+The rectangle spans from row 0 to 1 and from column 0 to 2.
+Height: (bottom_row - top_row + 1) = (1 - 0 + 1) = 2
+Width: (right_col - left_col + 1) = (2 - 0 + 1) = 3
+Minimum Area: height * width = 2 * 3 = 6.
+
+Solution Approach:
+
+The core idea is to find the topmost, bottommost, leftmost, and rightmost coordinates where a 1 appears. These four coordinates define the corners of the minimum bounding rectangle.
+
+Algorithm Steps
+Initialize Boundaries: We start by creating four variables to track the extreme coordinates of the 1s:
+
+minRow & minCol: Initialized to a very large value (like Integer.MAX_VALUE).
+
+maxRow & maxCol: Initialized to a very small value (like Integer.MIN_VALUE).
+We also use a boolean flag, foundOne, to handle the case where the grid might not contain any 1s.
+
+Find the Extents: We iterate through every cell (i, j) of the grid. 
+If a cell contains a 1, we update our boundary variables:
+
+minRow = Math.min(minRow, i)
+maxRow = Math.max(maxRow, i)
+minCol = Math.min(minCol, j)
+maxCol = Math.max(maxCol, j)
+Calculate the Area: After checking all the cells, we have the precise boundaries of our rectangle.
+If foundOne is false, it means there were no 1s, so the required area is 0.
+
+Otherwise, the dimensions are calculated as:
+Height: maxRow - minRow + 1
+Width: maxCol - minCol + 1
+The final minimum area is simply height * width.
+This single pass through the grid is efficient and guarantees we find the tightest possible bounding box for all the 1s.
+
+Here's the code:
+
+class Solution {
+    public int minimumArea(int[][] grid) {
+        int minRow = Integer.MAX_VALUE;
+        int maxRow = Integer.MIN_VALUE;
+        int minCol = Integer.MAX_VALUE;
+        int maxCol = Integer.MIN_VALUE;
+
+        boolean foundOne = false;
+
+        int rows = grid.length;
+        int cols = grid[0].length;
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (grid[i][j] == 1) {
+                    foundOne = true;
+                    minRow = Math.min(minRow, i);
+                    maxRow = Math.max(maxRow, i);
+                    minCol = Math.min(minCol, j);
+                    maxCol = Math.max(maxCol, j);
+                }
+            }
+        }
+
+        if (!foundOne) {
+            return 0;
+        }
+
+        int height = maxRow - minRow + 1;
+        int width = maxCol - minCol + 1;
+
+        return height * width;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(m×n)
+Space Complexity: O(1)
+
+
+
+
+
+
+
+
+
