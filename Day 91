@@ -1,0 +1,74 @@
+Day 91/100: Longest Subarray of 1's After Deleting One Element
+
+Problem Statement #1493
+
+Problem Statement Explanation:
+
+Given a binary array nums (containing only 0s and 1s), you must delete exactly one element from it. 
+The goal is to find the length of the longest contiguous subarray that contains only 1s in the modified array.
+If no such subarray exists (e.g., after deletion, the array is empty or has no 1s), the answer is 0.
+
+Example:
+Input: nums = [1, 1, 0, 1]
+Output: 3
+
+Explanation: By deleting the 0 at index 2, the array becomes [1, 1, 1]. 
+The longest subarray of 1s has a length of 3.
+
+Solution Approach:
+
+The problem can be elegantly solved using a sliding window technique. 
+The core idea is to find the longest subarray that contains at most one zero. 
+The length of this window, minus one (for the deleted element), gives us the length of the subarray of 1s.
+
+The algorithm works as follows:
+
+Initialize Pointers: 
+We use two pointers, l (left) and r (right), to define our sliding window. Both start at index 0. 
+We also use a variable zeros to count the number of zeros inside the current window.
+
+Expand the Window: 
+We iterate through the array with the r pointer, expanding the window to the right. 
+If we encounter a 0, we increment our zeros counter.
+
+Shrink the Window: 
+If zeros becomes greater than 1 (i.e., we have two zeros in our window), the window is invalid. 
+We must shrink it from the left by moving the l pointer forward. 
+If the element at nums[l] was a zero, we decrement the zeros counter as it leaves the window. We continue shrinking until the window is valid again (contains at most one zero).
+
+Calculate Max Length: 
+After each expansion of the r pointer, the current window [l, r] is guaranteed to have at most one zero. 
+The size of this window is r - l. This size represents the length of a subarray of 1s if we were to delete the single zero within it.
+We continuously update our answer with the maximum size seen so far.
+
+This process efficiently finds the longest possible subarray by expanding and shrinking the window in a single pass.
+
+Here's the code:
+
+class Solution {
+    public int longestSubarray(int[] nums) {
+        int ans = 0;
+        int zeros = 0;
+
+        for (int l = 0, r = 0; r < nums.length; ++r) {
+            if (nums[r] == 0)
+                ++zeros;
+            while (zeros == 2)
+                if (nums[l++] == 0)
+                --zeros;
+            ans = Math.max(ans, r - l);
+        }
+        return ans;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+
+
+
+
+
