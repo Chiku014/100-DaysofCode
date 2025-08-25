@@ -1,0 +1,76 @@
+Day 92/100: Diagonal Traverse
+
+Problem Statement #498
+
+Problem Statement Explanation:
+
+Given an m x n matrix of integers, the task is to traverse the matrix in a diagonal pattern and return all its elements in a single 1D array. 
+The traversal direction alternates between moving up-right and down-left.
+
+For example, given the matrix:
+
+[
+ [ 1, 2, 3 ],
+ [ 4, 5, 6 ],
+ [ 7, 8, 9 ]
+]
+The traversal path would be: 1 -> 2 -> 4 -> 7 -> 5 -> 3 -> 6 -> 8 -> 9.
+The output should be: [1, 2, 4, 7, 5, 3, 6, 8, 9]
+
+Solution Approach:
+
+The algorithm simulates the traversal path directly. We iterate m * n times, keeping track of the current (row, col) position. 
+In each step, the current element is recorded, and the next position is calculated.
+The direction of movement is determined by the sum of the indices (row + col).
+An even sum results in an up-right movement (row--, col++).
+An odd sum results in a down-left movement (row++, col--).
+When the traversal hits a matrix boundary (a wall), special logic applies to shift the position down or right to begin traversing the next diagonal.
+
+Here's the code:
+
+class Solution {
+    public int[] findDiagonalOrder(int[][] mat) {
+        if (mat == null || mat.length == 0) {
+            return new int[0];
+        }
+
+        int m = mat.length;
+        int n = mat[0].length;
+        int[] result = new int[m * n];
+        int row = 0, col = 0;
+
+        for (int i = 0; i < result.length; i++) {
+            result[i] = mat[row][col];
+
+            if ((row + col) % 2 == 0) { // Moving up-right
+                if (col == n - 1) {
+                    row++;
+                } else if (row == 0) {
+                    col++;
+                } else {
+                    row--;
+                    col++;
+                }
+            } else { // Moving down-left
+                if (row == m - 1) {
+                    col++;
+                } else if (col == 0) {
+                    row++;
+                } else {
+                    row++;
+                    col--;
+                }
+            }
+        }
+        return result;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(M × N)
+Space Complexity: O(1)
+
+
+
+
