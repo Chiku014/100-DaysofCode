@@ -1,0 +1,48 @@
+Day 93/100: Maximum Area of Longest Diagonal Rectangle
+
+Problem Statement #3000
+
+Problem Statement Explanation:
+
+You are given a 2D integer array dimensions, where each element dimensions[i] = [li, wi] represents the length and width of the i-th rectangle.
+
+Your task is to find the rectangle with the longest diagonal. 
+If there are multiple rectangles with the same longest diagonal, you should choose the one among them that has the largest area. 
+Return the area of this rectangle.
+
+Solution Approach:
+
+The algorithm proceeds as follows:
+Initialize two variables:
+maxDiagonalSq to 0, which will store the square of the longest diagonal found.
+maxArea to 0, which will store the area associated with that longest diagonal.
+Iterate through each rectangle [l, w] in the dimensions array.
+For each rectangle, calculate the square of its diagonal: currentDiagonalSq = l*l + w*w.
+
+
+Compare currentDiagonalSq with maxDiagonalSq:
+If currentDiagonalSq > maxDiagonalSq: We have found a new longest diagonal. We update maxDiagonalSq to this new value and reset maxArea to the area of the current rectangle (l*w).
+If currentDiagonalSq == maxDiagonalSq: We have found another rectangle with the same longest diagonal. 
+The problem requires us to pick the one with the largest area, so we update maxArea = Math.max(maxArea, l * w).
+After iterating through all the rectangles, the maxArea variable will hold the final answer.
+This approach ensures that we find the maximum area corresponding to the longest diagonal in a single, efficient pass.
+                                                                                                
+Here's the code:
+
+ class Solution {
+    public int areaOfMaxDiagonal(int[][] dimensions) {
+        int maxDiagonalSq = 0;
+        int maxArea = 0;
+
+        for (int[] dim : dimensions) {
+            int l = dim[0];
+            int w = dim[1];
+
+            int currentDiagonalSq = l * l + w * w;
+…    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(1)                                                                                                                                                                     
