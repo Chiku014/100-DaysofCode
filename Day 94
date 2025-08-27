@@ -1,0 +1,108 @@
+Day 94/100: Length of Longest V-Shaped Diagonal Segment
+
+Problem Statement #3459
+
+Problem Statement Explanation:
+
+You are given an n × m grid where each cell contains one of the values 0, 1, or 2.
+
+A V-shaped diagonal segment is defined as:
+It starts at a cell containing 1.
+It continues diagonally, following the repeating sequence: 2 → 0 → 2 → 0 → ….
+Movement is restricted to the four diagonal directions: up-left, up-right, down-left, down-right.
+At most one clockwise 90° turn is allowed while traversing.
+Return the length of the longest V-shaped diagonal segment. 
+If no valid segment exists, return 0.
+
+Solution Approach:
+
+1.Observation:
+Any valid segment must start from a cell containing 1.
+From there, the traversal must strictly follow the alternating pattern: 2 → 0 → 2 → 0 ….
+Movement is diagonal and can only include one clockwise turn.
+
+2.DFS + Memoization:
+Use Depth-First Search (DFS) to explore paths starting from every 1.
+Each DFS state includes:
+current position (i, j)
+whether a turn has already been made (turned flag) 
+the expected next value (2 or 0)
+the current diagonal direction
+Store results in a 5-dimensional memoization table to avoid recomputation.
+
+3. Transitions:
+Go straight in the current direction if the next cell matches expectation.
+Turn clockwise (only if not yet turned) and continue traversal.
+
+4. Result:
+Iterate over all cells with value 1.
+From each, try all 4 diagonal directions.
+
+Here's the code:
+
+class Solution {
+    private static final int[][] DIRS = {
+        {-1, 1}, // up-right
+        {1, 1},  // down-right
+        {1, -1}, // down-left
+        {-1, -1} // up-left
+    };
+    
+    private int n, m;
+    private int[][] grid;
+    private Integer[][][][][] memo; // i, j, turned (0/1), expectedValue (2/0), dir (0–3)
+    
+    public int lenOfVDiagonal(int[][] grid) {
+        this.grid = grid;
+        n = grid.length;
+        m = grid[0].length;
+        // Initialize memoization: n×m×2×2×4
+        memo = new Integer[n][m][2][2][4];
+        
+        int best = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (grid[i][j] == 1) {
+                    for (int dir = 0; dir < 4; dir++) {
+                        int length = 1 + dfs(i + DIRS[dir][0], j + DIRS[dir][1],
+                                             false, 2, dir);
+                        best = Math.max(best, length);
+                    }
+                }
+            }
+        }
+        return best;
+    }
+    
+    private int dfs(int i, int j, boolean turned, int expected, int dir) {
+        if (i < 0 || i >= n || j < 0 || j >= m) return 0;
+        if (grid[i][j] != expected) return 0;
+        
+        int ti = turned ? 1 : 0;
+        int ev = (expected == 2 ? 0 : 1); // map 2→0, 0→1
+        if (memo[i][j][ti][ev][dir] != null) {
+            return memo[i][j][ti][ev][dir];
+        }
+        
+        int res = 1; // current cell counts as 1
+        int nextExp = (expected == 2) ? 0 : 2;
+        
+        // Continue straight
+        res = Math.max(res, 1 + dfs(i + DIRS[dir][0], j + DIRS[dir][1], turned, nextExp, dir));
+        
+        // Try one clockwise turn
+        if (!turned) {
+            int newDir = (dir + 1) % 4; // rotate 90° clockwise
+            res = Math.max(res, 1 + dfs(i + DIRS[newDir][0], j + DIRS[newDir][1], true, nextExp, newDir));
+        }
+        
+        memo[i][j][ti][ev][dir] = res;
+        return res;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n × m × max(n, m))
+Space Complexity: O(n × m)
+
