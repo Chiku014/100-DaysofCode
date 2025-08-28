@@ -1,0 +1,68 @@
+Day 95/100: Sort Matrix by Diagonals
+
+Problem Statement #3446
+
+Problem Statement Explantion:
+
+You are given an n x n square matrix.
+For each diagonal in the lower-left region (including the main diagonal), sort its elements in non-increasing (descending) order.
+For each diagonal in the upper-right region (excluding the main diagonal), sort its elements in non-decreasing (ascending) order.
+Return the modified matrix after sorting all diagonals accordingly.
+
+The matrix is divided into two regions based on diagonals:
+Lower-left (main diagonal included): Sort diagonals in descending order.
+Upper-right (excluding main diagonal): Sort diagonals in ascending order.
+
+Each diagonal is independent, so we can process one diagonal at a time:
+Collect elements along the diagonal.
+Sort them according to the region’s rule.
+Put them back into the matrix along the same diagonal.
+
+Solution Approach:
+
+Traverse starting points of all diagonals:
+From the bottom row to top at column 0 → descending sort.
+From the left to right at row 0 (excluding 0,0) → ascending sort.
+
+Use a helper function to:
+Extract diagonal into a list.
+Sort it (Collections.sort() for ascending, reverseOrder() for descending).
+Write values back into the matrix.
+Return the updated matrix
+
+Here's the code:
+
+import java.util.*;
+
+class Solution {
+    public int[][] sortMatrix(int[][] mat) {
+        int n = mat.length;
+        for (int startRow = n - 1; startRow >= 0; startRow--) {
+            sortOneDiagonal(mat, startRow, 0, false);
+        }
+        for (int startCol = 1; startCol < n; startCol++) {
+            sortOneDiagonal(mat, 0, startCol, true);
+        }
+        return mat;
+    }
+
+    private void sortOneDiagonal(int[][] mat, int row, int col, boolean asc) {
+        int n = mat.length;
+        ArrayList<Integer> diag = new ArrayList<>();
+        for (int r = row, c = col; r < n && c < n; r++, c++) {
+            diag.add(mat[r][c]);
+        }
+        if (asc) Collections.sort(diag);
+        else diag.sort(Collections.reverseOrder());
+        int idx = 0;
+        for (int r = row, c = col; r < n && c < n; r++, c++) {
+            mat[r][c] = diag.get(idx++);
+        }
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n² log n)
+Space Complexity: O(n)
+
