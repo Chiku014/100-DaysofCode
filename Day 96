@@ -1,0 +1,53 @@
+Day 96/100: Alice and Bob Playing Flower Game
+
+Problem Statement #3021
+
+Problem Statement Explanation:
+
+Alice and Bob are playing a game with flowers. 
+There are two gardens, one with n flowers and the other with m flowers. 
+Alice picks a number of flowers x such that 1 <= x <= n, and Bob picks a number of flowers y such that 1 <= y <= m.
+
+The rule for winning is simple: 
+Alice wins if the total number of flowers they pick, x + y, is an odd number. 
+Your task is to calculate the total number of different pairs (x, y) that result in Alice winning.
+
+Solution Approach:
+
+Alice wins if the total flowers, x + y, is odd. 
+This only happens if one person picks an even number and the other picks an odd number.
+Instead of counting every combination, we can use a simpler insight. 
+Out of all n * m possible pairs, exactly half will have an odd sum. Therefore, the total number of ways Alice can win is simply the total number of pairs divided by two.
+
+The formula is:
+Total Wins = (n * m) / 2
+
+A 64-bit integer type (like long in Java) is necessary for the calculation to prevent overflow since n and m can be large.
+
+Here's the code:
+
+class Solution {
+    public long flowerGame(int n, int m) {
+        long evenCountN = n / 2;
+        long oddCountN = (n + 1) / 2;
+
+        long evenCountM = m / 2;
+        long oddCountM = (m + 1) / 2;
+
+        long firstCase = evenCountN * oddCountM;
+        long secondCase = oddCountN * evenCountM;
+
+        return firstCase + secondCase;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(1)
+Space Complexity: O(1)
+
+
+
+
+
+
