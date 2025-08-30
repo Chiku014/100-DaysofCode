@@ -1,0 +1,72 @@
+Day 97/100: Valid Sudoku
+
+Problem Statement #36
+
+Problem Statement Explanation:
+
+The goal is to determine if a given 9x9 Sudoku board is valid. 
+The validation is based on three rules, and only the filled cells on the board need to be validated. A board can be valid even if it is not solvable.
+
+The rules for a valid Sudoku are:
+Each row must contain the digits 1-9 without repetition.
+Each column must contain the digits 1-9 without repetition.
+Each of the nine 3x3 sub-boxes of the grid must contain the digits 1-9 without repetition.
+
+Solution Aproach:
+
+The solution involves a single pass through the 9x9 grid. 
+We use HashSets to efficiently track the numbers already seen in each row, column, and 3x3 sub-box, leveraging their O(1) average time for checking duplicates.
+
+For each cell (i, j) containing a number, we perform three checks:
+Has the number appeared in the current row (rows[i])?
+Has the number appeared in the current column (cols[j])?
+Has the number appeared in the current 3x3 box?
+The 3x3 box index is calculated with the formula (i / 3) * 3 + (j / 3). 
+We attempt to add the cell's number to the corresponding HashSet for each of these three contexts. 
+The Set.add() method returns false if the number is already present. If this occurs for any check, we've found a duplicate and immediately return false.
+If we traverse the entire board without finding any duplicates, the board is valid, and we return true.
+
+Here's the code:
+
+import java.util.HashSet;
+import java.util.Set;
+
+class Solution {
+    public boolean isValidSudoku(char[][] board) {
+        Set<Character>[] rows = new HashSet[9];
+        Set<Character>[] cols = new HashSet[9];
+        Set<Character>[] boxes = new HashSet[9];
+
+        for (int i = 0; i < 9; i++) {
+            rows[i] = new HashSet<>();
+            cols[i] = new HashSet<>();
+            boxes[i] = new HashSet<>();
+        }
+
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                char val = board[i][j];
+
+                if (val == '.') {
+                    continue;
+                }
+
+                int boxIndex = (i / 3) * 3 + (j / 3);
+
+                if (!rows[i].add(val) || !cols[j].add(val) || !boxes[boxIndex].add(val)) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(1)
+Space Complexity: O(1)
+
+
+
