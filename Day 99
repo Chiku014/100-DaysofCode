@@ -1,0 +1,73 @@
+Day 99/100:  Maximum Average Pass Ratio
+
+Problem Statement #1792
+
+Problem Statement Explanation:
+
+You're given a 2D array classes, where classes[i] = [pass_i, total_i] represents the number of passing students and the total number of students in the i-th class. 
+You're also given an integer extraStudents, the number of brilliant extra students you can assign to any of the classes.
+Your goal is to assign all extraStudents to the classes in a way that maximizes the average pass ratio across all classes. 
+Adding an extra student to a class increases both its pass count and its total count by one. 
+You need to return this maximum possible average.
+
+Solution Approach:
+
+The problem asks us to find the optimal distribution of students to maximize an average. 
+This hints at a greedy approach. 
+To get the best overall result, we should make the best possible decision at each step.
+What's the best decision? For each of the extraStudents, we should assign them to the class where the increase in the pass ratio is the largest.
+Let's define this "increase" or "profit". 
+For a class with pass and total students, the current ratio is fracpasstotal.
+
+Our algorithm is as follows:
+
+Create a Max-Heap (using PriorityQueue in Java) to store the classes. 
+The priority of each class will be its potential profit.
+Add all the initial classes to the heap.
+
+Loop extraStudents times:
+Remove the class from the top of the heap (this is the one with the highest potential gain).
+Increment its pass and total counts by one.
+Add the updated class back into the heap. 
+The heap will automatically place it in the correct position based on its new potential profit.
+Once all extra students are assigned, the heap contains the final state of all classes. 
+Calculate the sum of their pass ratios and divide by the number of classes to get the final average.
+
+Here's the code:
+
+import java.util.PriorityQueue;
+
+class Solution {
+    public double maxAverageRatio(int[][] classes, int extraStudents) {
+        PriorityQueue<double[]> maxHeap = new PriorityQueue<>((a, b) -> {
+            double profit_a = (a[0] + 1) / (a[1] + 1) - a[0] / a[1];
+            double profit_b = (b[0] + 1) / (b[1] + 1) - b[0] / b[1];
+            return Double.compare(profit_b, profit_a);
+        });
+
+        for (int[] c : classes) {
+            maxHeap.offer(new double[]{c[0], c[1]});
+        }
+
+        for (int i = 0; i < extraStudents; i++) {
+            double[] maxProfitClass = maxHeap.poll();
+            double[] updatedClass = new double[]{maxProfitClass[0] + 1, maxProfitClass[1] + 1};
+            maxHeap.offer(updatedClass);
+        }
+
+        double totalRatioSum = 0;
+        while (!maxHeap.isEmpty()) {
+            double[] c = maxHeap.poll();
+            totalRatioSum += c[0] / c[1];
+        }
+
+        return totalRatioSum / classes.length;
+    }
+}
+
+Complexity:
+
+Time Complexity: O((n+k)logn)
+Space Complexity: O(n)
+
+
