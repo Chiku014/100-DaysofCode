@@ -1,0 +1,76 @@
+Day 100: Find the Number of Ways to Place People I
+
+Problem Statement #3025
+
+Problem Statement Explanation:
+
+You are given a 2D array of coordinates, points, where points[i] = [xi, yi] represents the location of the i-th person.
+The goal is to find the total number of valid pairs of people, (i, j), that satisfy two specific conditions:
+Top-Left Relationship: Person i must be in the "top-left" region relative to person j. 
+This means xi <= xj and yi >= yj. 
+The two people cannot be at the exact same location.
+Empty Rectangle: The rectangle formed by person i and person j as its diagonal corners must not contain any other person k.
+We need to count how many such pairs exist.
+
+Solution Approach:
+
+The solution uses a brute-force approach by checking every possible pair of people `(i, j)`.
+For each pair, we first confirm the top-left condition (`xi <= xj` and `yi >= yj`). 
+If it holds, we then check the empty rectangle condition by using a third loop to see if any other person `k` is inside the rectangle formed by `i` and `j` (`xi <= xk <= xj` and `yj <= yk <= yi`).
+If the rectangle is empty, the pair is valid, and we increment our counter. 
+After checking all pairs, the final count is the answer. 
+This method is efficient enough given the problem's constraints.
+
+Here's the code:
+
+class Solution {
+    public int numberOfPairs(int[][] points) {
+        int n = points.length;
+        int validPairsCount = 0;
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == j) {
+                    continue;
+                }
+
+                int x_i = points[i][0];
+                int y_i = points[i][1];
+                int x_j = points[j][0];
+                int y_j = points[j][1];
+
+                if (x_i <= x_j && y_i >= y_j) {
+                    boolean isRectangleEmpty = true;
+                    
+                    for (int k = 0; k < n; k++) {
+                        if (k == i || k == j) {
+                            continue;
+                        }
+
+                        int x_k = points[k][0];
+                        int y_k = points[k][1];
+
+                        if (x_k >= x_i && x_k <= x_j && y_k >= y_j && y_k <= y_i) {
+                            isRectangleEmpty = false;
+                            break;
+                        }
+                    }
+
+                    if (isRectangleEmpty) {
+                        validPairsCount++;
+                    }
+                }
+            }
+        }
+
+        return validPairsCount;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N^3)
+Space Complexity: O(1)
+
+
+
