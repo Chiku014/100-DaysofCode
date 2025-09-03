@@ -1,0 +1,82 @@
+Day 101/150: Find the Number of Ways to Place People II
+
+Problem Statmeent #3027
+
+Problem Statement Explanation:
+
+Imagine you have a set of points scattered on a 2D plane. 
+Your goal is to find the number of "valid pairs" of points.
+
+A pair of points, let's call them A(x1, y1) and B(x2, y2), is considered a valid pair only if it meets two specific conditions:
+Top-Left Condition: Point A must be to the "top-left" of point B. 
+This means A's x-coordinate is less than or equal to B's (x1 ≤ x2), and A's y-coordinate is greater than or equal to B's (y1 ≥ y2).
+No Obstructions Condition: There cannot be any other point C that lies inside the imaginary rectangle formed by points A and B as its corners.
+So, you need to count how many pairs of points satisfy both of these rules simultaneously.
+
+Solution Approach:
+
+A  brute-force O(N^3) approach is possible, but we can do much better with an elegant O(N^2) solution. 
+The key is to sort the points first.
+
+1. Sort the Points SORT:
+The first step is to sort the array of points. 
+We sort them primarily by their x-coordinate in ascending order. 
+If two points share the same x-coordinate, we sort them by their y-coordinate in descending order. 
+This clever sorting is crucial because it automatically satisfies the $x_i \le x_j$ part of the "top-left" condition whenever we compare a point i with a later point j.
+
+2. Iterate and Find Partners:
+Next, we loop through each point, let's call it i, from the beginning of the sorted array. 
+For each i, we'll try to find all valid partner points j that come after it in the array.
+The "Ceiling" Logic
+For a fixed point i, we start a second loop to look at subsequent points j. 
+A point j is a potential partner if its y-coordinate is less than or equal to i's ($y_j \le y_i$).
+
+However, we also need to satisfy the "no obstructions" rule. 
+To do this efficiently, we keep track of a variable, maxY. 
+This variable acts like a "ceiling," storing the highest y-coordinate of any valid partner we've already found for our current point i.
+
+When we consider a new potential partner j, we check two things:
+Is $y_j \le y_i$? (Is it below our starting point?)
+Is $y_j > maxY$? (Is it above the "ceiling" set by previous partners?)
+If both are true, it means we've found a new valid pair! No point we've previously validated can block this new pair because they are all below j's y-level. 
+We then count this pair and update our ceiling by setting maxY = yj. This new, higher ceiling makes the condition stricter for any future points.
+
+Here's the code:
+
+import java.util.Arrays;
+
+class Solution {
+    public int numberOfPairs(int[][] points) {
+        Arrays.sort(points, (a, b) -> {
+            if (a[0] == b[0]) {
+                return b[1] - a[1];
+            }
+            return a[0] - b[0];
+        });
+
+        int validPairs = 0;
+        int n = points.length;
+
+        for (int i = 0; i < n; i++) {
+            int yi = points[i][1];
+            int maxY = Integer.MIN_VALUE;
+
+            for (int j = i + 1; j < n; j++) {
+                int yj = points[j][1];
+                if (yj <= yi && yj > maxY) {
+                    validPairs++;
+                    maxY = yj;
+                }
+            }
+        }
+        return validPairs;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N^2)
+Space Complexity: O(logN)
+
+
+
