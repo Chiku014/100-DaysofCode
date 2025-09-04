@@ -1,0 +1,55 @@
+Day 102/150: Find Closest Number
+
+Problem Statement #3516
+
+Problem Statement Explanation:
+
+Given three integers, x, y, and z. 
+Your task is to implement a function that determines which of the first two integers (x or y) is closer in value to the third integer (z).
+
+The function should return:
+1 if x is closer to z.
+2 if y is closer to z.
+0 if x and y are equidistant from z.
+
+Example:
+Input: x = 5, y = 12, z = 10
+Output: 2
+Explanation: The distance between 5 and 10 is 5. 
+The distance between 12 and 10 is 2. Since 2 is less than 5, y is closer to z.
+
+Solution Approach:
+The solution is straightforward and relies on basic arithmetic. 
+The core idea is to calculate the absolute difference between each of the first two numbers and the third number, and then compare these differences.
+Calculate Distances: We first find the absolute distance between x and z and store it in a variable xz. 
+The absolute value is crucial because distance is always non-negative.
+xz = |x - z|
+Calculate Second Distance: Similarly, we calculate the absolute distance between y and z and store it in yz.
+yz = |y - z|
+Compare and Return:
+If xz is less than yz, it means x is closer to z, so we return 1.
+If yz is less than xz, it means y is closer to z, so we return 2.
+If xz and yz are equal, x and y are equidistant from z, so we return 0.
+This logic is efficiently implemented using a simple conditional check and a ternary operator.
+
+Here's the code:
+
+class Solution {
+    public int findClosest(int x, int y, int z) {
+        final int xz = Math.abs(x - z);
+        final int yz = Math.abs(y - z);
+        if (xz == yz)
+            return 0;
+        return xz < yz ? 1 : 2;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(1)
+Space Complexity: O(1)
+
+
+
+
+
