@@ -1,0 +1,46 @@
+Day 103: Minimum Operations to Make The Integer Zero
+
+Problem Statement #2749
+
+Problem Statement Explanation:
+
+You are given two integers num1 and num2.
+In one operation, you can choose an integer i ≥ 0 and subtract (num2 + 2^i) from num1.
+Return the minimum number of operations required to make num1 equal to 0.
+If it is impossible, return -1.
+After performing k operations, the equation becomes:
+num1 - k * num2 = 2^i1 + 2^i2 + ... + 2^ik
+The right-hand side is a sum of k powers of two.This means:
+The number of set bits in target = num1 - k * num2 must be ≤ k (since each set bit represents a power of two)
+Target ≥ k, because the smallest sum of k powers of two is 1 + 1 + ... + 1 = k.
+Therefore, for each possible k, we check:
+        target >= k
+        bitCount(target) <= k
+The first valid k is our answer.
+
+Solution Approach:
+
+Iterate k from 0 to 60 (safe upper bound, since 2^60 is very large).
+Compute target = num1 - k * num2.
+If target >= k and bitCount(target) <= k, return k.
+If no valid k exists, return -1.
+
+Here's the code:
+
+class Solution {
+    public int makeTheIntegerZero(int num1, int num2) {
+        for (long ops = 0; ops <= 60; ++ops) {
+            long target = num1 - ops * num2;
+            if (Long.bitCount(target) <= ops && ops <= target)
+            return (int) ops;
+        }
+
+        return -1;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(1)
+Space Complexity: O(1)
+
