@@ -1,0 +1,75 @@
+Day 105/150: Find N Unique Integers Sum up to Zero
+
+Problem Statement #1304
+
+Problem Statement Explanation:
+
+Size: The array must contain exactly n numbers.
+Uniqueness: Every number in the array must be unique. You can't have any repeats.
+Sum: The sum of all the numbers in the array must be exactly zero.
+
+A Simple Example: n = 3
+Let's say the input is n = 3. You need to find an array with three unique numbers that add up to zero.
+A simple solution is [-1, 0, 1]. Let's check if it follows the rules:
+
+Is the size 3? Yes.
+Are the numbers unique? Yes.
+Is the sum 0? Yes, because -1 + 0 + 1 = 0.
+So, [-1, 0, 1] is a valid answer.
+The Key Word: "Any"
+The problem asks for "any array" that works. 
+This is important because it means there can be many correct answers. For n = 3, [-2, 1, 1] is not a valid answer because 1 is repeated. 
+However, [-5, 2, 3] is another perfectly valid answer.
+You don't need to find the "best" or a specific answer—you just need to find one that works.
+
+Solution Appraoch:
+
+The core idea is to leverage a simple mathematical property: the sum of any number and its opposite is zero (e.g., x + (-x) = 0). 
+We can build our array using pairs of such numbers.
+
+An elegant way to implement this is with a two-pointer approach:
+
+Create the result array of size n. 
+In Java, it will be initialized with all zeros.
+Initialize two pointers, left at the start of the array (0) and right at the end (n - 1).
+Use a counter variable, value, starting from 1.
+In a while loop that runs as long as left < right, we do the following:
+Set the element at the left pointer to value.
+Set the element at the right pointer to -value.
+Move the pointers inward (left++, right--) and increment the counter (value++).
+This method naturally handles both even and odd values of n:
+If n is even, the loop continues until the pointers cross, filling the entire array with n / 2 pairs of (value, -value). 
+The total sum is 0.
+If n is odd, the loop stops when left and right meet at the middle index. 
+This middle element retains its default initialized value of 0, which perfectly completes the array while keeping the sum 0.
+
+Here's the code:
+
+class Solution {
+    public int[] sumZero(int n) {
+        int[] result = new int[n];
+        int left = 0;
+        int right = n - 1;
+        int value = 1;
+
+        while (left < right) {
+            result[left] = value;
+            result[right] = -value;
+
+            left++;
+            right--;
+            value++;
+        }
+        return result;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+
+
+
+
