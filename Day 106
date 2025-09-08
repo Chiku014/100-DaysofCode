@@ -1,0 +1,66 @@
+Day 106/150: Covert Integer to the sum of Two No-Zero Integers
+
+Problem Statement #1317
+
+Problem Statement Explanation:
+
+Given an integer n, return a list of two integers [A, B] where:
+A and B are No-Zero integers.
+A + B = n.
+A No-Zero integer is a positive integer that does not contain the digit 0 in its decimal representation.
+The problem guarantees that at least one valid solution exists. 
+If there are multiple solutions, you can return any of them.
+
+Example 1:
+Input: n = 2
+Output: [1, 1]
+Explanation: A = 1, B = 1. A + B = 2. Both A and B are No-Zero integers.
+
+Example 2:
+Input: n = 11
+Output: [2, 9]
+
+Constraints:
+2 <= n <= 10^4
+
+Solution Approach:
+
+The most straightforward way to solve this problem is by iterating through all possible pairs of numbers that sum up to n and stopping at the first valid pair we find.
+Iterate: We can loop through all possible values for the first integer, let's call it a, from 1 up to n - 1.
+Calculate the Complement: For each a, the second integer, b, is simply n - a.
+Check for Zeros: The core of the problem is to verify that both a and b are "No-Zero" integers. 
+We can create a helper function, containsZero(num), for this check.
+This function can work by repeatedly checking the last digit of the number using the modulo operator (num % 10). 
+If the last digit is 0, the number is not a No-Zero integer.
+If the last digit is not 0, we remove it by integer division (num / 10) and repeat the process until the number becomes 0.
+
+Return the Solution: The first pair (a, b) where !containsZero(a) and !containsZero(b) are both true is our answer. Since a solution is guaranteed to exist, we don't need to handle the case where the loop finishes without finding a pair.
+
+Here's the code:
+
+class Solution {
+    public int[] getNoZeroIntegers(int n) {
+        for (int i = 1; i < n; i++) {
+            int b = n - i;
+            if (!containsZero(i) && !containsZero(b)) {
+                return new int[]{i, b};
+            }
+        }
+        return new int[]{-1, -1};
+    }
+    
+    private boolean containsZero(int num) {
+        while (num > 0) {
+            if (num % 10 == 0) {
+                return true;
+            }
+            num /= 10;
+        }
+        return false;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(NlogN)
+Space Complexity: O(1)
