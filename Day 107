@@ -1,0 +1,82 @@
+Day 107/150: Number of People Aware of a Secret
+
+Problem Statement #2327
+
+Problem Statement Explanation:
+
+On day 1, one person discovers a secret. This person can share the secret with new people under a specific set of rules:
+
+After learning the secret, a person must wait for a delay number of days before they can start sharing it.
+
+Once the delay period is over, the person can share the secret with one new person each day.
+
+A person permanently forgets the secret forget days after learning it. They can no longer share it from that day onwards.
+
+Given the total number of days n, the delay, and the forget time, your task is to calculate the total number of people who know the secret on day n. 
+Since the answer can be large, return it modulo 10^9+7.
+
+Example:
+Input: n = 6, delay = 2, forget = 4
+
+Output: 5
+
+Explanation:
+Day 1: Person 1 discovers the secret. (1 person knows)
+Day 2: Person 1 is still in the delay period. (1 person knows)
+Day 3: Person 1 can now share. They share with Person 2. (2 people know)
+Day 4: Person 1 shares with Person 3. (3 people know)
+Day 5: Person 1 shares with Person 4. Person 2 (who learned on day 3) can now share, and they share with Person 5. However, Person 1 (who learned on day 1) forgets the secret today (day 1 + 4 = day 5). So, 4 people know the secret at the end of the day.
+Day 6: Person 2 shares with a new person. Person 3 (who learned on day 4) can now share and shares with another new person. At the end of day 6, a total of 5 people know the secret.
+
+Solution Approach
+This problem can be effectively solved using dynamic programming. 
+We can track the number of new people who learn the secret each day.
+
+Let dp[i] be the number of new people who learn the secret on day i.
+Base Case: On day 1, exactly one new person learns the secret. So, dp[1] = 1.
+DP Transition: The number of new people learning the secret on any given day i (dp[i]) is equal to the total number of people who are currently able to share it. A person who learned the secret on day j can share it on day i if j + delay <= i < j + forget.
+Sliding Window Optimization: Instead of re-calculating the sum of active sharers every day, we can maintain a running count. Let's call this sharing. As we iterate from day i-1 to i:
+New Sharers: People who learned the secret delay days ago (on day i - delay) have now passed their waiting period and can start sharing. We add dp[i - delay] to sharing.
+People Forgetting: People who learned the secret forget days ago (on day i - forget) will forget it today and must stop sharing. We subtract dp[i - forget] from sharing.
+The number of new people on day i is the updated sharing count: dp[i] = sharing.
+Final Answer: The question asks for the total number of people who know the secret on day n. 
+These are all the people who learned the secret on some day j and have not forgotten it by day n (i.e., j + forget > n). 
+This corresponds to the sum of dp[j] for all j from n - forget + 1 to n.
+All calculations are performed modulo 10^9+7 to handle large numbers.
+
+Here's the code:
+
+class Solution {
+    public int peopleAwareOfSecret(int n, int delay, int forget) {
+        final int MOD = 1_000_000_007;
+        long[] dp = new long[n + 1];
+        dp[1] = 1;
+        long sharing = 0;
+
+        for (int i = 2; i <= n; i++) {
+            if (i - delay > 0) {
+                sharing = (sharing + dp[i - delay]) % MOD;
+            }
+
+            if (i - forget > 0) {
+                sharing = (sharing - dp[i - forget] + MOD) % MOD;
+            }
+            dp[i] = sharing;
+        }
+
+        long total = 0;
+        for (int i = n - forget + 1; i <= n; i++) {
+            total = (total + dp[i]) % MOD;
+        }
+        return (int) total;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+
+
+
