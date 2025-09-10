@@ -1,0 +1,84 @@
+Day 108/150: Minimum Number of People to Teach
+
+Problem Statement Explanation:
+
+You are given n languages, numbered from 1 to n. 
+You are also given a 2D array languages where languages[i] is the set of languages the (i+1)-th user knows.
+Finally, you have a 2D array friendships where friendships[j] = [u, v] means that user u and user v are friends.
+Two users can communicate if they know at least one common language. 
+You can teach exactly one language to any number of users.
+Your task is to find the minimum number of users you need to teach a language to so that all friends can communicate.
+
+Solution Approach:
+
+Identify "Unconnected" Users: First, we identify all friendship pairs that cannot communicate. 
+We gather every user from these pairs into a single set to avoid duplicates. 
+This set represents all the people who are part of our problem. 
+If this set is empty, it means everyone can already communicate, and the answer is 0.
+Count Language Frequencies: We create a frequency map (or an array) to count how many users in our "unconnected" set speak each language from 1 to n.
+Find the Optimal Language: We iterate through our frequency map to find the language that is most commonly spoken among the users in our set. 
+The count of this language is the maximum number of people we don't have to teach if we choose this language.
+Calculate the Result: The minimum number of people to teach is the total size of our "unconnected" user set minus the frequency of the most common language.
+min_teachings = total_unconnected_users - max_frequency
+This approach guarantees we pick the language that is already known by the maximum number of relevant people, thereby minimizing the number of new teachings required.
+
+Here's the code:
+
+import java.util.HashSet;
+import java.util.Set;
+
+class Solution {
+    public int minimumTeachings(int n, int[][] languages, int[][] friendships) {
+        Set<Integer>[] userLanguages = new HashSet[languages.length];
+        for (int i = 0; i < languages.length; i++) {
+            userLanguages[i] = new HashSet<>();
+            for (int lang : languages[i]) {
+                userLanguages[i].add(lang);
+            }
+        }
+
+        Set<Integer> unconnectedUsers = new HashSet<>();
+        for (int[] friendship : friendships) {
+            int u1 = friendship[0] - 1;
+            int u2 = friendship[1] - 1;
+
+            if (!canCommunicate(userLanguages[u1], userLanguages[u2])) {
+                unconnectedUsers.add(u1);
+                unconnectedUsers.add(u2);
+            }
+        }
+
+        if (unconnectedUsers.isEmpty()) {
+            return 0;
+        }
+
+        int[] langFrequency = new int[n + 1];
+        int maxFreq = 0;
+
+        for (int userIndex : unconnectedUsers) {
+            for (int lang : userLanguages[userIndex]) {
+                langFrequency[lang]++;
+                maxFreq = Math.max(maxFreq, langFrequency[lang]);
+            }
+        }
+
+        return unconnectedUsers.size() - maxFreq;
+    }
+
+    private boolean canCommunicate(Set<Integer> langSet1, Set<Integer> langSet2) {
+        if (langSet1.size() > langSet2.size()) {
+            return canCommunicate(langSet2, langSet1);
+        }
+        for (int lang : langSet1) {
+            if (langSet2.contains(lang)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(U⋅L+F⋅L)
+Space Complexity: O(U⋅L+n)
