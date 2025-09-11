@@ -1,0 +1,80 @@
+Day 109/150: Sort Vowels in a String.
+
+Problem Statement #2785
+
+Problem Statement Explanation:
+
+Given a 0-indexed string s, the task is to rearrange the string by sorting its vowels while keeping all the consonants in their original positions. 
+The vowels should be sorted in non-decreasing order based on their ASCII values.
+Vowels are 'a', 'e', 'i', 'o', 'u', and they can appear in both uppercase and lowercase.
+
+Example:
+Input: s = "lEetcOde"
+Output: "lEOtcede"
+
+Explanation: The vowels in "lEetcOde" are 'E', 'e', 'O', 'e'. 
+Sorting them gives 'E', 'O', 'e', 'e'. 
+Replacing the original vowels with these sorted ones results in "lEOtcede".
+
+Solution Approach:
+
+The core idea is to treat the vowels and consonants separately. 
+We can extract all the vowels, sort them, and then place them back into the positions that were originally occupied by vowels.
+This can be broken down into three simple steps:
+Extract Vowels: Iterate through the input string s from beginning to end. Check each character. 
+If it's a vowel (either uppercase or lowercase), add it to a separate list.
+Sort Vowels: Sort the list of collected vowels. 
+Since we need to sort them by their ASCII values, a standard sorting algorithm (like the one provided by Collections.sort() in Java) works perfectly.
+Reconstruct the String: Create a new string or StringBuilder. 
+Iterate through the original string s a second time.
+If the character at the current position is a consonant, append it directly to your new string.
+If the character is a vowel, take the next available vowel from your sorted list and append it instead. 
+A pointer or index can be used to keep track of the current position in the sorted vowel list.
+This process ensures that consonants remain untouched in their initial spots, while the vowel spots are refilled with the sorted vowels.
+
+Here's the code:
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+class Solution {
+    public String sortVowels(String s) {
+        List<Character> vowels = new ArrayList<>();
+        // This was the main error: it should be a 'for' loop, not an 'if' statement.
+        for (char c : s.toCharArray()) {
+            if (isVowel(c)) {
+                // The semicolon was misplaced inside the parentheses.
+                vowels.add(c);
+            }
+        }
+
+        Collections.sort(vowels);
+
+        StringBuilder result = new StringBuilder();
+        int vowelIndex = 0;
+        for (char c : s.toCharArray()) {
+            if (isVowel(c)) {
+                result.append(vowels.get(vowelIndex));
+                vowelIndex++;
+            } else {
+                result.append(c);
+            }
+        }
+        return result.toString();
+    }
+
+    // Helper method to check for vowels
+    private boolean isVowel(char c) {
+        c = Character.toLowerCase(c);
+        return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u';
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N+KlogK)
+Space Complexity: O(N)
+
+
+
