@@ -1,0 +1,58 @@
+Day 110/150: Vowels Game in a String 
+
+Problem Statement #3227
+
+Problem Statement Explanation:
+
+Alice and Bob are playing a game with a string s. 
+The rules are as follows:
+Alice goes first.
+On each turn, the current player must remove a single character from the string.
+A move is only valid if the resulting string still contains at least one vowel.
+The game ends when a player cannot make a valid move. The player who cannot move loses.
+The task is to determine if Alice can win the game, assuming both players play optimally.
+
+Solution Approach:
+This problem seems like a complex game theory question at first, but it simplifies to a very straightforward observation.
+Let's analyze the game's core mechanics:
+Losing Condition: A player loses when they cannot make a valid move. 
+This happens only when any character they remove would result in a string with zero vowels. 
+The only time this is possible is if the string they receive is a single character that is a vowel (e.g., "a", "e"). 
+Removing it would leave an empty string (0 vowels), which is an invalid move.
+Making a Move: When can a player make a move?
+If the string has no vowels, the first player (Alice) cannot make a valid move, as the resulting string will also have no vowels. 
+In this case, Alice loses immediately.
+If the string has at least one vowel, a player can almost always make a move.
+They can remove a consonant. 
+This doesn't change the vowel count, so the move is always valid.
+They can remove a vowel, as long as it's not the last one.
+
+The Winning Insight: The game is not about complex strategy, but simply about whether a move is possible.
+If the initial string s contains zero vowels, Alice has no valid move. She loses.
+If the initial string s contains at least one vowel, Alice can always make a valid move. She can simply find the first vowel and is guaranteed a winning path. 
+Because she can always make a move, she can ensure the game continues, forcing her opponent, Bob, to eventually face the losing state (the single-vowel string).
+Therefore, Alice's victory depends entirely on the presence of at least one vowel in the initial string. 
+The length of the string, the number of vowels, and the number of consonants are all irrelevant to the outcome.
+Alice wins if and only if the string contains at least one vowel.
+
+Here's the code:
+
+class Solution {
+    public boolean doesAliceWin(String s) {
+        for (char c : s.toCharArray()) {
+            if (isVowel(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private boolean isVowel(char c) {
+        return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u';
+    }
+}
+
+Complexity:
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+
