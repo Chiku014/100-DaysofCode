@@ -1,0 +1,113 @@
+Day 112/150: Vowel Spellchecker
+
+Problem Statement #966
+
+Problem Statement Explantion:
+
+Given a wordlist of words and a list of queries, we need to implement a spellchecker. 
+For each query, we must find the correct word in the wordlist based on a specific set of matching rules, applied in a strict order of priority.
+
+The rules are as follows:
+Exact Match: If the query word exists in the wordlist (case-sensitive), it's a perfect match.
+Case-Insensitive Match: If the query, when its case is ignored, matches a word in the wordlist, that word is the answer. If there are multiple such matches, we should return the first one that appeared in the original wordlist.
+Vowel Error Match: If the query, after replacing any of its vowels ('a', 'e', 'i', 'o', 'u') with a placeholder (case-insensitively), matches a word in the wordlist that has undergone the same transformation, that word is the answer. 
+Again, if there are multiple matches, return the first one from the original wordlist.
+No Match: If none of the above rules yield a match, the answer for that query is an empty string "".
+
+Solution Approach:
+
+The key to solving this problem efficiently is to preprocess the wordlist into data structures that allow for fast lookups. A brute-force approach of iterating through the wordlist for every single query would be too slow. We can use HashMaps and HashSets to achieve near O(1) average lookup times.
+
+We will use three data structures to handle the three matching rules:
+exactWords (HashSet): A HashSet<String> is used to store all words from the wordlist as is. 
+This allows for very fast O(1) average time complexity for checking the first rule: an exact, case-sensitive match.
+
+caseInsensitiveWords (HashMap): A HashMap<String, String> is used for the second rule.
+Key: The lowercase version of a word from the wordlist.
+Value: The original word from the wordlist.
+We iterate through the wordlist and for each word, we generate its lowercase key. 
+We use map.putIfAbsent(key, value) to ensure that only the first occurrence of a word that maps to a specific lowercase key is stored, satisfying the problem's requirement.
+vowelErrorWords (HashMap): A HashMap<String, String> is used for the third rule.
+
+Key: A "devoweled" version of the word (e.g., "Kite" -> "k#t#"). 
+We first convert the word to lowercase and then replace all vowels with a placeholder like '#'.
+Value: The original word from the wordlist.
+Similar to the case-insensitive map, we use map.putIfAbsent(key, value) to store only the first word from the wordlist that corresponds to a devoweled pattern.
+
+Here's the code:
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+class Solution {
+    public String[] spellchecker(String[] wordlist, String[] queries) {
+        Set<String> exactWords = new HashSet<>();
+        Map<String, String> caseInsensitiveWords = new HashMap<>();
+        Map<String, String> vowelErrorWords = new HashMap<>();
+
+        for (String word : wordlist) {
+            exactWords.add(word);
+
+            String lowerCaseWord = word.toLowerCase();
+            caseInsensitiveWords.putIfAbsent(lowerCaseWord, word);
+
+            String devoweledWord = devowel(lowerCaseWord);
+            vowelErrorWords.putIfAbsent(devoweledWord, word);
+        }
+
+        String[] result = new String[queries.length];
+        int i = 0;
+
+        for (String query : queries) {
+            if (exactWords.contains(query)) {
+                result[i++] = query;
+                continue;
+            }
+
+            String lowerCaseQuery = query.toLowerCase();
+            if (caseInsensitiveWords.containsKey(lowerCaseQuery)) {
+                result[i++] = caseInsensitiveWords.get(lowerCaseQuery);
+                continue;
+            }
+
+            String devoweledQuery = devowel(lowerCaseQuery);
+            if (vowelErrorWords.containsKey(devoweledQuery)) {
+                result[i++] = vowelErrorWords.get(devoweledQuery);
+                continue;
+            }
+
+            result[i++] = "";
+        }
+
+        return result;
+    }
+
+    private String devowel(String word) {
+        StringBuilder sb = new StringBuilder();
+        for (char c : word.toCharArray()) {
+            if (isVowel(c)) {
+                sb.append('#');
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    private boolean isVowel(char c) {
+        return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u';
+    }
+}
+
+Complexity:
+
+Time Complexity: O(W⋅L+Q⋅L)
+Space Complexity: O(W⋅L)
+
+
+
+
+
+
