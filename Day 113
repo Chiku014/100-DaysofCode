@@ -1,0 +1,70 @@
+Day 113/150: Maximum Number of Words You Can Type
+
+Problem Statement #1935
+
+Problem Statement Explanation:
+
+You are given a string text containing words separated by single spaces and a string brokenLetters representing the set of keyboard keys that are broken.
+The goal is to determine how many words in the text can be typed completely, meaning they do not contain any of the characters from brokenLetters.
+
+Example:
+text = "hello world"
+brokenLetters = "ad"
+Output: 2 (Neither "hello" nor "world" contain 'a' or 'd')
+
+Solution Approch:
+
+
+The most efficient way to solve this is to first create a fast way to check if a character is broken. 
+Then, we can iterate through each word and check its characters against our set of broken letters.
+Create a Fast Lookup for Broken Letters: Instead of repeatedly searching the brokenLetters string, we can use a more efficient data structure. 
+Since all characters are lowercase English letters, a boolean array of size 26 is the most optimal choice. 
+We'll create an array broken[26] and for each character c in brokenLetters, we'll mark broken[c - 'a'] as true. This gives us an O(1) lookup time for any character.
+
+Process Words: Split the input text into an array of words using the space delimiter.
+
+Check Each Word:
+Initialize a counter typeableWordsCount to 0.
+Loop through each word in the words array.
+For each word, assume it's typeable by using a flag, say canBeTyped = true.
+Start a nested loop to check each letter in the current word.
+Using our boolean array, check if broken[letter - 'a'] is true.
+If it is, this word cannot be typed. Set canBeTyped = false and immediately break from the inner loop (a small optimization, since there's no need to check the rest of the word).
+After the inner loop finishes, if the canBeTyped flag is still true, it means no broken letters were found. 
+Increment typeableWordsCount.
+Return the Result: After checking all words, typeableWordsCount will hold the final answer.
+
+Here's the code:
+
+class Solution {
+    public int canBeTypedWords(String text, String brokenLetters) {
+        boolean[] broken = new boolean[26];
+        for (char c : brokenLetters.toCharArray()) {
+            broken[c - 'a'] = true;
+        }
+
+        String[] words = text.split(" ");
+        int typeableWordsCount = 0;
+
+        for (String word : words) {
+            boolean canBeTyped = true;
+            for (char letter : word.toCharArray()) {
+                if (broken[letter - 'a']) {
+                    canBeTyped = false;
+                    break;
+                }
+            }
+
+            if (canBeTyped) {
+                typeableWordsCount++;
+            }
+        }
+
+        return typeableWordsCount;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N+M)
+Space Complexity: O(N)
