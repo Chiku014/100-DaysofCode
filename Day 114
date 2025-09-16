@@ -1,0 +1,90 @@
+Day 114/150: Replace Non-Coprime Numbers in Array
+
+Problem Statement #2197
+
+Problem Statement Explanation:
+
+You are given an array of integers nums. 
+The task is to repeatedly find any two adjacent numbers in the array that are non-coprime and replace them with their Least Common Multiple (LCM). 
+This process continues until no such adjacent non-coprime numbers exist. 
+The final resulting array should be returned.
+Two numbers are non-coprime if their Greatest Common Divisor (GCD) is greater than 1.
+
+For example, if we have [6, 4, 3]:
+6 and 4 are adjacent and non-coprime (GCD is 2). 
+Their LCM is 12. The array becomes [12, 3].
+Now, 12 and 3 are adjacent and non-coprime (GCD is 3). Their LCM is 12. 
+The array becomes [12].
+No more adjacent pairs exist, so the final answer is [12].
+
+Solution Approach:
+
+The problem requires us to resolve adjacent pairs, which hints at a stack-based approach. 
+As we iterate through the numbers from left to right, we can maintain a result list (acting as a stack) that represents the processed, stable part of the array.
+
+The core idea is: for each new number from the input array, we try to "merge" it with the last number in our result list if they are non-coprime.
+
+Here is the step-by-step algorithm:
+Initialize an empty list, let's call it result, which will function like a stack.
+Iterate through each number num in the input array nums.
+
+For the current num, start a loop:
+Check if result is not empty and if num is non-coprime with the last element in result (result.get(result.size() - 1)).
+If they are non-coprime:
+Calculate their LCM. Remember, LCM(a, b) = (a * b) / GCD(a, b).
+Remove the last element from result.
+Update num to be this new LCM.
+The loop continues, checking this new num against the new last element of result.
+If they are coprime (or if result is empty), the loop terminates.
+After the inner loop finishes, add the final value of num to the result list.
+Once all numbers from nums have been processed, result will contain the final array.
+This approach ensures that whenever we add a number, it's first fully merged with any preceding non-coprime numbers until it settles into a stable state.
+
+Here's the code:
+
+import java.util.ArrayList;
+import java.util.List;
+
+class Solution {
+    public List<Integer> replaceNonCoprimes(int[] nums) {
+        List<Integer> result = new ArrayList<>();
+
+        for (int num : nums) {
+            long currentNum = num;
+
+            while (!result.isEmpty()) {
+                long lastNum = result.get(result.size() - 1);
+                long commonDivisor = gcd(lastNum, currentNum);
+
+                if (commonDivisor > 1) {
+                    result.remove(result.size() - 1);
+                    currentNum = (lastNum * currentNum) / commonDivisor;
+                } else {
+                    break;
+                }
+            }
+            result.add((int) currentNum);
+        }
+        return result;
+    }
+
+    private long gcd(long a, long b) {
+        while (b != 0) {
+            long temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n⋅log(M))
+Space Complexity: O(n)
+
+
+
+
+
+
