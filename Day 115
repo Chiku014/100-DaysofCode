@@ -1,0 +1,103 @@
+Day 115/150:
+
+Problem Statement #2353
+
+Problem Statement Explanation:
+
+Design a system that can manage food ratings. 
+The system should be able to:
+Initialize with a set of foods, their cuisines, and their initial ratings.
+
+Modify the rating of a specific food.
+Retrieve the highest-rated food of a given cuisine.
+If there's a tie in ratings for a particular cuisine, the food with the lexicographically smaller name is considered the highest-rated.
+
+Solution Approach:
+
+The core of this problem is to perform two main operations efficiently: Updating a food's rating and querying for the highest-rated food. A simple linear scan would be too slow, so we need data structures that optimize these actions.
+Our approach uses a combination of Hash Maps for quick lookups and TreeSets for ordered storage.
+
+Data Structures:
+
+We use three primary data structures:
+Map<String, Integer> foodToRating:
+Purpose: To store the current rating of each food.
+Why: Provides O(1) average time complexity for fetching a food's current rating, which is essential for the changeRating operation.
+
+Map<String, String> foodToCuisine:
+Purpose: To find the cuisine of any given food.
+Why: Allows us to know which cuisine's TreeSet to update when a food's rating changes, also in O(1) average time.
+
+Map<String, TreeSet<Food>> cuisineToFoods:
+Purpose: This is the main data structure. It maps each cuisine to a TreeSet of custom Food objects.
+Why: A TreeSet is a self-balancing binary search tree that automatically keeps its elements in sorted order. 
+By defining a custom sorting logic, we can ensure the highest-rated food is always at the "top" of the set, making retrievals extremely fast.
+
+Here's the code:
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
+
+class FoodRatings {
+
+    private class Food implements Comparable<Food> {
+        String name;
+        int rating;
+
+        Food(String name, int rating) {
+            this.name = name;
+            this.rating = rating;
+        }
+
+        @Override
+        public int compareTo(Food other) {
+            if (this.rating == other.rating) {
+                return this.name.compareTo(other.name);
+            }
+            return Integer.compare(other.rating, this.rating);
+        }
+    }
+
+    private Map<String, Integer> foodToRating;
+    private Map<String, String> foodToCuisine;
+    private Map<String, TreeSet<Food>> cuisineToFoods;
+
+    public FoodRatings(String[] foods, String[] cuisines, int[] ratings) {
+        foodToRating = new HashMap<>();
+        foodToCuisine = new HashMap<>();
+        cuisineToFoods = new HashMap<>();
+
+        for (int i = 0; i < foods.length; i++) {
+            foodToRating.put(foods[i], ratings[i]);
+            foodToCuisine.put(foods[i], cuisines[i]);
+
+            cuisineToFoods.computeIfAbsent(cuisines[i], k -> new TreeSet<>())
+                          .add(new Food(foods[i], ratings[i]));
+        }
+    }
+
+    public void changeRating(String food, int newRating) {
+        String cuisine = foodToCuisine.get(food);
+        int oldRating = foodToRating.get(food);
+        
+        TreeSet<Food> foodSet = cuisineToFoods.get(cuisine);
+        
+        foodSet.remove(new Food(food, oldRating));
+        foodSet.add(new Food(food, newRating));
+        
+        foodToRating.put(food, newRating);
+    }
+
+    public String highestRated(String cuisine) {
+        return cuisineToFoods.get(cuisine).first().name;
+    }
+}
+
+Complexity:
+
+Tme complexity: O(N⋅logK)
+Space Complexity: O(N⋅L)
+
+
+
