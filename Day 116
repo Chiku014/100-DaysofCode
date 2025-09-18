@@ -1,0 +1,135 @@
+Day 116/150: Design Task Manager
+
+Problem Statement #3408
+
+Problem Statement Explanation:
+
+Design a task management system that supports the following operations:
+
+TaskManager(tasks): Initialize the system with a list of tasks, where each task is represented as [userId, taskId, priority]
+add(userId, taskId, priority): Add a new task to the system
+edit(taskId, newPriority): Update the priority of an existing task
+rmv(taskId): Remove a task from the system
+execTop(): Execute and remove the task with the highest priority. 
+If multiple tasks have the same priority, execute the one with the highest taskId. 
+Return the userId of the executed task, or -1 if no tasks exist.
+
+Solution Approach:
+
+Data Structures Used:
+
+HashMap<Integer, Integer> taskPri: Maps taskId to priority for O(1) priority lookup
+HashMap<Integer, Integer> taskUser: Maps taskId to userId for O(1) user lookup
+PriorityQueue<int[]> pq: Max-heap to maintain execution order
+Key Design Decisions
+
+Priority Queue Comparator:
+
+Primary: Higher priority tasks first
+Secondary: Higher taskId first (for equal priorities)
+
+Lazy Cleanup Strategy:
+When editing/removing tasks, we don't modify the priority queue directly (expensive O(n) operation)
+Instead, we insert new entries for edits and handle stale entries during execution
+During execTop(), we validate entries against current HashMaps to filter out stale data
+
+Stale Entry Handling:
+After edit: Old entry becomes stale, new entry is valid
+After remove: Entry in PQ becomes stale, removed from HashMaps
+Validation: Check if taskPri.get(taskId) == priority from PQ entry
+
+Algorithm Walkthrough
+add(userId, taskId, priority)
+Store taskId → userId mapping
+Store taskId → priority mapping
+Insert [priority, taskId] into priority queue
+edit(taskId, newPriority)
+Update taskId → newPriority mapping
+Insert [newPriority, taskId] into priority queue
+Old entry becomes stale (handled in execTop)
+rmv(taskId)
+Remove taskId from both HashMaps
+Leave stale entry in PQ (handled in execTop)
+execTop()
+Poll from priority queue until valid entry found
+Validate: Check if stored priority matches PQ entry priority
+If valid: Remove from HashMaps and return userId
+If invalid: Continue to next entry
+Return -1 if no valid entries exist
+
+Here's the code:
+
+import java.util.*;
+
+class TaskManager {
+    private HashMap<Integer, Integer> taskPri;
+    private HashMap<Integer, Integer> taskUser;
+    private PriorityQueue<int[]> pq;
+    
+    public TaskManager(List<List<Integer>> tasks) {
+        pq = new PriorityQueue<>((a, b) -> {
+            if (a[0] == b[0]) {
+                return b[1] - a[1];
+            }
+            return b[0] - a[0];
+        });
+        
+        taskPri = new HashMap<>();
+        taskUser = new HashMap<>();
+        
+        for (List<Integer> task : tasks) {
+            int userId = task.get(0);
+            int taskId = task.get(1);
+            int priority = task.get(2);
+            
+            taskUser.put(taskId, userId);
+            taskPri.put(taskId, priority);
+            pq.offer(new int[]{priority, taskId});
+        }
+    }
+    
+    public void add(int userId, int taskId, int priority) {
+        taskUser.put(taskId, userId);
+        taskPri.put(taskId, priority);
+        pq.offer(new int[]{priority, taskId});
+    }
+    
+    public void edit(int taskId, int newPriority) {
+        taskPri.put(taskId, newPriority);
+        pq.offer(new int[]{newPriority, taskId});
+    }
+    
+    public void rmv(int taskId) {
+        taskPri.remove(taskId);
+        taskUser.remove(taskId);
+    }
+    
+    public int execTop() {
+        while (!pq.isEmpty()) {
+            int[] task = pq.poll();
+            int priority = task[0];
+            int taskId = task[1];
+            
+            if (taskPri.getOrDefault(taskId, -1) == priority) {
+                int userId = taskUser.get(taskId);
+                taskUser.remove(taskId);
+                taskPri.remove(taskId);
+                return userId;
+            }
+        }
+        return -1;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(M log N)
+Space Complexity: O(N)
+
+
+
+
+
+
+
+
