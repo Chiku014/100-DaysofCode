@@ -1,0 +1,74 @@
+Day 117/150: Design Spreadsheet
+
+Problem Statement #3484
+
+Problem Statement Explanation:
+
+Design a simple spreadsheet system with 26 columns (labeled 'A' to 'Z') and a specified number of rows. 
+Each cell can store an integer value between 0 and 100,000.
+
+Implement the Spreadsheet class:
+
+Spreadsheet(int rows): Creates a new spreadsheet with 26 columns and the given number of rows. 
+All cells start with a value of 0.
+setCell(String cell, int value): Sets a specific cell to a given value. 
+The cell is identified by a string like "A1" or "B10", where the letter indicates the column ('A' through 'Z') and the number indicates the row (starting from 1).
+resetCell(String cell): Resets a specific cell back to 0.
+getValue(String formula): Evaluates a simple addition formula and returns the result. 
+The formula always starts with "=" and contains exactly two operands separated by "+". 
+Each operand can be either a cell reference (like "A1") or a non-negative integer (like "5").
+
+Solution Approach:
+
+Sparse Storage: Most cells in a spreadsheet remain at their default value of 0. Instead of creating a 2D array for all possible cells, we use a HashMap to store only the cells that have been explicitly set to non-zero values.
+Formula Parsing: Since formulas always follow the pattern "=X+Y", we can:
+Remove the leading "=" sign
+Split by "+" to get two operands
+For each operand, check if it's a number (starts with digit) or cell reference
+Default Values: Unset cells automatically return 0 using getOrDefault(cell, 0).
+
+Here's the code:
+
+import java.util.*;
+
+class Spreadsheet {
+    private Map<String, Integer> cellValues;
+
+    public Spreadsheet(int rows) {
+        this.cellValues = new HashMap<>();
+    }
+
+    public void setCell(String cell, int value) {
+        cellValues.put(cell, value);
+    }
+
+    public void resetCell(String cell) {
+        cellValues.remove(cell);
+    }
+
+    public int getValue(String formula) {
+        int sum = 0;
+        String[] terms = formula.substring(1).split("\\+");
+        
+        for (String term : terms) {
+            if (Character.isDigit(term.charAt(0))) {
+                sum += Integer.parseInt(term);
+            } else {
+                sum += cellValues.getOrDefault(term, 0);
+            }
+        }
+        
+        return sum;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(L)
+Space Complexity: O(N)
+
+
+
+
+
+
