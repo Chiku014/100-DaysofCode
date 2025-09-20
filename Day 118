@@ -1,0 +1,215 @@
+Day 118/150: Implement Router
+
+Problem Statement #3508
+
+Problem Statement Explanation:
+
+Design a data structure that efficiently manages data packets in a network router with the following requirements:
+
+Router Class
+Constructor: Router(int memoryLimit) - Initialize router with memory limit for packet storage
+addPacket(): boolean addPacket(int source, int destination, int timestamp) - Add a packet to the router
+forwardPacket(): List<Integer> forwardPacket() - Forward the oldest packet (FIFO order)
+getCount(): int getCount(int destination, int startTime, int endTime) - Count packets to a destination within time range
+
+Constraints
+Packets are uniquely identified by (source, destination, timestamp) triplet
+Duplicate packets should be rejected
+When memory limit is reached, oldest packet must be forwarded before adding new packet
+Forwarded packets should not be counted in future getCount() queries
+Time range queries are inclusive on both ends
+
+Solution Approach:
+
+Key Data Structures
+TreeSet<Packet> - Efficient duplicate detection and removal (O(log n))
+Queue<Packet> - FIFO packet processing for forwarding
+Map<Integer, List<Integer>> - Store timestamps per destination for range queries
+Map<Integer, Integer> - Track number of processed packets per destination
+Algorithm Design
+Adding Packets
+Create packet object with source, destination, timestamp
+Check for duplicates using TreeSet containment
+If memory limit reached, forward oldest packet first
+Add packet to queue, TreeSet, and destination timestamp list
+Forwarding Packets
+Remove oldest packet from queue (FIFO)
+Remove packet from TreeSet to allow future duplicates
+Increment processed packet counter for destination
+Return packet details as list
+Counting Packets
+Get timestamp list for destination
+Skip already processed packets using counter
+Use binary search to find packets within time range
+Return count of packets in range
+Binary Search Optimization
+Two helper functions for efficient range queries:
+
+firstGreaterEqual() - Find first timestamp >= startTime
+firstGreater() - Find first timestamp > endTime
+This avoids linear scanning of timestamp arrays for better performance.
+
+Here's the code:
+
+import java.util.*;
+
+class Packet implements Comparable<Packet> {
+    public int source;
+    public int destination; 
+    public int timestamp;
+    
+    public Packet(int source, int destination, int timestamp) {
+        this.source = source;
+        this.destination = destination;
+        this.timestamp = timestamp;
+    }
+    
+    @Override
+    public int compareTo(Packet other) {
+        if (source != other.source)
+            return Integer.compare(source, other.source);
+        if (destination != other.destination)
+            return Integer.compare(destination, other.destination);
+        return Integer.compare(timestamp, other.timestamp);
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Packet packet = (Packet) o;
+        return source == packet.source && 
+               destination == packet.destination && 
+               timestamp == packet.timestamp;
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(source, destination, timestamp);
+    }
+}
+
+class Router {
+    private final int memoryLimit;
+    private final TreeSet<Packet> uniquePackets;
+    private final Queue<Packet> packetQueue;
+    private final Map<Integer, List<Integer>> destinationTimestamps;
+    private final Map<Integer, Integer> processedPacketIndex;
+    
+    public Router(int memoryLimit) {
+        this.memoryLimit = memoryLimit;
+        this.uniquePackets = new TreeSet<>();
+        this.packetQueue = new LinkedList<>();
+        this.destinationTimestamps = new HashMap<>();
+        this.processedPacketIndex = new HashMap<>();
+    }
+    
+    public boolean addPacket(int source, int destination, int timestamp) {
+        Packet packet = new Packet(source, destination, timestamp);
+        
+        if (uniquePackets.contains(packet)) {
+            return false;
+        }
+        
+        if (packetQueue.size() == memoryLimit) {
+            forwardPacket();
+        }
+        
+        packetQueue.add(packet);
+        uniquePackets.add(packet);
+        destinationTimestamps.computeIfAbsent(destination, k -> new ArrayList<>()).add(timestamp);
+        
+        return true;
+    }
+    
+    public List<Integer> forwardPacket() {
+        if (packetQueue.isEmpty()) {
+            return Collections.emptyList();
+        }
+        
+        Packet nextPacket = packetQueue.poll();
+        uniquePackets.remove(nextPacket);
+        
+        processedPacketIndex.merge(nextPacket.destination, 1, Integer::sum);
+        
+        return Arrays.asList(nextPacket.source, nextPacket.destination, nextPacket.timestamp);
+    }
+    
+    public int getCount(int destination, int startTime, int endTime) {
+        if (!destinationTimestamps.containsKey(destination)) {
+            return 0;
+        }
+        
+        List<Integer> timestamps = destinationTimestamps.get(destination);
+        
+        int startIndex = processedPacketIndex.getOrDefault(destination, 0);
+        
+        int lowerBoundIndex = firstGreaterEqual(timestamps, startIndex, startTime);
+        int upperBoundIndex = firstGreater(timestamps, lowerBoundIndex, endTime);
+        
+        return upperBoundIndex - lowerBoundIndex;
+    }
+    
+    private int firstGreaterEqual(List<Integer> timestamps, int startIndex, int target) {
+        int left = startIndex;
+        int right = timestamps.size();
+        
+        while (left < right) {
+            int mid = (left + right) / 2;
+            if (timestamps.get(mid) >= target) {
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+        
+        return left;
+    }
+    
+    private int firstGreater(List<Integer> timestamps, int startIndex, int target) {
+        int left = startIndex;
+        int right = timestamps.size();
+        
+        while (left < right) {
+            int mid = (left + right) / 2;
+            if (timestamps.get(mid) > target) {
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+        
+        return left;
+    }
+}
+
+class Solution {
+    public static void main(String[] args) {
+        Router router = new Router(3);
+        
+        System.out.println("Adding packets:");
+        System.out.println(router.addPacket(1, 2, 100));
+        System.out.println(router.addPacket(3, 2, 150));
+        System.out.println(router.addPacket(1, 2, 100));
+        System.out.println(router.addPacket(2, 3, 200));
+        
+        System.out.println("\nMemory full, adding another packet:");
+        System.out.println(router.addPacket(4, 2, 250));
+        
+        System.out.println("\nForwarding packets:");
+        System.out.println(router.forwardPacket());
+        
+        System.out.println("\nCounting packets for destination 2:");
+        System.out.println(router.getCount(2, 140, 260));
+    }
+}
+
+Complexity:
+
+Time Complexity: O(log n)
+SPace Complexity: O(n)
+
+
+
+
+
