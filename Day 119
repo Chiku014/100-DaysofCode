@@ -1,0 +1,136 @@
+Day 119/150: Design Movie Rental System
+
+Problem Statement #1912
+
+Problem Statement Explanation:
+
+In this problem, we need to design a system that simulates the process of renting and returning movies from a collection of shops. 
+
+The system must support several key operations:
+Initialization: The system is initialized with a list of available movies. Each movie is defined by a [shop, movie, price] triplet.
+search(movie): Find and return the top 5 cheapest available shops for a specific movie. 
+The results must be sorted first by price (ascending) and then by shop ID (ascending) for any ties.
+rent(shop, movie): A customer rents a movie. 
+We must update the system's state to mark this specific [shop, movie] pair as unavailable.
+drop(shop, movie): A customer returns a movie. 
+The [shop, movie] pair that was previously rented becomes available again.
+report(): Find and return the top 5 cheapest currently rented movies across the entire system. 
+The results, in the form of [shop, movie] pairs, must be sorted first by price, then shop ID, and finally movie ID, all in ascending order.
+The core challenge is to efficiently manage the state of movies (rented vs. available) and retrieve sorted lists based on different criteria.
+
+Solution Approach:
+
+The most effective way to handle the dynamic sorting requirements is to use data structures that maintain order automatically. 
+
+In Java, TreeSet is the perfect tool for this job. Our design will use three primary data structures:
+unrentedMovies (a HashMap of TreeSets): This structure keeps track of all movies available for rent.
+It's a Map<Integer, TreeSet<int[]>> where the key is the movie ID.
+The value is a TreeSet containing int[] arrays of {price, shop}.
+This TreeSet is crucial for the search operation because it keeps the shops for each movie sorted by price, and then by shop ID.
+rentedMovies (a TreeSet): This structure maintains a single, globally sorted list of all movies that are currently rented out.
+It's a TreeSet<int[]> that stores int[] arrays of {price, shop, movie}.
+The sorting order is by price, then shop ID, and finally movie ID. 
+This maps directly to the requirements of the report function.
+moviePrices (a HashMap): A simple helper map (Map<Long, Integer>) to store the price of every unique (shop, movie) combination. 
+This allows us to quickly look up a movie's price when moving it between the unrented and rented sets, which is necessary for the rent and drop operations. 
+A unique long key is generated from the shop and movie IDs.
+
+Workflow:
+rent(shop, movie): We look up the price in moviePrices, remove the {price, shop} entry from the corresponding unrentedMovies TreeSet, and add a new {price, shop, movie} entry to the rentedMovies TreeSet.
+drop(shop, movie): This is the reverse of rent. We look up the price, remove the entry from rentedMovies, and add it back to unrentedMovies.
+search() and report(): These operations become very simple. We just iterate through the first 5 elements of the appropriate TreeSet to get our already-sorted results.
+
+Here's the code:
+
+import java.util.*;
+
+class MovieRentingSystem {
+
+    private static final int MOVIE_ID_MULTIPLIER = 10001;
+
+    private Map<Integer, TreeSet<int[]>> unrentedMovies;
+    private TreeSet<int[]> rentedMovies;
+    private Map<Long, Integer> moviePrices;
+
+    public MovieRentingSystem(int n, int[][] entries) {
+        Comparator<int[]> unrentedComparator = (a, b) -> {
+            if (a[0] != b[0]) return a[0] - b[0];
+            return a[1] - b[1];
+        };
+
+        Comparator<int[]> rentedComparator = (a, b) -> {
+            if (a[0] != b[0]) return a[0] - b[0];
+            if (a[1] != b[1]) return a[1] - b[1];
+            return a[2] - b[2];
+        };
+
+        unrentedMovies = new HashMap<>();
+        rentedMovies = new TreeSet<>(rentedComparator);
+        moviePrices = new HashMap<>();
+
+        for (int[] entry : entries) {
+            int shop = entry[0];
+            int movie = entry[1];
+            int price = entry[2];
+
+            long key = (long) shop * MOVIE_ID_MULTIPLIER + movie;
+            moviePrices.put(key, price);
+
+            unrentedMovies.computeIfAbsent(movie, k -> new TreeSet<>(unrentedComparator));
+            unrentedMovies.get(movie).add(new int[]{price, shop});
+        }
+    }
+
+    public List<Integer> search(int movie) {
+        List<Integer> result = new ArrayList<>();
+        if (!unrentedMovies.containsKey(movie)) {
+            return result;
+        }
+
+        TreeSet<int[]> availableShops = unrentedMovies.get(movie);
+        int count = 0;
+        for (int[] shopInfo : availableShops) {
+            if (count >= 5) break;
+            result.add(shopInfo[1]);
+            count++;
+        }
+        return result;
+    }
+
+    public void rent(int shop, int movie) {
+        long key = (long) shop * MOVIE_ID_MULTIPLIER + movie;
+        int price = moviePrices.get(key);
+
+        unrentedMovies.get(movie).remove(new int[]{price, shop});
+        rentedMovies.add(new int[]{price, shop, movie});
+    }
+
+    public void drop(int shop, int movie) {
+        long key = (long) shop * MOVIE_ID_MULTIPLIER + movie;
+        int price = moviePrices.get(key);
+
+        rentedMovies.remove(new int[]{price, shop, movie});
+        unrentedMovies.get(movie).add(new int[]{price, shop});
+    }
+
+    public List<List<Integer>> report() {
+        List<List<Integer>> result = new ArrayList<>();
+        int count = 0;
+        for (int[] rentalInfo : rentedMovies) {
+            if (count >= 5) break;
+            result.add(Arrays.asList(rentalInfo[1], rentalInfo[2]));
+            count++;
+        }
+        return result;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(E⋅logK)
+Space Complexity: O(E)
+
+
+
+
+
