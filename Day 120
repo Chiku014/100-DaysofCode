@@ -1,0 +1,120 @@
+Day 120/150: Count Elements with Maximum Frequency
+
+Problem Statemet #3005
+
+Problem Statement Explanation:
+
+You are given an array nums consisting of positive integers.
+Return the total frequencies of elements in nums such that those elements all have the maximum frequency.
+An element's frequency is the number of occurrences of that element in the array.
+
+Constraints
+1 <= nums.length <= 100
+1 <= nums[i] <= 100
+
+Solution Approach:
+
+Approach 1: Two-Pass HashMap Solution
+Count Frequencies: Use a HashMap to count the frequency of each element in the array
+Find Maximum Frequency: Iterate through all frequencies to find the maximum
+Sum Matching Frequencies: Sum up all frequencies that equal the maximum frequency
+Approach 2: One-Pass Optimized Solution
+Track as We Go: While building the frequency map, simultaneously track the maximum frequency and running total
+Update Logic: When an element's frequency increases:
+If it becomes the new maximum, reset the total to this frequency
+If it equals the current maximum, add it to the total
+
+Algorithm Steps
+
+Two-Pass Approach:
+Create HashMap and count frequency of each element
+Find the maximum frequency among all elements
+Iterate through frequencies and sum those equal to maximum
+Return the total sum
+
+One-Pass Approach:
+Initialize HashMap, maxFreq = 0, totalFreq = 0
+For each number, increment its frequency
+If new frequency > maxFreq: update maxFreq and reset totalFreq
+If new frequency == maxFreq: add to totalFreq
+Return totalFreq
+
+Here's the code:
+
+import java.util.*;
+
+public class Solution {
+    
+    public int maxFrequencyElements(int[] nums) {
+        Map<Integer, Integer> freqMap = new HashMap<>();
+        for (int num : nums) {
+            freqMap.put(num, freqMap.getOrDefault(num, 0) + 1);
+        }
+        
+        int maxFreq = 0;
+        for (int freq : freqMap.values()) {
+            maxFreq = Math.max(maxFreq, freq);
+        }
+        
+        int totalFreq = 0;
+        for (int freq : freqMap.values()) {
+            if (freq == maxFreq) {
+                totalFreq += freq;
+            }
+        }
+        
+        return totalFreq;
+    }
+    
+    public int maxFrequencyElementsOptimized(int[] nums) {
+        Map<Integer, Integer> freqMap = new HashMap<>();
+        int maxFreq = 0;
+        int totalFreq = 0;
+        
+        for (int num : nums) {
+            int newFreq = freqMap.getOrDefault(num, 0) + 1;
+            freqMap.put(num, newFreq);
+            
+            if (newFreq > maxFreq) {
+                maxFreq = newFreq;
+                totalFreq = newFreq;
+            } else if (newFreq == maxFreq) {
+                totalFreq += newFreq;
+            }
+        }
+        
+        return totalFreq;
+    }
+    
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        
+        int[] nums1 = {1, 2, 2, 3, 1, 4};
+        System.out.println("Input: [1,2,2,3,1,4]");
+        System.out.println("Output: " + solution.maxFrequencyElements(nums1));
+        
+        int[] nums2 = {1, 2, 3, 4, 5};
+        System.out.println("Input: [1,2,3,4,5]");
+        System.out.println("Output: " + solution.maxFrequencyElements(nums2));
+        
+        int[] nums3 = {1, 1, 1, 1};
+        System.out.println("Input: [1,1,1,1]");
+        System.out.println("Output: " + solution.maxFrequencyElements(nums3));
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(k)
+
+
+
+
+
+
+
+
+
+
+
