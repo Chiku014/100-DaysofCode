@@ -1,0 +1,71 @@
+Day 121/150: Compare Versions Numbers
+
+Problem Statement #165
+
+Problem Statement Explanation:
+
+Given two version strings, version1 and version2, compare them.
+Version strings are composed of numbers and dots (.). 
+The dot separates number sequences and does not represent a decimal point. 
+For example, 2.5 is not "two and a half" but the second-level revision of the second first-level revision.
+To compare version numbers, you compare their revisions from left to right. Revisions are 0-indexed. 
+For example, in version = "1.2.3", revision 0 is 1, revision 1 is 2, and revision 2 is 3. When comparing, you compare revision 0 of both versions, then revision 1, and so on.
+
+Rules:
+If version1 > version2, return 1.
+If version1 < version2, return -1.
+Otherwise, return 0.
+Leading zeros in a revision are ignored (e.g., 1.01 is the same as 1.1).
+If a version string does not specify a revision at a certain index, it is treated as 0 (e.g., 1.0 is the same as 1.0.0).
+
+Solution Approach:
+
+The most direct way to solve this is to compare the version strings level by level. 
+The core idea is to parse each revision number and compare their integer values.
+
+Split Strings: The first step is to split both version strings by the . delimiter. 
+This breaks down a string like "1.10.3" into an array of its revision numbers: ["1", "10", "3"].
+Iterate Over Revisions: We need to compare revisions at each level (index 0, index 1, etc.). 
+Since the version strings can have a different number of levels (e.g., "1.0" vs "1.0.1"), we should iterate up to the maximum number of levels found in either string.
+Handle Missing Revisions: If we are at a level that doesn't exist for one of the version strings, we treat its revision number as 0. 
+For instance, when comparing "1.0" and "1.0.1", at the third level (index 2), "1.0" has no revision, so we use 0 to compare against the 1 from "1.0.1".
+Numerical Comparison: At each level, we convert the string revisions (e.g., "01", "1") into integers. 
+This automatically handles leading zeros and allows for a proper numerical comparison.
+Return Early: As soon as we find a level where the revision numbers differ, we can determine the result and return 1 or -1 immediately. 
+If the loop finishes without finding any differences, it means the versions are identical, and we can return 0.
+
+Here's the code:
+
+class Solution {
+    public int compareVersion(String version1, String version2) {
+        String[] levels1 = version1.split("\\.");
+        String[] levels2 = version2.split("\\.");
+
+        int maxLength = Math.max(levels1.length, levels2.length);
+
+        for (int i = 0; i < maxLength; i++) {
+            Integer v1 = i < levels1.length ? Integer.parseInt(levels1[i]) : 0;
+            Integer v2 = i < levels2.length ? Integer.parseInt(levels2[i]) : 0;
+
+            int compare = v1.compareTo(v2);
+
+            if (compare != 0) {
+                return compare;
+            }
+        }
+        
+        return 0;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N+M)
+Space Complexity: O(N+M)
+
+
+
+
+
+
+
