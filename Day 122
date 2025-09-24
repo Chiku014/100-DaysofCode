@@ -1,0 +1,113 @@
+Day 122/150: Fraction to Recurring Decimal recurring
+
+Problem Statement #166
+
+Problem Statement Statement Explanation: 
+
+Given two integers representing the numerator and denominator of a fraction, the task is to return the fraction in string format.
+
+There are three possible outcomes:
+
+The fraction results in a terminating decimal (e.g., 1/2 = 0.5).
+The fraction results in a repeating decimal (e.g., 2/3 = 0.666...). 
+In this case, the repeating part of the decimal must be enclosed in parentheses (e.g., 0.(6)).
+The fraction results in an integer (e.g., 4/2 = 2).
+
+Constraints:
+
+numerator and denominator are 32-bit signed integers.
+denominator will not be zero.
+
+Examples:
+Input: numerator = 1, denominator = 2 -> Output: "0.5"
+Input: numerator = 2, denominator = 3 -> Output: "0.(6)"
+Input: numerator = 4, denominator = 333 -> Output: "0.(012)"
+Input: numerator = -50, denominator = 8 -> Output: "-6.25"
+
+solution Approach:
+
+The core of the solution is to simulate the process of long division while keeping track of the remainders encountered. 
+A repeating remainder indicates a repeating sequence of digits in the quotient.
+
+Handle Edge Cases and Sign:
+
+If the numerator is 0, the result is simply "0".
+We determine the sign of the result upfront. 
+If the numerator and denominator have different signs, the result is negative. 
+We then proceed with the absolute values of both numbers.
+To prevent integer overflow (especially with Integer.MIN_VALUE), we cast the numerator and denominator to long.
+
+Calculate Integer Part:
+
+The part of the result before the decimal point is calculated using standard integer division (num / den).
+The remainder (num % den) is what we'll use to calculate the fractional part.
+
+Calculate Fractional Part:
+If the remainder is 0 after calculating the integer part, the division is complete, and we can return the result.
+Otherwise, we append a decimal point . to our result string.
+To detect a repeating cycle, we use a HashMap<Long, Integer> that stores each remainder as the key and the position (index) in our result string where this remainder was first seen as the value.
+
+The Loop for Long Division:
+We loop as long as the remainder num is not zero.
+In each iteration, we first check if the current num already exists in our map.
+If it does, we've found a repeating cycle. 
+We retrieve the starting index of the cycle from the map, insert an opening parenthesis ( at that index, and append a closing parenthesis ) at the end of the string. 
+We then break the loop.
+If it does not, we store the current remainder and the current length of the result string in the map: map.put(num, result.length()).
+We then simulate bringing down a zero by multiplying the remainder by 10 (num *= 10).
+We append the next digit (num / den) to our result string and update the remainder for the next iteration (num %= den).
+This process guarantees that we will either terminate (when the remainder becomes 0) or find a cycle (when a remainder repeats).
+
+Here's the code:
+
+import java.util.HashMap;
+import java.util.Map;
+
+class Solution {
+    public String fractionToDecimal(int numerator, int denominator) {
+        if (numerator == 0) {
+            return "0";
+        }
+
+        StringBuilder result = new StringBuilder();
+        if ((numerator > 0) ^ (denominator > 0)) {
+            result.append("-");
+        }
+        long num = Math.abs((long) numerator);
+        long den = Math.abs((long) denominator);
+
+        result.append(num / den);
+        num %= den;
+        if (num == 0) {
+            return result.toString();
+        }
+        result.append(".");
+
+        Map<Long, Integer> remainderMap = new HashMap<>();
+
+        while (num != 0) {
+            if (remainderMap.containsKey(num)) {
+                int startIndex = remainderMap.get(num);
+                result.insert(startIndex, "(");
+                result.append(")");
+                break; 
+            }
+            remainderMap.put(num, result.length());
+            num *= 10;
+            result.append(num / den);
+            num %= den;
+        }
+
+        return result.toString();
+    }
+}
+
+Complexity:
+
+Time Complexity: O(D)
+Space Complexity: O(D)
+
+
+
+
+
