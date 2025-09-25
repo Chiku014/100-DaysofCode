@@ -1,0 +1,80 @@
+Day 123/150: Triangle
+
+Problem Statement #120
+
+Problem Statement Explanation:
+
+Given a triangle array, find the minimum path sum from the top to the bottom.
+
+For each step, you may move to an adjacent number in the row below. 
+More formally, if you are on index i in the current row, you may move to either index i or index i+1 in the next row.
+
+Example:
+
+Input: triangle = [[2],[3,4],[6,5,7],[4,1,8,3]]
+Output: 11
+Explanation: The minimum path sum from top to bottom is 2 + 3 + 5 + 1 = 11.
+   2
+  3 4
+ 6 5 7
+4 1 8 3
+
+Solution Approach:
+
+The problem can be solved efficiently using bottom-up dynamic programming. 
+A naive recursive approach would be too slow due to re-calculating the same subproblems multiple times.
+
+The core idea is to start from the bottom of the triangle and work our way up. 
+The minimum path sum from any given cell is its own value plus the minimum of the two possible paths from the row directly below it.
+
+Space-Optimized Bottom-Up DP
+Instead of using a 2D dp table which would take O(N^2) space, we can optimize it to O(N) space, where N is the number of rows. 
+We only need to store the minimum path sums for the row below the one we are currently processing.
+
+Initialization: Create a 1D array, dp, of size N, and initialize it with the values from the last row of the triangle.
+
+Iteration: Loop from the second-to-last row (n-2) up to the top row (0).
+
+Calculation: For each element in the current row, update its corresponding dp entry. 
+The new value will be the element's value plus the minimum of the two adjacent dp values from the row below. 
+
+The formula is:
+dp[col] = triangle[row][col] + min(dp[col], dp[col + 1])
+
+Result: After iterating through all the rows, the final minimum path sum for the entire triangle will be stored in dp[0].
+
+Here's the code:
+
+import java.util.List;
+import java.util.Collections;
+
+class Solution {
+    public int minimumTotal(List<List<Integer>> triangle) {
+        if (triangle == null || triangle.isEmpty()) {
+            return 0;
+        }
+
+        int n = triangle.size();
+        int[] dp = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            dp[i] = triangle.get(n - 1).get(i);
+        }
+
+        for (int row = n - 2; row >= 0; row--) {
+            for (int col = 0; col <= row; col++) {
+                dp[col] = triangle.get(row).get(col) + Math.min(dp[col], dp[col + 1]);
+            }
+        }
+
+        return dp[0];
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N^2)
+Space Complexity: O(N)
+
+
+
