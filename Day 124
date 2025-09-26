@@ -1,0 +1,75 @@
+Day 124/150: Valid Triangle Number
+
+Problem Statement #611
+
+Problem Statement Explanation:
+
+Given an integer array nums, your task is to determine the number of triplets (nums[i], nums[j], nums[k]) that can form the sides of a valid triangle. 
+The indices must satisfy 0 <= i < j < k < n.
+For three lengths a, b, and c to form a valid triangle, they must satisfy the Triangle Inequality Theorem: the sum of the lengths of any two sides must be greater than the length of the third side.
+
+a + b > c
+a + c > b
+b + c > a
+
+Solution Approach
+A brute-force solution would involve checking every possible triplet, leading to an O(n^3) time complexity, which is generally too slow. 
+A more efficient approach can be achieved by first sorting the array and then using a two-pointer technique.
+
+Sort the Array: The first and most critical step is to sort the input array nums in non-decreasing order. 
+Sorting helps simplify the Triangle Inequality check. If we ensure that a ≤ b ≤ c, we only need to check if a + b > c. 
+The other two conditions (a + c > b and b + c > a) will always be true since c is the largest side.
+
+Two-Pointer Technique: After sorting, we can iterate through the array from right to left, fixing the longest side of our potential triangle, c. 
+Let's say c is the element nums[k]. Our goal is to find pairs (a, b) such that a = nums[left] and b = nums[right] from the subarray nums[0...k-1] where a + b > c.
+
+We can do this efficiently using two pointers:
+Initialize left = 0 and right = k - 1.
+We check the sum nums[left] + nums[right].
+If nums[left] + nums[right] > nums[k]: We have found a valid pair. 
+Because the array is sorted, we know that any element between left and right (i.e., nums[left], nums[left+1], ..., nums[right-1]) when paired with nums[right] will also result in a sum greater than nums[k]. 
+Therefore, there are right - left such valid pairs. We add this count to our total, and then decrement right to try and form a triangle with a smaller second side.
+If nums[left] + nums[right] <= nums[k]: The sum is not large enough. To increase the sum, we must move our left pointer to the right (left++).
+
+Here's the code:
+
+import java.util.Arrays;
+
+class Solution {
+    public int triangleNumber(int[] nums) {
+        if (nums == null || nums.length < 3) {
+            return 0;
+        }
+
+        Arrays.sort(nums);
+
+        int count = 0;
+        int n = nums.length;
+
+        for (int k = n - 1; k >= 2; k--) {
+            int left = 0;
+            int right = k - 1;
+
+            while (left < right) {
+                if (nums[left] + nums[right] > nums[k]) {
+                    count += (right - left);
+                    right--;
+                } else {
+                    left++;
+                }
+            }
+        }
+
+        return count;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n^2)
+Space Complexity: O(logn) or O(n)
+
+
+
+
+We repeat this two-pointer scan for each element nums[k] from k = n-1 down to 2.
