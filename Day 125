@@ -1,0 +1,66 @@
+Day 125/150: Largest Triangle Area
+
+Problem Statement #812
+
+Problem Statement Explanation:
+
+Given an array of points in a 2D plane, the task is to find the area of the largest triangle that can be formed by picking any three distinct points from the array.
+
+Example:
+Input: points = [[0,0],[0,1],[1,0],[0,2],[2,0]]
+Output: 2.0
+
+Solution Approach:
+
+The most straightforward way to solve this problem is with a brute-force approach. 
+Since the number of points is relatively small (up to 50), we can check every possible combination of three points and find the area of the triangle they form.
+
+1. Iterate Through All Combinations: We use three nested loops to select every unique triplet of points (p1, p2, p3) from the input list.
+
+2. Calculate the Area: For each triplet of points (x^1,y^1), (x^2,y^2), and (x^3,y^3), we calculate the area using the Shoelace Formula. 
+This formula is a quick and efficient way to find the area of a polygon given the coordinates of its vertices.
+
+The formula for the area of a triangle is:
+
+Area= 0.5× ∣ x^1(y^2−y^3)+ x^2 (y^3−y^1)+x^3(y^1−y^2) ∣
+
+3. Track the Maximum Area: We maintain a variable, maxArea, initialized to 0. 
+After calculating the area of each triangle, we compare it with maxArea. If the newly calculated area is larger, we update maxArea.
+After iterating through all possible combinations, the maxArea variable will hold the area of the largest possible triangle.
+
+Here;s the code:
+
+class Solution {
+    public double largestTriangleArea(int[][] points) {
+        int n = points.length;
+        double maxArea = 0.0;
+
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                for (int k = j + 1; k < n; k++) {
+                    // Extract coordinates for the three points
+                    int x1 = points[i][0];
+                    int y1 = points[i][1];
+                    int x2 = points[j][0];
+                    int y2 = points[j][1];
+                    int x3 = points[k][0];
+                    int y3 = points[k][1];
+
+                    // Calculate area using the Shoelace formula
+                    double currentArea = 0.5 * Math.abs(x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2));
+
+                    // Update the maximum area
+                    maxArea = Math.max(maxArea, currentArea);
+                }
+            }
+        }
+
+        return maxArea;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n^3)
+Space Complexity: O(1)
+
