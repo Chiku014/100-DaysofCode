@@ -1,0 +1,100 @@
+Day 126/150: Largest Perimeter Triangle
+
+Problem Statement #976
+
+Problem Statement Explanation:
+
+Given an integer array nums, return the largest perimeter of a triangle with a non-zero area, formed from three of these lengths. 
+If it is impossible to form any triangle of a non-zero area, return 0.
+
+Example 1:
+Input: nums = [2,1,2]
+Output: 5
+Explanation: You can form a triangle with three side lengths: 1, 2, and 2.
+
+Example 2:
+Input: nums = [1,2,1,10]
+Output: 0
+
+Explanation: You cannot use the side lengths 1, 1, and 2 to form a triangle.
+You cannot use the side lengths 1, 1, and 10 to form a triangle.
+You cannot use the side lengths 1, 2, and 10 to form a triangle.
+You cannot use the side lengths 2, 1, and 10 to form a triangle.
+
+Constraints
+3 <= nums.length <= 10^4
+1 <= nums[i] <= 10^6
+
+Solution Approach:
+
+The key insight is to use the triangle inequality theorem: for three sides a, b, and c to form a valid triangle, the sum of any two sides must be greater than the third side.
+
+Algorithm Steps:
+Sort the array in ascending order
+Iterate from the largest elements (right to left) to find the maximum perimeter first
+Check triangle inequality for consecutive triplets
+Return the first valid triangle's perimeter (which will be the largest due to iteration order)
+
+Key Optimization:
+Since the array is sorted in ascending order (a ≤ b ≤ c), we only need to check if a + b > c. The other two conditions (a + c > b and b + c > a) are automatically satisfied because:
+
+a + c > b is true since c ≥ b and a > 0
+b + c > a is true since b ≥ a and c > 
+
+Here's the code:
+
+class Solution {
+    public int largestPerimeter(int[] nums) {
+        Arrays.sort(nums);
+
+        for (int i = nums.length - 3; i >= 0; i--) {
+            if (nums[i] + nums[i + 1] > nums[i + 2]) {
+                return nums[i] + nums[i + 1] + nums[i + 2];
+            }
+        }
+        
+        return 0;
+    }
+}
+
+class SolutionVerbose {
+    public int largestPerimeter(int[] nums) {
+        Arrays.sort(nums);
+        
+        for (int i = nums.length - 1; i >= 2; i--) {
+            int a = nums[i - 2];
+            int b = nums[i - 1]; 
+            int c = nums[i];
+            if (a + b > c && a + c > b && b + c > a) {
+                return a + b + c;
+            }
+        }
+        
+        return 0;
+    }
+}
+class TestSolution {
+    public static void main(String[] args) {
+        Solution sol = new Solution();
+
+        int[] test1 = {2, 1, 2};
+        System.out.println("Test 1: " + sol.largestPerimeter(test1)); // Output: 5
+
+        int[] test2 = {1, 2, 1, 10};
+        System.out.println("Test 2: " + sol.largestPerimeter(test2)); // Output: 0
+
+        int[] test3 = {3, 2, 3, 4};
+        System.out.println("Test 3: " + sol.largestPerimeter(test3)); // Output: 10
+
+        int[] test4 = {3, 6, 2, 3};
+        System.out.println("Test 4: " + sol.largestPerimeter(test4)); // Output: 8
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n log n)
+Space Complexity: O(1)
+
+
+
