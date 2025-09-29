@@ -1,0 +1,57 @@
+Day 127/150: Minimum Score Triangulation of Polygon
+
+Problem Statement #1039
+
+Problem Statement Explanation:
+
+You are given a convex n-sided polygon with n vertices, labeled v_0, v_1, ..., v_{n-1} in clockwise order. 
+The value of each vertex is given in an integer array values, where values[i] is the value of vertex v_i.
+
+The task is to triangulate the polygon into n-2 triangles. 
+The score of a single triangle with vertices a, b, and c is the product of their values: a * b * c. 
+The total score of a triangulation is the sum of the scores of all n-2 triangles.
+
+Your goal is to find the minimum possible total score that can be achieved through any valid triangulation of the polygon.
+
+Soltuion Appraoch:
+
+This problem has an optimal substructure and overlapping subproblems, making it a perfect candidate for Dynamic Programming.
+We define a 2D DP array, dp[i][j], to store the minimum score required to triangulate the sub-polygon formed by the vertices from index i to j. Our final answer will be the value in dp[0][n-1], which represents the score for the entire polygon.
+
+The core idea is to break down the problem:
+Base Case: A sub-polygon with fewer than 3 vertices (e.g., from i to i+1) cannot be triangulated. Its score is 0.
+Recurrence Relation: To compute dp[i][j], we consider the edge (i, j) as the base of a triangle. We must then pick a third vertex k from the range (i+1, j-1) to form the triangle (i, k, j).
+The score of this single triangle is values[i] * values[k] * values[j].
+Forming this triangle splits the polygon (i...j) into two smaller sub-polygons: (i...k) and (k...j). The minimum scores for these sub-polygons are dp[i][k] and dp[k][j], which we would have already computed.
+We iterate through all possible intermediate vertices k and find the one that minimizes the total score.
+
+Here's the code:
+
+class Solution {
+    public int minScoreTriangulation(int[] values) {
+        int n = values.length;
+        int[][] dp = new int[n][n];
+
+        for (int len = 3; len <= n; len++) {
+            for (int i = 0; i <= n - len; i++) {
+                int j = i + len - 1;
+                dp[i][j] = Integer.MAX_VALUE;
+
+                for (int k = i + 1; k < j; k++) {
+                    int currentScore = dp[i][k] + dp[k][j] + values[i] * values[j] * values[k];
+                    dp[i][j] = Math.min(dp[i][j], currentScore);
+                }
+            }
+        }
+        
+        return dp[0][n - 1];
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n^3)
+Space Complexity: O(n^2)
+
+
+
