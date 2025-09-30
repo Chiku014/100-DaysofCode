@@ -1,0 +1,54 @@
+Day 128/150: Find Triangular Sum of an Array
+
+Problem Statement #2221
+
+Problem Statement Explanation:
+
+You are given a 0-indexed, n-element integer array nums, where 0 <= nums[i] <= 9.
+The triangular sum of nums is found by the following process, which is repeated until there is only one element left:
+Create a new array newNums of length n - 1.
+For each i from 0 to n - 2, set newNums[i] = (nums[i] + nums[i+1]) % 10.
+Replace nums with newNums.
+Your task is to return the last remaining element after this process is complete.
+
+Solution Approach:
+
+The most straightforward way to solve this problem is to directly simulate the process described. 
+We can optimize this by performing the updates in-place on the original array instead of creating a new array at each step. This saves significant space.
+
+The algorithm works as follows:
+Start with the initial length of the array, n.
+Use an outer loop that continues as long as n > 1. In each iteration, this loop will simulate one pass of the triangular sum calculation.
+Inside, a for loop runs from i = 0 to n - 2. It calculates (nums[i] + nums[i+1]) % 10 and overwrites nums[i] with the result.
+After the inner loop completes, the first n-1 elements of nums now hold the new row. We then decrement n to reflect the reduced size of our effective array.
+This process repeats until n is 1. The single remaining element will be at nums[0].
+This approach is efficient because it avoids the overhead of allocating memory for a new array in every step.
+
+Here's the code:
+
+class Solution {
+    public int triangularSum(int[] nums) {
+        int n = nums.length;
+        
+        while (n > 1) {
+            for (int i = 0; i < n - 1; i++) {
+                nums[i] = (nums[i] + nums[i + 1]) % 10;
+            }
+            n--;
+        }
+        
+        return nums[0];
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n^2)
+Space Complexity: O(1)
+
+
+Complexity:
+
+
+
+
