@@ -1,0 +1,59 @@
+Day 129/150: Water Bottles
+
+Problem Statement #1518
+
+Problem Statement Explanation:
+
+You are given numBottles full water bottles. 
+You can exchange numExchange empty water bottles for one full water bottle. 
+The operation of drinking a full water bottle turns it into an empty one.
+Return the maximum number of water bottles you can drink.
+
+Solution Approach:
+
+The problem can be solved with a straightforward simulation.
+Initial Drink: Start by drinking all the initial numBottles. 
+This is our initial count of drunk bottles and also the initial number of empty bottles we possess.
+Exchange Loop: As long as we have enough empty bottles to make an exchange (i.e., emptyBottles >= numExchange), we continue the process.
+Calculate New Bottles: In each step of the loop, we calculate how many new bottles we can get by dividing the current number of empty bottles by numExchange.
+Drink New Bottles: We add these newly acquired bottles to our total count of drunk bottles.
+Update Empty Bottles: The number of empty bottles for the next iteration will be the sum of the new bottles we just drank plus any leftover empty bottles from the previous exchange (emptyBottles % numExchange).
+Termination: The loop stops when we can no longer exchange empty bottles for a full one. The total count is our answe
+
+Let's walk through an example: numBottles = 9, numExchange = 3.
+Initial: Drink 9 bottles.
+Total Drunk: 9
+Empty Bottles: 9
+Exchange 1: We have 9 empty bottles, so we can exchange them.
+9 / 3 = 3 new bottles.
+Total Drunk: 9 + 3 = 12
+Empty Bottles: 3 (from the new ones) + 9 % 3 (leftovers) = 3 + 0 = 3
+Exchange 2: We have 3 empty bottles.
+3 / 3 = 1 new bottle.
+Total Drunk: 12 + 1 = 13
+Empty Bottles: 1 (from the new one) + 3 % 3 (leftovers) = 1 + 0 = 1
+End: We now have only 1 empty bottle, which is less than numExchange (3). We can't exchange anymore.
+The final answer is 13.
+
+Here's the code:
+
+class Solution {
+    public int numWaterBottles(int numBottles, int numExchange) {
+        int totalDrunk = numBottles;
+        int emptyBottles = numBottles;
+
+        while (emptyBottles >= numExchange) {
+            int newBottles = emptyBottles / numExchange;
+            totalDrunk += newBottles;
+            int remainingEmpty = emptyBottles % numExchange;
+            emptyBottles = newBottles + remainingEmpty;
+        }
+        
+        return totalDrunk;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(logN)
+Space Complexity: O(1)
