@@ -1,0 +1,71 @@
+Day 130: Water Bottles II
+
+Problem Statement #3100
+
+Problem Statement Explanation:
+
+You are given two integers, numBottles and numExchange.
+
+numBottles represents the initial number of full water bottles you have.
+numExchange represents the initial number of empty bottles required to exchange for one full water bottle.
+When you exchange numExchange empty bottles for a full water bottle, the value of numExchange increases by one. 
+This means the next exchange will require one more empty bottle than the previous one.
+You can perform the following operations:
+Drink a full water bottle, which turns it into an empty bottle.
+Exchange a certain number of empty bottles for a new full water bottle.
+Your goal is to determine the maximum number of water bottles you can drink.
+
+Solution Approach:
+
+The problem can be solved by simulating the process described above. 
+We can use a while loop to continuously perform exchanges as long as we have enough empty bottles.
+
+The algorithm is as follows:
+Initialize a bottlesDrunk counter with the initial numBottles, as we drink all of them first.
+Initialize an emptyBottles counter to numBottles.
+
+Use a while loop that continues as long as emptyBottles is greater than or equal to the current numExchange cost.
+Inside the loop, for each successful exchange:
+a. Subtract numExchange from emptyBottles.
+b. Increment bottlesDrunk by 1 (for the new bottle).
+c. Increment emptyBottles by 1 (as the new bottle becomes empty).
+d. Increment numExchange by 1 to increase the cost for the next trade.
+
+Once the loop terminates (when we can no longer afford an exchange), the value of bottlesDrunk is our final answer.
+
+This approach directly models the problem's conditions and guarantees we find the maximum number of bottles we can drink.
+
+Here's the code:
+
+class Solution {
+    public int maxBottlesDrunk(int numBottles, int numExchange) {
+        int bottlesDrunk = numBottles;
+        int emptyBottles = numBottles;
+
+        while (emptyBottles >= numExchange) {
+            emptyBottles -= numExchange;
+            bottlesDrunk++;
+            emptyBottles++;
+            numExchange++;
+        }
+        return bottlesDrunk;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Solution sol = new Solution();
+        System.out.println("Example 1: " + sol.maxBottlesDrunk(13, 6));
+        System.out.println("Example 2: " + sol.maxBottlesDrunk(10, 3));
+    }
+}
+
+Complexity:
+
+Time Complexity: O(k)
+Space Complexity: O(1)
+
+
+
+
+
