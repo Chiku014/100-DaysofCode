@@ -1,0 +1,103 @@
+Day 131/150: Trapping Rain Water II
+
+Problem Statement #407
+
+Problem Statement Explanation:
+
+Given an m x n integer matrix heightMap representing the height of each unit cell in a 2D elevation map, return the volume of water it can trap after raining.
+
+Solution Approach:
+
+The problem can be visualized as finding how much water can be held within a terrain map. 
+The volume of trapped water at any given cell is determined by the height of the lowest "wall" surrounding it. 
+This suggests that the problem is about finding the lowest boundary points and moving inwards.
+
+This can be solved efficiently using a Min-Heap (implemented as a PriorityQueue in Java) to always process the lowest point on the current boundary.
+
+Here's the step-by-step approach:
+Initialize the Boundary: 
+The outermost cells of the grid can't hold water themselves but act as the initial container wall. 
+We add all border cells to a min-heap, which prioritizes cells by their height. 
+We also use a visited matrix to keep track of cells we've already processed.
+
+Process from the Lowest Wall: 
+We start a loop that continues as long as the heap is not empty. 
+In each iteration, we extract the cell with the minimum height from the heap. 
+This cell represents the lowest point on our current "dam". Let's call its height h.
+
+Explore and Trap Water: 
+From this lowest cell, we explore its 4-directional neighbors (up, down, left, right). For each unvisited neighbor.
+
+If the neighbor's height is less than h, it means water can be trapped. 
+The amount of trapped water is h - neighbor_height. 
+We add this volume to our total.
+
+We then add this neighbor to our heap to make it part of the new, expanded boundary.
+Update the Boundary: 
+When adding a neighbor to the heap, its effective height for containing more water becomes max(h, neighbor_height). 
+This is crucial because the new wall height is limited by the water level (h) that just flowed in, but also by its own physical height. 
+This ensures the water level never decreases as we move inwards.
+
+This process continues until the heap is empty, meaning we have visited all possible cells that can be reached from the boundary.
+
+Here's the code:
+
+import java.util.PriorityQueue;
+
+class Solution {
+    public int trapRainWater(int[][] heightMap) {
+        if (heightMap == null || heightMap.length <= 2 || heightMap[0].length <= 2) {
+            return 0;
+        }
+
+        int m = heightMap.length;
+        int n = heightMap[0].length;
+        boolean[][] visited = new boolean[m][n];
+
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[2] - b[2]);
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == 0 || i == m - 1 || j == 0 || j == n - 1) {
+                    pq.offer(new int[]{i, j, heightMap[i][j]});
+                    visited[i][j] = true;
+                }
+            }
+        }
+
+        int totalWater = 0;
+        int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+        while (!pq.isEmpty()) {
+            int[] cell = pq.poll();
+            int row = cell[0];
+            int col = cell[1];
+            int height = cell[2];
+
+            for (int[] dir : dirs) {
+                int newRow = row + dir[0];
+                int newCol = col + dir[1];
+
+                if (newRow >= 0 && newRow < m && newCol >= 0 && newCol < n && !visited[newRow][newCol]) {
+                    visited[newRow][newCol] = true;
+                    if (heightMap[newRow][newCol] < height) {
+                        totalWater += height - heightMap[newRow][newCol];
+                    }
+                    pq.offer(new int[]{newRow, newCol, Math.max(height, heightMap[newRow][newCol])});
+                }
+            }
+        }
+
+        return totalWater;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(m⋅n⋅log(m⋅n))
+Space Complexity: O(m⋅n)
+
+
+
+
+
