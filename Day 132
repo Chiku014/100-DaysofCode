@@ -1,0 +1,61 @@
+Day 132: Container With Most Water 
+
+Problem Statement #11
+
+Problem Statement Explanation:
+
+You are given an integer array height of length n.
+There are n vertical lines such that the two endpoints of the i-th line are (i, 0) and (i, height[i]).
+Find two lines that together with the x-axis form a container, such that the container holds the most water.
+Return the maximum area of water the container can store.
+
+Explanation:
+The water container is formed between two vertical lines.
+
+The area depends on:
+
+Width = distance between lines (right - left)
+Height = min(height[left], height[right])
+
+Solution Approach:
+
+Two Pointers;
+Place one pointer at the beginning (left) and another at the end (right).
+Compute the current container area.
+Move the pointer pointing to the shorter line, since that’s the limiting factor for water height.
+Keep updating the maximum area until left < right.
+This guarantees the optimal solution in O(n) time.
+
+Here's the code:
+
+class Solution {
+    public int maxArea(int[] height) {
+        int left = 0;
+        int right = height.length - 1;
+        int max = 0;
+
+        while (left < right) {
+            int h = Math.min(height[left], height[right]);
+            int w = right - left;
+            int area = h * w;
+
+            max = Math.max(max, area);
+
+            if (height[left] < height[right]) {
+                left++;
+            } else {
+                right--;
+            }
+        }
+        return max;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+
+
+
