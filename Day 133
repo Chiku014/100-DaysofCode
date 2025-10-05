@@ -1,0 +1,102 @@
+Day 133: Pacific Atlantic Water Flow
+
+Problem Statement #417
+
+Problem Statement Explanation:
+
+You are given an m x n integer matrix heights representing the height of each cell in a continent. 
+The Pacific Ocean touches the continent's top and left edges, and the Atlantic Ocean touches the bottom and right edges.
+Water can flow from one cell to an adjacent cell (up, down, left, or right) if the adjacent cell's height is less than or equal to the current cell's height.
+The goal is to find and return a list of grid coordinates [ri, ci] from which water can flow to both the Pacific and Atlantic oceans.
+
+Solution Approach:
+
+A brute-force method, where we start a search from every cell to check if it can reach both oceans, would be inefficient. 
+A much better approach is to start from the oceans and see which cells they can "reach" by flowing backward (or uphill).
+
+The core idea is to identify two sets of cells:
+All cells that can drain into the Pacific Ocean.
+All cells that can drain into the Atlantic Ocean.
+The cells that are present in both sets are our answer.
+We can find these sets using a Depth-First Search (DFS) that starts from the ocean borders and moves inland.
+
+Algorithm:
+Initialization: Create two boolean m x n grids, pacificReachable and atlanticReachable, to keep track of the cells that can be reached from each ocean.
+Pacific DFS: Start a DFS from every cell along the Pacific border (the top and left edges). 
+During the traversal, we can only move from a cell to an adjacent cell if the adjacent cell's height is greater than or equal to the current cell's height (simulating the "uphill" flow). 
+Mark every visited cell as true in the pacificReachable grid.
+Atlantic DFS: Similarly, start a DFS from every cell along the Atlantic border (the bottom and right edges) and mark all reachable cells as true in the atlanticReachable grid.
+Find Intersection: Iterate through the entire heights matrix. Any cell (r, c) where both pacificReachable[r][c] and atlanticReachable[r][c] are true is a part of our final result.
+This two-pass approach efficiently finds all required cells by exploring each cell only a constant number of times.
+
+Here's the code:
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+class Solution {
+    public List<List<Integer>> pacificAtlantic(int[][] heights) {
+        if (heights == null || heights.length == 0 || heights[0].length == 0) {
+            return new ArrayList<>();
+        }
+
+        int rows = heights.length;
+        int cols = heights[0].length;
+        
+        boolean[][] pacificReachable = new boolean[rows][cols];
+        boolean[][] atlanticReachable = new boolean[rows][cols];
+
+        for (int c = 0; c < cols; c++) {
+            dfs(heights, 0, c, Integer.MIN_VALUE, pacificReachable);
+            dfs(heights, rows - 1, c, Integer.MIN_VALUE, atlanticReachable);
+        }
+
+        for (int r = 0; r < rows; r++) {
+            dfs(heights, r, 0, Integer.MIN_VALUE, pacificReachable);
+            dfs(heights, r, cols - 1, Integer.MIN_VALUE, atlanticReachable);
+        }
+
+        List<List<Integer>> result = new ArrayList<>();
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                if (pacificReachable[r][c] && atlanticReachable[r][c]) {
+                    result.add(Arrays.asList(r, c));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private void dfs(int[][] heights, int r, int c, int prevHeight, boolean[][] reachable) {
+        if (r < 0 || r >= heights.length || c < 0 || c >= heights[0].length) {
+            return;
+        }
+        if (reachable[r][c]) {
+            return;
+        }
+        if (heights[r][c] < prevHeight) {
+            return;
+        }
+
+        reachable[r][c] = true;
+
+        int currentHeight = heights[r][c];
+        dfs(heights, r + 1, c, currentHeight, reachable);
+        dfs(heights, r - 1, c, currentHeight, reachable);
+        dfs(heights, r, c + 1, currentHeight, reachable);
+        dfs(heights, r, c - 1, currentHeight, reachable);
+    }
+}
+
+Complexity:
+
+Time Complexity: O(m×n)
+Space Complexity: O(m×n)
+
+
+
+
+
+
