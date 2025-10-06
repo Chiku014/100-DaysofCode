@@ -1,0 +1,91 @@
+Day 134/150: Swim in Rising Water
+
+Problem Statement #778
+
+Problem Statement Explanation:
+
+You are given an n x n integer matrix grid where grid[i][j] represents the elevation at that point (i, j).
+Imagine rain starts to fall. 
+At time t, the depth of the water everywhere is t. 
+You can swim from one square to an adjacent square (up, down, left, or right) if and only if the elevation of both squares is at most t.
+Your goal is to find the least amount of time required to swim from the top-left square (0, 0) to the bottom-right square (n - 1, n - 1).
+
+Example:
+Consider grid = [[0, 2], [1, 3]].
+To travel the path (0,0) -> (0,1) -> (1,1), the elevations are 0, 2, 3. 
+The highest elevation is 3. 
+You would need the water level to be at least t=3 to use this path.
+The problem asks for the path that minimizes this "highest elevation" requirement. 
+The minimum possible time is the answer.
+
+Solution Approach:
+
+This problem can be modeled as finding a path in a graph that minimizes the maximum weight (elevation) along the path. 
+A modified Dijkstra's algorithm using a Priority Queue (Min-Heap) is a perfect fit for this.
+The core idea is to always explore the path that has the lowest "maximum elevation requirement" so far.
+Graph Representation: The grid itself is our graph. Each cell (r, c) is a node.
+Priority Queue: We use a min-heap to prioritize which cell to visit next. 
+It stores elements as [time, row, col], where time is the maximum elevation encountered on the path to (row, col). 
+The queue is sorted by time.
+Initialization: We start at (0, 0). 
+The initial "time" needed to be at this cell is its own elevation, grid[0][0]. 
+We add [grid[0][0], 0, 0] to the queue.
+
+Exploration:
+We repeatedly extract the cell with the smallest time from the queue. 
+This time represents the minimum possible water level needed to reach the current cell.
+For the current cell, we explore its unvisited neighbors.
+The time required to move to a neighbor is calculated as newTime = Math.max(currentTime, neighborElevation). 
+This is the crucial step: the cost of a path is not a sum, but the "high-water mark."
+We add the neighbor to the queue with its calculated newTime.
+Termination: The first time we extract the destination cell (n-1, n-1) from the queue, its associated time is the answer. 
+Because we always explore the path with the minimum possible time, we are guaranteed to find the optimal path first.
+
+Here's the code:
+
+import java.util.PriorityQueue;
+
+class Solution {
+    public int swimInWater(int[][] grid) {
+        int n = grid.length;
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[0] - b[0]);
+        boolean[][] visited = new boolean[n][n];
+        int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+        pq.offer(new int[]{grid[0][0], 0, 0});
+        visited[0][0] = true;
+
+        while (!pq.isEmpty()) {
+            int[] current = pq.poll();
+            int time = current[0];
+            int row = current[1];
+            int col = current[2];
+
+            if (row == n - 1 && col == n - 1) {
+                return time;
+            }
+
+            for (int[] dir : dirs) {
+                int newRow = row + dir[0];
+                int newCol = col + dir[1];
+
+                if (newRow >= 0 && newRow < n && newCol >= 0 && newCol < n && !visited[newRow][newCol]) {
+                    visited[newRow][newCol] = true;
+                    int newTime = Math.max(time, grid[newRow][newCol]);
+                    pq.offer(new int[]{newTime, newRow, newCol});
+                }
+            }
+        }
+        
+        return -1; 
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N^2logN)
+Space Complexity: O(N^2)
+
+
+
+
