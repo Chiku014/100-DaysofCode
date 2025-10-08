@@ -1,0 +1,83 @@
+Day 136/150: Successful Pairs of Spells and Potions
+
+Problem Statement #2300
+
+Problem Statement Explanation:
+
+You are given two positive integer arrays spells and potions, of length n and m respectively, where spells[i] represents the strength of the i-th spell and potions[j] represents the strength of the j-th potion.
+You are also given an integer success. A spell and potion pair is considered successful if the product of their strengths is at least success.
+Return an integer array pairs of length n, where pairs[i] is the number of potions that will form a successful pair with the i-th spell.
+
+Solution Approach:
+
+The core task is to find, for each spell, the number of potions that satisfy the condition: spell * potion >= success.
+A naive brute-force approach would use nested loops, checking every spell against every potion. This would result in an O(n×m) time complexity, which is too slow for the given constraints.
+A more optimized approach involves sorting and binary search. We can rearrange the success condition to find the minimum potion strength needed for a given spell:
+
+potion >= success / spell
+
+This insight allows for a much faster algorithm:
+
+Sort the Potions: 
+First, we sort the potions array in ascending order. 
+This is the key step that enables an efficient search.
+
+Iterate Through Spells: 
+For each spell in the spells array, we calculate the minimum potion strength required to meet the success value.
+
+Binary Search: 
+With the potions array sorted, we can now use binary search to find the index of the first potion that has a strength greater than or equal to the required minimum.
+
+
+Count Successful Pairs: 
+Once this index (k) is found, we know that this potion and all subsequent potions in the array will form a successful pair (since the array is sorted). 
+The total count of successful potions for the current spell is therefore m - k, where m is the total number of potions.
+
+This method avoids the inefficient nested loop and finds the count for each spell in logarithmic time
+
+Here's the code:
+
+import java.util.Arrays;
+
+class Solution {
+    public int[] successfulPairs(int[] spells, int[] potions, long success) {
+        Arrays.sort(potions);
+
+        int n = spells.length;
+        int m = potions.length;
+        int[] result = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            long currentSpell = spells[i];
+            long minPotionStrength = (success + currentSpell - 1) / currentSpell;
+            int firstValidIndex = findFirstGreaterOrEqual(potions, minPotionStrength);
+            result[i] = m - firstValidIndex;
+        }
+
+        return result;
+    }
+
+    private int findFirstGreaterOrEqual(int[] arr, long target) {
+        int left = 0;
+        int right = arr.length;
+
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (arr[mid] >= target) {
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+        
+        return left;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(mlogm+nlogm)
+Space Complexity: O(n)
+
+
+
