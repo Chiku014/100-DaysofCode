@@ -1,0 +1,61 @@
+Day 137/150: Find the Minimum Amount of Time to Brew Potions
+
+Problem Statement #3494 
+
+Problem Statement Explanation:
+
+You have arrays skill (length n) and mana (length m). You need to brew m potions in order. 
+You have n wizards, each wizard i has skill[i] (the rate) and each potion j requires mana cost mana[j]. 
+The time for wizard i to brew one potion with mana cost mana[j] is skill[i] * mana[j]. 
+Wizards brew potions sequentially in the given potion order, but they can overlap across wizards as long as each wizard works on at most one potion at a time. 
+We want the minimum total time to finish all m potions.
+
+Solution Approach:
+
+One approach (described in solutions) is to simulate or compute the earliest possible start times for each potion given constraints, in O(n×m)O(n×m) time.
+The key insight: to brew potion j, each wizard must be free, and potion j can only start once potion j-1 is brewed. So for each wizard, consider when they finish their previous assigned potion, and when the previous potion is done (global). This leads to a recurrence for the earliest start times.
+
+A typical strategy:
+Let finishPrev = 0 — the finish time of previous potion (initially 0 before any potion).
+For potion j = 0 to m-1:
+We want to compute the earliest start time start at which potion j can begin (all wizards free, and after finishPrev).
+We iterate over wizards i = 0..n-1 in order:
+We compute for wizard i, if potion j starts at time start, wizard i will finish it at start + skill[i] * mana[j].
+But wizard i cannot start before wizard i-1 has started (or finished their portion?), to respect ordering of overlapping? Actually the simulation maintains that the start times take into account cumulative delays.
+Using a prefix-sum style, we adjust start to satisfy that every wizard is free when their turn comes.
+After computing start, we compute finish = start + (sum over i of skill[i] * mana[j]) (i.e. total time to brew this potion by all wizards in sequence).
+Update finishPrev = finish.
+Because each potion’s computation loops over all wizards, complexity is O(n×m)O(n×m)
+
+Here's the code:
+
+import java.util.*;
+
+public class Solution {
+    public long minTime(int[] skill, int[] mana) {
+        long sumSkill = 0;
+        for (int s : skill) sumSkill += s;
+        long ans = sumSkill * mana[0];
+
+        for (int j = 1; j < mana.length; ++j) {
+            long prevPotionDone = ans;
+            long wizardDone = ans;
+
+            for (int i = skill.length - 2; i >= 0; --i) {
+                prevPotionDone -= (long) skill[i + 1] * mana[j - 1];
+                wizardDone = Math.max(prevPotionDone, wizardDone - (long) skill[i] * mana[j]);
+            }
+
+            ans = wizardDone + sumSkill * mana[j];
+        }
+
+        return ans;
+    }
+}
+
+Complexity:
+
+Time Complexity: 	O(n * m)
+Space Complexity: O(1)
+
+
