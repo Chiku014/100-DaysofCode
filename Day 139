@@ -1,0 +1,94 @@
+Day 139/150: Maximum Total Damage With Spell Casting
+
+Problem Statement #3186
+
+Problem Statement Explanation:
+
+You are given an integer array power, where each element represents the damage power of a spell.
+You can cast any subset of spells, but if you cast a spell with power x, you cannot cast any spell with power x - 2, x - 1, x + 1, or x + 2.
+Your task is to maximize the total damage you can deal by optimally choosing which spells to cast.
+Return the maximum total damage you can achieve.
+
+Explanation:
+
+Take all spells with power 1 → total damage = 2
+Skip 3, 4, 5 because they are within ±2 range of 1
+Take 7 → total damage = 7
+Total = 2 (from 1’s) + 7 = 9
+But a better choice is to take 3, 4, 5 (damage = 12) and skip 1, 7.
+Hence, maximum total damage = 14
+
+Solution Approach:
+
+Sort the array:
+Sorting allows us to group identical spell powers together and efficiently manage conflicts between nearby powers.
+
+Count spell occurrences:
+For each unique power x, compute how many times it appears (using a HashMap).
+
+Build a next array:
+For each index i, find the smallest index j such that power[j] > power[i] + 2.
+This helps skip all conflicting powers when we decide to take power[i].
+
+Dynamic Programming (Top-Down DFS with Memoization):
+State: dfs(i) represents the maximum damage achievable starting from index i.
+
+Transitions:
+
+Skip: Move to i + count(power[i]) (skip all spells with current power).
+Take: Add power[i] * count(power[i]) and jump to next[i].
+Take the maximum of the two choices.
+Return dfs(0) as the final result.
+
+Here's the code:
+
+import java.util.*;
+
+public class Solution {
+    private Long[] memo;
+    private int[] powers;
+    private int[] nxt;
+    private Map<Integer, Integer> count;
+    private int n;
+
+    public long maximumTotalDamage(int[] power) {
+        Arrays.sort(power);
+        this.powers = power;
+        n = power.length;
+
+        memo = new Long[n];
+        count = new HashMap<>();
+        nxt = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            count.merge(power[i], 1, Integer::sum);
+            int target = power[i] + 3;
+            int pos = Arrays.binarySearch(power, target);
+            if (pos < 0) pos = -pos - 1;
+            nxt[i] = pos;
+        }
+
+        return dfs(0);
+    }
+
+    private long dfs(int i) {
+        if (i >= n) return 0;
+        if (memo[i] != null) return memo[i];
+
+        long skip = dfs(i + count.get(powers[i]));
+        long takeVal = (long) powers[i] * count.get(powers[i]);
+        long take = takeVal + dfs(nxt[i]);
+
+        return memo[i] = Math.max(skip, take);
+    }
+}
+
+Complexity:
+
+Time Complexity: 0(nlogn)
+Space Complexity: 0(n)
+
+
+
+
+
