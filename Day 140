@@ -1,0 +1,71 @@
+Day 140/150: Find Sum of Array Product of Magical Sequences
+
+Problem Statement #3539
+
+Problem Statement Explanation:
+
+You are given an integer array nums of length n.
+A magical sequence is defined as a sequence of indices
+0 ≤ i₀ < i₁ < ... < iₖ < n such that for every consecutive pair
+(iⱼ₋₁, iⱼ), the bitwise AND of nums[iⱼ₋₁] and nums[iⱼ] is nonzero
+(i.e., they share at least one common bit set to 1).
+
+For each magical sequence, define its product as the product of all elements
+in the sequence.
+Your task is to compute the sum of products of all magical sequences in nums.
+Return the result modulo 10⁹ + 7.
+
+Explanation:
+All possible magical sequences are:
+[1] → product = 1
+[3] → product = 3
+[5] → product = 5
+[1, 3] → (1 & 3) = 1 → valid → product = 1 × 3 = 3
+[3, 5] → (3 & 5) = 1 → valid → product = 3 × 5 = 15
+[1, 3, 5] → (1 & 3) = 1 and (3 & 5) = 1 → valid → product = 15
+Sum = 1 + 3 + 5 + 3 + 15 + 15 = 42 → (mod 10⁹ + 7) = 42
+
+Solutio Approach:
+
+We use Dynamic Programming (DP) to compute the total contribution of each element to all magical sequences.
+Let dp[i] be the total sum of products of all magical sequences ending at index i.
+For each i, initialize dp[i] = nums[i] (the sequence [nums[i]] itself).
+For every previous index j < i:
+If (nums[i] & nums[j]) != 0, then nums[i] can be appended to all magical sequences ending at j.
+Add nums[i] * dp[j] to dp[i].
+The final answer is the sum of all dp[i] modulo 10⁹ + 7.
+This directly follows the definition of a magical sequence and ensures all valid subsequences are counted.
+
+Here;s the code:
+
+class Solution {
+    static final long MOD = 1_000_000_007L;
+
+    public int magicalSum(int n, int m, int[] nums) {
+        int len = nums.length;
+        long[] dp = new long[len];
+        long ans = 0;
+        for (int i = 0; i < len; ++i) {
+            long vi = nums[i] % MOD;
+            long extendSum = 0;
+            for (int j = 0; j < i; ++j) {
+                if ((nums[i] & nums[j]) != 0) {
+                    extendSum += dp[j];
+                    if (extendSum >= MOD) extendSum -= MOD;
+                }
+            }
+            dp[i] = (vi + (vi * (extendSum % MOD)) % MOD) % MOD;
+            ans += dp[i];
+            if (ans >= MOD) ans -= MOD;
+        }
+        return (int) ans;
+    }
+}
+
+Complexity:
+
+ Time Complexity: O(n²)
+ Space Complexity: O(n) 
+
+
+
