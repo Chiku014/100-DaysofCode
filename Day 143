@@ -1,0 +1,71 @@
+Day 143/150: Adjacent Increasing Subarrays Detection II
+
+Problem Statement #3350
+
+Problem Statement Explanation:
+
+You are given an array of integers nums.
+Find the maximum integer k such that there exist two adjacent strictly increasing subarrays of length k each.
+Formally, for a given integer k, check if there exist indices i and j such that:
+Both nums[i...(i+k-1)] and nums[j...(j+k-1)] are strictly increasing subarrays.
+j = i + k (the second subarray starts immediately after the first one).
+Return the maximum possible value of k.
+
+Example
+Input: nums = [1, 2, 3, 5, 4, 6, 8, 9]
+Output: 2
+
+Explanation:
+
+[1, 2, 3] and [5] → invalid since the second is not increasing of same length
+[4, 6, 8, 9] can be split into [4, 6] and [8, 9], both increasing of length 2
+✅ So k = 2 is the answer.
+
+Solution Approach:
+
+Track increasing runs:
+Traverse through the array while maintaining the length of the current strictly increasing sequence (cur).
+
+Compare with previous run:
+Whenever the increasing sequence breaks (nums[i] <= nums[i - 1]),
+
+Update the answer using two possible scenarios:
+Split the current run into two halves → cur / 2
+Combine previous and current run → min(prev, cur)
+
+Update pointers:
+Move prev = cur and reset cur = 1 whenever a break occurs.
+Recheck the final segment after traversal.
+This ensures every possible adjacent segment pair is considered efficiently.
+
+Here's the code:
+
+class Solution {
+    public int maxIncreasingSubarrays(List<Integer> nums) {
+        int n = nums.size();
+        int cur = 1, prev = 0, ans = 0;
+        for (int i = 1; i < n; i++) {
+            if (nums.get(i) > nums.get(i - 1)) {
+                cur++;
+            } else {
+                ans = Math.max(ans, cur / 2);
+                ans = Math.max(ans, Math.min(prev, cur));
+                prev = cur;
+                cur = 1;
+            }
+        }
+        ans = Math.max(ans, cur / 2);
+        ans = Math.max(ans, Math.min(prev, cur));
+        return ans;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+
+
+
+
