@@ -1,0 +1,53 @@
+Day 146/150: 
+**Problem Statement:**
+You are given an integer array `nums` and an integer `k`. You may perform the following operation on each element at most once: add a value in the range `[-k, k]` to that element. Return the maximum possible number of **distinct elements** in the resulting array.
+
+---
+
+**Explanation:**
+Each element `x` can be adjusted to any value within `[x - k, x + k]`. The goal is to maximize the number of distinct integers formed after these adjustments.
+
+To achieve this, we can sort the array and greedily assign each element the smallest possible value within its allowed range that is greater than the last assigned value. This ensures we create as many distinct elements as possible.
+
+---
+
+**Solution Approach:**
+
+1. Sort the array `nums` in ascending order.
+2. Maintain a variable `occupied` representing the last distinct value assigned.
+3. For each element `x`:
+
+   * If `occupied < x + k`, we can assign a new distinct value.
+   * The new value is `assign = max(occupied + 1, x - k)` to ensure it’s both distinct and within the allowed range.
+   * Increment the distinct count and update `occupied = assign`.
+4. Return the total count of distinct values assigned.
+
+---
+
+**Complexity Analysis:**
+
+* **Time Complexity:** `O(n log n)` — due to sorting the array.
+* **Space Complexity:** `O(1)` — only a few extra variables used.
+
+---
+
+**Code (Java):**
+
+```java
+class Solution {
+    public int maxDistinctElements(int[] nums, int k) {
+        int ans = 0;
+        long occupied = Long.MIN_VALUE;
+        Arrays.sort(nums);
+        for (int x : nums) {
+            if (occupied < (long)x + k) {
+                long assign = Math.max(occupied + 1, (long)x - k);
+                occupied = assign;
+                ans++;
+            }
+        }
+        return ans;
+    }
+}
+```
+
