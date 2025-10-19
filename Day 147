@@ -1,0 +1,137 @@
+Day 147/150: Lexicographically Smallest String After Applying Operations
+
+Problem Statement #1625
+
+Problem Statement Explanation:
+
+You are given a string s of even length consisting of digits from 0 to 9, and two integers a and b.
+You can apply either of the following two operations any number of times and in any order on s:
+Add: Add a to all odd indices of s (0-indexed). Digits post 9 are cycled back to 0.
+For example, if s = "3456" and a = 5, s becomes "3951".
+Rotate: Rotate s to the right by b positions.
+For example, if s = "3456" and b = 1, s becomes "6345".
+Return the lexicographically smallest string you can obtain by applying the above operations any number of times on s.
+
+Solution Approach:
+
+
+Show thinking
+Here is the content formatted for a GitHub README.
+
+1625. Lexicographically Smallest String After Applying Operations
+Problem Statement
+You are given a string s of even length consisting of digits from 0 to 9, and two integers a and b.
+
+You can apply either of the following two operations any number of times and in any order on s:
+
+Add: Add a to all odd indices of s (0-indexed). Digits post 9 are cycled back to 0.
+
+For example, if s = "3456" and a = 5, s becomes "3951".
+
+Rotate: Rotate s to the right by b positions.
+
+For example, if s = "3456" and b = 1, s becomes "6345".
+
+Return the lexicographically smallest string you can obtain by applying the above operations any number of times on s.
+
+Solution Approach
+This problem can be modeled as a graph problem. Each possible string we can generate is a node, and the "add" and "rotate" operations are the edges that connect the nodes. Our goal is to find the lexicographically smallest node that is reachable from the starting node s.
+
+This is a classic state-space search problem, which can be solved perfectly using a Breadth-First Search (BFS).
+
+Initialization:
+
+minString: A variable to store the smallest string found so far. Initialize it to the starting string s.
+
+queue: A Queue (e.g., LinkedList) to manage the states to visit.
+
+visited: A Set (e.g., HashSet) to keep track of strings we have already processed. This is crucial to prevent re-visiting the same state and getting caught in an infinite loop.
+
+Start BFS:
+
+Add the initial string s to both the queue and the visited set.
+
+Process Queue:
+
+While the queue is not empty, dequeue a string, let's call it current.
+
+Compare current with minString. If current is lexicographically smaller, update minString.
+
+Generate Neighbors (New States):
+
+Add Operation: Apply the add operation to current to get a addedString. If visited does not contain addedString, add it to both the queue and visited.
+
+Rotate Operation: Apply the rotate operation to current to get a rotatedString. If visited does not contain rotatedString, add it to both the queue and visited.
+
+Return Result:
+
+Once the queue is empty, it means we have explored all possible reachable strings. The minString variable will hold the lexicographically smallest string found during the entire traversal.
+
+Here's the code:
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
+
+class Solution {
+    public String findLexSmallestString(String s, int a, int b) {
+        String minString = s;
+
+        Queue<String> queue = new LinkedList<>();
+        Set<String> visited = new HashSet<>();
+
+        queue.add(s);
+        visited.add(s);
+
+        while (!queue.isEmpty()) {
+            String current = queue.poll();
+
+            if (current.compareTo(minString) < 0) {
+                minString = current;
+            }
+
+            String added = applyAdd(current, a);
+            if (!visited.contains(added)) {
+                visited.add(added);
+                queue.add(added);
+            }
+
+            String rotated = applyRotate(current, b);
+            if (!visited.contains(rotated)) {
+                visited.add(rotated);
+                queue.add(rotated);
+            }
+        }
+
+        return minString;
+    }
+
+    private String applyAdd(String s, int a) {
+        StringBuilder sb = new StringBuilder(s);
+        for (int i = 1; i < s.length(); i += 2) {
+            int digit = sb.charAt(i) - '0';
+            int newDigit = (digit + a) % 10;
+            sb.setCharAt(i, (char) (newDigit + '0'));
+        }
+        return sb.toString();
+    }
+
+    private String applyRotate(String s, int b) {
+        int n = s.length();
+        return s.substring(n - b) + s.substring(0, n - b);
+    }
+}
+Complexity:
+
+Time Complexity: O(S⋅N)
+Space Complexity: O(S⋅N)
+
+
+
+
+
+
+
+
+
