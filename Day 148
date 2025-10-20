@@ -1,0 +1,56 @@
+Day 148/150: Final Value of Variable After Performing Operations
+
+Problem Statement #2011
+
+Problem Statement Explanation:
+
+You are given an array of strings operations, where each element is one of the following:
+
+"++X" → increment x by 1
+"X++" → increment x by 1
+"--X" → decrement x by 1
+"X--" → decrement x by 1
+
+Initially, x = 0.
+Return the final value of x after performing all the operations in the array.
+
+Each operation directly affects the variable x:
+Any operation containing "++" increases x by 1.
+Any operation containing "--" decreases x by 1.
+We simply iterate through the array, check each operation, and update the variable accordingly.
+
+Solution Approach:
+
+Initialize x = 0.
+Loop through all elements in operations.
+If the current operation contains "++", increment x.
+Else (for "--"), decrement x.
+Return the final value of x.
+This uses straightforward iteration and string matching — no extra data structures are needed.
+
+Here's the code:
+
+class Solution {
+    public int finalValueAfterOperations(String[] operations) {
+        int x = 0;
+        for (String op : operations) {
+            if (op.contains("++")) {
+                x++;
+            } else {
+                x--;
+            }
+        }
+        return x;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+
+
+
+
+
