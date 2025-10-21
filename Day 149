@@ -1,0 +1,115 @@
+Day 149/150: Maximum Frequency of an Element After Performing Operations I
+
+Problem Statement #3346
+
+Problem Statement Explanation:
+
+You are given an array of integers nums, an integer k, and an integer numOperations.
+You can perform an operation on up to numOperations distinct elements in the array. 
+An operation consists of choosing an index i and changing its value nums[i] to any integer in the range [nums[i] - k, nums[i] + k].
+The goal is to find the maximum possible frequency of any single element in the array after performing at most numOperations.
+
+Example
+nums = [1, 4, 5]
+k = 1
+numOperations = 2
+Let's see what each element can become:
+1 can be changed to any value in [1-1, 1+1] = [0, 2].
+4 can be changed to any value in [4-1, 4+1] = [3, 5].
+5 can be changed to any value in [5-1, 5+1] = [4, 6].
+If we choose target = 4:
+1 cannot become 4.
+4 is already 4 (base count = 1).
+5 can become 4 (adjustable count = 1).
+We use 1 operation (which is ≤ numOperations) to change 5 to 4.
+The final array could be [1, 4, 4]. The frequency of 4 is 2.
+If we choose target = 5:
+1 cannot become 5.
+4 can become 5 (adjustable count = 1).
+5 is already 5 (base count = 1).
+We use 1 operation to change 4 to 5.
+The final array could be [1, 5, 5]. The frequency of 5 is 2.
+The maximum frequency we can achieve is 2.
+
+Solution Approach:
+
+This problem can be solved efficiently using a sweep-line (also known as a difference array) algorithm.
+The core idea is to reframe the problem: each number num in the array "votes" for all potential target values in its convertible range [num - k, num + k]. 
+We want to find the integer target that receives the most "votes," while respecting the numOperations limit.
+Intervals: Each num creates an inclusive interval [num - k, num + k]. 
+Any target value inside this interval is a potential candidate for num to be changed into.
+Sweep-Line (TreeMap): Instead of checking every possible target value, we can track the change in the number of overlapping intervals. 
+We use a TreeMap (named line) to store these changes:
+For each num, we add +1 at the start of its interval: line.put(num - k, ...)
+We add -1 at the end of its interval: line.put(num + k + 1, ...) (The +1 is because the interval is inclusive, so the "off" switch happens after num + k).
+Original Counts (HashMap): We need to know how many elements are already equal to a potential target. We use a HashMap (named count) to store the original frequencies of each number in nums.
+Critical Points (TreeSet): The maximum frequency can only occur at "critical points" where the overlap count changes or where an original number exists. We use a TreeSet (named candidates) to store all unique critical points we must check:
+num - k (start of an interval)
+num + k + 1 (end of an interval)
+num (original number locations)
+The Sweep: We iterate through the sorted candidates from the TreeSet. We maintain a currentOverlap variable.
+For each target in candidates, we update currentOverlap += line.getOrDefault(target, 0).
+currentOverlap now represents the total number of elements that can be changed to target.
+Calculate Max Frequency: For each target we are sweeping over:
+baseCount = count.getOrDefault(target, 0)
+This is the number of elements already equal to target.
+adjustableCount = currentOverlap - baseCount
+This is the number of elements that can be changed to target but are not target initially.
+We can only change Math.min(numOperations, adjustableCount) of these elements due to our budget.
+The total frequency for this target is totalForTarget = baseCount + Math.min(numOperations, adjustableCount).
+We update our global maxFreq = Math.max(maxFreq, totalForTarget).
+After sweeping through all candidates, maxFreq will hold the maximum possible frequency
+
+Here's the code:
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+class Solution {
+    public int maxFrequency(int[] nums, int k, int numOperations) {
+        Map<Integer, Integer> count = new HashMap<>();
+        Map<Integer, Integer> line = new TreeMap<>();
+        TreeSet<Integer> candidates = new TreeSet<>();
+
+        for (int num : nums) {
+            count.merge(num, 1, Integer::sum);
+
+            int start = num - k;
+            int end = num + k + 1;
+            
+            line.merge(start, 1, Integer::sum);
+            line.merge(end, -1, Integer::sum);
+
+            candidates.add(num);
+            candidates.add(start);
+            candidates.add(end);
+        }
+
+        int maxFreq = 0;
+        int currentOverlap = 0; 
+
+        for (int target : candidates) {
+            currentOverlap += line.getOrDefault(target, 0);
+
+            int baseCount = count.getOrDefault(target, 0);
+            int adjustableCount = currentOverlap - baseCount;
+            int freqForTarget = baseCount + Math.min(numOperations, adjustableCount);
+
+            maxFreq = Math.max(maxFreq, freqForTarget);
+        }
+
+        return maxFreq;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(nlogn)
+Space Complexity: O(n)
+
+
+
+
+
