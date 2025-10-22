@@ -1,0 +1,91 @@
+Day 150/150: Maximum Frequency of an Element After Performing Operations II
+
+Problem Statement #3347
+
+Problem Statement Explanation:
+
+You are given a 0-indexed integer array nums and two integers, k and numOperations.
+You must perform exactly numOperations operations on the array. In each operation, you must:
+Choose an index i that has not been selected in any previous operation (each index can be used at most once).
+Add an integer value val to nums[i], where val is in the range [-k, k].
+Your task is to return the maximum possible frequency of any single element value that can be achieved after performing all the operations.
+
+Solution Approach:
+
+This problem can be solved efficiently using a sweep-line (or difference array) algorithm.
+The core insight is that each element nums[i] can be transformed into any value within the inclusive range [nums[i] - k, nums[i] + k]. We want to find a single target value (let's call it target) that is covered by the most ranges, with the constraint that we can only use numOperations "conversions" from elements that are not originally equal to target.
+
+Algorithm Steps:
+Count Original Frequencies (count Map): First, we create a HashMap called count to store the original frequency of each number in the nums array.
+Define Ranges (line Map): We use a TreeMap called line to act as our sweep-line or difference array. The TreeMap is crucial as it keeps our "events" (range boundaries) in sorted order.
+
+For each num in nums, we mark the start and end of its reachable range.
+line.put(num - k, ... + 1): We add 1 at the start of the range (num - k).
+line.put(num + k + 1, ... - 1): We subtract 1 at the position just after the end of the range (num + k).
+Identify Critical Points (candidates Set): The maximum frequency can only occur at a point where a range begins, ends, or at an original number's value. We store all these "points of interest" in a TreeSet called candidates to iterate over them in sorted order.
+Sweep and Calculate: We initialize maxFrequency = 0 and currentAdjustable = 0. We then iterate through every candidate in our sorted TreeSet.
+Update currentAdjustable: For the current candidate value, we update our running sum: currentAdjustable += line.getOrDefault(candidate, 0). This sum represents the total number of original elements that can be transformed into the current candidate value.
+
+Get Counts:
+
+originalCount = count.getOrDefault(candidate, 0): This is how many times the candidate value appeared in the original nums array.
+others = currentAdjustable - originalCount: This is the number of other elements (that were not originally candidate) that can be transformed into candidate.
+Apply Operations: We can only use up to numOperations to perform these transformations. The number of elements we actually convert is transformedCount = Math.min(numOperations, others).
+Find Total: The total frequency for this candidate is totalFrequency = originalCount + transformedCount.
+Update Max: We update our answer: maxFrequency = Math.max(maxFrequency, totalFrequency).
+Return: After checking all candidates, we return maxFrequency.
+
+Here's the code:
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+class Solution {
+    public int maxFrequency(int[] nums, int k, int numOperations) {
+        Map<Integer, Integer> count = new HashMap<>();
+        TreeMap<Integer, Integer> line = new TreeMap<>();
+        TreeSet<Integer> candidates = new TreeSet<>();
+
+        for (int num : nums) {
+            count.put(num, count.getOrDefault(num, 0) + 1);
+            
+            int start = num - k;
+            int end = num + k + 1;
+            line.put(start, line.getOrDefault(start, 0) + 1);
+            line.put(end, line.getOrDefault(end, 0) - 1);
+            
+            candidates.add(num);
+            candidates.add(start);
+            candidates.add(end);
+        }
+
+        int maxFrequency = 0;
+        int currentAdjustable = 0; 
+
+        for (int candidate : candidates) {
+            currentAdjustable += line.getOrDefault(candidate, 0);
+            
+            int originalCount = count.getOrDefault(candidate, 0);
+            
+            int others = currentAdjustable - originalCount;
+            
+            int transformedCount = Math.min(numOperations, others);
+            
+            int totalFrequency = originalCount + transformedCount;
+            
+            maxFrequency = Math.max(maxFrequency, totalFrequency);
+        }
+
+        return maxFrequency;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(NlogN)
+Space Complexity: O(N)
+
+
+
