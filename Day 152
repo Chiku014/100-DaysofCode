@@ -1,0 +1,102 @@
+Day 152/200: Next Greater Numerically Balanced Number
+
+Problem Statement #2048
+
+Problem Statement Explanation:
+
+An integer n is considered beautiful if, for every digit d present in the number, the digit d appears exactly d times.
+
+For example:
+
+22 is beautiful: The digit 2 appears 2 times.
+1333 is beautiful: The digit 1 appears 1 time, and the digit 3 appears 3 times.
+122 is beautiful: The digit 1 appears 1 time, and the digit 2 appears 2 times.
+12 is not beautiful: The digit 1 appears 1 time (correct), but the digit 2 only appears 1 time (it should appear 2 times).
+44 is not beautiful: The digit 4 appears 2 times (it should appear 4 times).
+The task is to find and return the smallest beautiful number that is strictly greater than a given integer n.
+
+Solution Approach:
+
+
+Show thinking
+Here's a breakdown you can use for your GitHub README.md file.
+
+LeetCode 2048: Next Beautiful Number
+Problem Statement
+An integer n is considered beautiful if, for every digit d present in the number, the digit d appears exactly d times.
+
+For example:
+
+22 is beautiful: The digit 2 appears 2 times.
+1333 is beautiful: The digit 1 appears 1 time, and the digit 3 appears 3 times.
+122 is beautiful: The digit 1 appears 1 time, and the digit 2 appears 2 times.
+12 is not beautiful: The digit 1 appears 1 time (correct), but the digit 2 only appears 1 time (it should appear 2 times).
+44 is not beautiful: The digit 4 appears 2 times (it should appear 4 times).
+The task is to find and return the smallest beautiful number that is strictly greater than a given integer n.
+
+Solution Approach:
+The most straightforward approach is to test numbers one by one, starting from n + 1, until we find one that satisfies the "beautiful number" criteria.
+
+Main Function (nextBeautifulNumber):
+Start a loop with a variable num, initialized to n + 1.
+In each iteration, check if num is a beautiful number using a helper function (isBeautiful).
+If isBeautiful(num) returns true, we have found our answer. Return num.
+If not, increment num and continue the loop.
+
+Helper Function (isBeautiful):
+This function takes an integer num and returns true or false.
+Create a frequency array (or a hash map) of size 10 to store the counts of each digit (0-9).
+Iterate through each digit of num. (Converting the number to a string is an easy way to do this).
+
+For each digit d:
+If d is 0, return false immediately (a beautiful number cannot contain 0).
+Increment the count for that digit in the frequency array (e.g., counts[d]++).
+After counting all digits, iterate through the frequency array from index 1 to 9.
+For each index i (representing the digit), check its count:
+If counts[i] > 0 (meaning the digit i was in the number) and counts[i] != i, then the condition is violated. Return false.
+If the loop finishes without returning false, it means all present digits satisfy the condition. Return true.
+
+Here's the code:
+
+class Solution {
+    
+    public int nextBeautifulNumber(int n) {
+        int num = n + 1;
+        
+        while (true) {
+            if (isBeautiful(num)) {
+                return num;
+            }
+            num++;
+        }
+    }
+    
+    private boolean isBeautiful(int num) {
+        int[] counts = new int[10];
+        String s = String.valueOf(num);
+        
+        for (char c : s.toCharArray()) {
+            int digit = c - '0'; 
+            
+            if (digit == 0) {
+                return false;
+            }
+            
+            counts[digit]++;
+        }
+        
+        for (int i = 0; i < 10; i++) {
+            if (counts[i] > 0 && counts[i] != i) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(k⋅logk)
+Space Complexity: O(logk)
+
