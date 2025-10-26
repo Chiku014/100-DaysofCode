@@ -1,0 +1,90 @@
+Day 154/200:  Simple Bank System
+
+Problem Statement #2043
+
+Problem Statement Explanation:
+
+You are tasked with designing a Bank class to automate transactions. 
+The bank has n accounts, numbered from 1 to n. The initial balance of each account is given in a 0-indexed integer array balance, where the (i + 1)-th account has an initial balance of balance[i].
+You must implement the Bank class with the following methods:
+Bank(long[] balance): Initializes the bank object with the initial balances.
+boolean transfer(int account1, int account2, long money): Attempts to transfer money from account1 to account2.
+boolean deposit(int account, long money): Attempts to deposit money into account.
+boolean withdraw(int account, long money): Attempts to withdraw money from account.
+A transaction is considered valid if:
+All specified account numbers are within the valid range (between 1 and n).
+For a withdrawal or transfer, the source account has a balance greater than or equal to the money being transacted.
+If a transaction is valid, the balances are updated, and the method returns true. If the transaction is invalid (e.g., bad account number, insufficient funds), no balances are changed, and the method returns false.
+
+Solution Approach:
+
+The core idea is to simulate the bank's operations directly using an array to manage the account balances.
+Data Structure: We use a long[] balance array, initialized in the constructor, to store the balance for each account. \
+We also store the number of accounts n as a class member for easy access during validation.
+Account Indexing: The problem uses 1-indexed accounts (1 to n), while Java arrays are 0-indexed (0 to n-1). 
+Therefore, for any operation on account, we must access the balance array at index account - 1.
+Validation: A private helper method, isValidAccount(int account), is created. 
+This method simply checks if the given account number is within the valid range: account >= 1 && account <= n.
+
+Method Logic:
+deposit(int account, long money):
+Check if account is valid using isValidAccount().
+If invalid, return false.
+If valid, add money to balance[account - 1] and return true.
+withdraw(int account, long money):
+Check if account is valid.
+Check if balance[account - 1] >= money (sufficient funds).
+If either check fails, return false.
+If both pass, subtract money from balance[account - 1] and return true.
+transfer(int account1, int account2, long money):
+Check if both account1 and account2 are valid.
+Check if balance[account1 - 1] >= money (sufficient funds).
+If any of these checks fail, return false.
+If all pass, perform the transaction: subtract money from balance[account1 - 1] and add money to balance[account2 - 1]. Return true.
+
+Here's the code:
+
+class Bank {
+    
+    private long[] balance;
+    private int n;
+
+    public Bank(long[] balance) {
+        this.balance = balance;
+        this.n = balance.length;
+    }
+    
+    private boolean isValidAccount(int account) {
+        return account >= 1 && account <= n;
+    }
+
+    public boolean transfer(int account1, int account2, long money) {
+        if (isValidAccount(account1) && isValidAccount(account2) && balance[account1 - 1] >= money) {
+            balance[account1 - 1] -= money;
+            balance[account2 - 1] += money;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean deposit(int account, long money) {
+        if (isValidAccount(account)) {
+            balance[account - 1] += money;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean withdraw(int account, long money) {
+        if (isValidAccount(account) && balance[account - 1] >= money) {
+            balance[account - 1] -= money;
+            return true;
+        }
+        return false;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(1)
+Space Complexity: O(n)
