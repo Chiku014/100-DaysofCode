@@ -1,0 +1,102 @@
+Day 156/200: Make Array Elements Equal to Zero
+
+Problem Statement #3354
+
+Problem Statement Explanation:
+
+You are given an integer array nums. 
+You must select a starting position curr such that nums[curr] == 0 and choose an initial movement direction (either left or right).
+After that, you repeat the following process:
+If curr is out of the array bounds (< 0 or >= nums.length), the process ends.
+If nums[curr] == 0, move one step in the current direction.
+If nums[curr] > 0:
+Decrement nums[curr] by 1.
+Reverse your movement direction.
+Take one step in the new direction.
+A selection (an initial curr and a direction) is considered valid if every element in nums becomes 0 by the end of the process.
+Return the total number of valid selections.
+
+Solution Approach:
+
+This problem appears to be a complex simulation, but it can be simplified into a counting problem by analyzing the number of "bounces" required.
+
+The Core Insight
+Bounces vs. Sum: Every time we encounter a non-zero number, we decrement it and "bounce" (reverse direction). This means that to make the entire array zero, the total number of bounces must be equal to the total sum of the array.
+Zeros are Pass-throughs: Zeros do not cause bounces; we simply pass through them.
+Left Sum vs. Right Sum: For any potential starting index i (where nums[i] == 0), the problem boils down to comparing the sum of all elements to its left (leftSum) and the sum of all elements to its right (rightSum).
+leftSum = Sum of nums[0...i-1]
+rightSum = Sum of nums[i+1...n-1]
+The total "work" or number of bounces required is leftSum + rightSum. We need to determine if starting at i and moving left or right can successfully complete all this work.
+The Three Cases
+When we stand at a valid starting index i (where nums[i] == 0), we only need to compare leftSum and rightSum:
+
+Case 1: leftSum == rightSum
+The "work" is perfectly balanced on both sides.
+If we start moving left, we will perform leftSum bounces, eventually return to i, cross over, perform rightSum bounces, and then exit the array.
+The same logic applies if we start right.
+Result: 2 valid selections (starting left and starting right).
+Case 2: Math.abs(leftSum - rightSum) == 1
+The "work" is unbalanced by exactly one.
+We must start moving toward the side with the larger sum.
+For example, if leftSum = 5 and rightSum = 4, we must start left. We will perform 5 bounces on the left, and the 5th bounce will send us to the right. We then perform 4 bounces on the right and exit the array.
+If we started right (the smaller side), we would perform 4 bounces, return, and exit, leaving the left side unfinished.
+Result: 1 valid selection (starting toward the side with the larger sum).
+Case 3: Math.abs(leftSum - rightSum) > 1
+The "work" is too unbalanced.
+If we start toward the larger side, we will complete its work, but the final bounce will not be enough to send us all the way across the smaller side to exit. 
+We will exit on the same side we started, leaving the other side unfinished.
+Result: 0 valid selections.
+
+Implementation:
+We can solve this in O(n) time and O(1) space.
+First, calculate the totalSum of the entire array.
+Initialize ans = 0 and leftSum = 0.
+Iterate through the array with an index i from 0 to n-1.
+In each iteration, calculate the current rightSum. The rightSum for index i is totalSum - leftSum - nums[i].
+Check if nums[i] == 0. If it is, apply our logic:
+If leftSum == rightSum, add 2 to ans.
+Else if Math.abs(leftSum - rightSum) == 1, add 1 to ans.
+After the check, add the current element to leftSum (leftSum += nums[i]) to prepare it for the next iteration (where nums[i] will be part of the leftSum).
+Return ans.
+
+Here's the code:
+
+import java.util.Arrays;
+
+class Solution {
+    public int countValidSelections(int[] nums) {
+        int n = nums.length;
+        int ans = 0;
+        
+        long totalSum = 0;
+        for (int num : nums) {
+            totalSum += num;
+        }
+
+        long leftSum = 0;
+
+        for (int i = 0; i < n; i++) {
+            
+            long rightSum = totalSum - leftSum - nums[i];
+            
+            if (nums[i] == 0) {
+                if (leftSum == rightSum) {
+                    ans += 2;
+                } 
+                else if (Math.abs(leftSum - rightSum) == 1) {
+                    ans += 1;
+                }
+            }
+            
+            leftSum += nums[i];
+        }
+        
+        return ans;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
