@@ -1,0 +1,39 @@
+Day 157/200: Smallest Number With All Set Bits
+
+Problem Statement #3370
+
+Problem Statement:
+Given a positive integer n, find the smallest integer x such that:
+x >= n, and
+the binary representation of x contains only set bits (1s).
+In other words, x should be of the form 111...1 in binary (e.g., 1, 3, 7, 15, 31, etc.).
+
+Explanation:
+Binary of 5 = 101.
+The smallest number ≥ 5 that has all set bits is 111 (binary), which equals 7.
+
+Solution Approach:
+Any number that has all bits set is of the form 2^k - 1.
+We need to find the smallest integer k such that 2^k - 1 >= n.
+The bit-length of n (number of bits required to represent n) is k.
+Thus, the result can be directly computed as (1 << k) - 1,
+where k = Integer.SIZE - Integer.numberOfLeadingZeros(n).
+This gives an O(1) and elegant bit-manipulation solution.
+
+Here's the code:
+
+class Solution {
+    public int smallestNumber(int n) {
+        int len = Integer.SIZE - Integer.numberOfLeadingZeros(n);
+        return (1 << len) - 1;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(1)
+Space Complexity: O(1)
+
+
+
+
