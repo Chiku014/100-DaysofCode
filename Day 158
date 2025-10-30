@@ -1,0 +1,74 @@
+Day 158/200: Minimum Number of Increments on Subarrays to Form a Target Array
+
+Problem Statement #1526
+
+Problem Statement Explanation:
+
+You are given an array of positive integers, target. 
+You start with an initial array of the same size, but filled entirely with zeros.
+The only operation you can perform is to:
+Choose any subarray of the initial array.
+Increment every element in that chosen subarray by 1.
+The goal is to find the minimum number of operations required to transform the initial array so that it becomes identical to the target array.
+
+Example:
+If target = [1, 2, 3, 2, 1]:
+
+We need 1 operation on the subarray [0...4] to make initial become [1, 1, 1, 1, 1].
+We need 1 operation on the subarray [1...3] to make initial become [1, 2, 2, 2, 1].
+We need 1 operation on the subarray [2...2] to make initial become [1, 2, 3, 2, 1].
+The minimum number of operations is 3.
+
+Solution Approach:
+
+This problem can be solved with a single, greedy pass through the array. 
+The key insight is to realize that the total number of operations is simply the value of the first element plus the sum of all positive differences between adjacent elements.
+Let's trace the logic with target = [1, 2, 3, 2, 1]:
+Start at target[0]: The first element is 1. We must perform at least 1 operation to make it non-zero. Let's initialize our operation count: result = target[0] = 1.
+Move to target[1]: The value is 2.
+It is greater than the previous element (2 > 1).
+This means the 1 operation we used for target[0] also "covers" target[1] up to a value of 1.
+We only need to add the difference to our count.
+result += target[1] - target[0] which is result += 2 - 1 = 1.
+result is now 2.
+Move to target[2]: The value is 3.
+It is greater than the previous element (3 > 2).
+We add the difference: result += target[2] - target[1] which is result += 3 - 2 = 1.
+result is now 3.
+Move to target[3]: The value is 2.
+It is less than the previous element (2 < 3).
+This "dip" requires no new operations.
+The 3 operations we've already counted (one for [0...4], one for [1...3], one for [2...2]) are sufficient to cover this element.
+We add max(0, 2 - 3), which is 0.
+result remains 3.
+Move to target[4]: The value is 1.
+It is less than the previous element (1 < 2).
+This also requires no new operations.
+We add max(0, 1 - 2), which is 0.
+result remains 3.
+The loop finishes, and we return result = 3.
+This works because any time we encounter a "peak" (target[i] > target[i-1]), we must add target[i] - target[i-1] new operations that start at index i. 
+Any time we are in a "valley" or on a "plateau" (target[i] <= target[i-1]), the operations from the previous, larger element are sufficient to cover the current one.
+
+Here's the code:
+
+class Solution {
+    public int minNumberOperations(int[] target) {
+        int result = target[0];
+
+        for (int i = 1; i < target.length; i++) {
+            if (target[i] > target[i - 1]) {
+                result += target[i] - target[i - 1];
+            }
+        }
+        return result;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+
+
