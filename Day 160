@@ -1,0 +1,61 @@
+Day 160: Delete Nodes From Linked List Present in Array
+
+Problem Statement #3217
+
+Problem Statement Explanation:
+
+You are given an array of integers, nums, and the head of a singly linked list. 
+The nums array contains a set of values that should be considered for deletion.
+Your task is to traverse the entire linked list and remove every node whose value is present in the nums array. 
+After removing all the specified nodes, you must return the head of the modified linked list.
+A key consideration is handling the deletion of the head node itself, or even multiple consecutive nodes at the beginning of the list.
+
+Solution Approach:
+
+A naive approach of checking the entire nums array for every single node in the linked list would be very slow, resulting in an O(N⋅M) time complexity, which would likely time out.
+We can optimize this significantly by using a HashSet for fast lookups and a dummy node to simplify the linked list manipulation.
+Create a Value Set: First, we iterate through the nums array and add all of its elements into a HashSet. This gives us O(1) average-time complexity to check if a value exists in the set.
+Use a Dummy Node: We create a new ListNode called dummy and set its next pointer to the original head of the list. 
+This is a common and powerful technique that solves the edge case of deleting the actual head node. Our dummy node acts as a new, "safe" starting point that will never be deleted.
+Iterate with a "Look-Ahead" Pointer: We initialize a pointer, curr, to our dummy node. We then traverse the list using the condition while (curr.next != null). 
+This is a "look-ahead" approach: curr will always point to the valid node just before the node we are inspecting.
+Check and Delete: Inside the loop, we inspect curr.next (the node we're considering)
+If curr.next.val is in the HashSet: This means the curr.next node must be deleted. We do this by "skipping" it: curr.next = curr.next.next. 
+We do not advance curr yet, because the new curr.next might also need to be deleted (e.g., in a case like [1, 2, 3] where we need to delete 2 and 3).
+If curr.next.val is NOT in the HashSet: This node is safe and should be kept. We advance our pointer normally: curr = curr.next.
+Return the New Head: After the loop finishes, all targeted nodes have been removed.
+The dummy node's next pointer now correctly points to the new head of the modified list. We return dummy.next.
+
+Here's the code:
+
+import java.util.HashSet;
+import java.util.Set;
+
+class Solution {
+    public ListNode modifiedList(int[] nums, ListNode head) {
+        Set<Integer> numSet = new HashSet<>();
+        for (int num : nums) {
+            numSet.add(num);
+        }
+
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        
+        ListNode curr = dummy;
+
+        while (curr.next != null) {
+            if (numSet.contains(curr.next.val)) {
+                curr.next = curr.next.next;
+            } else {
+                curr = curr.next;
+            }
+        }
+        
+        return dummy.next;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N+M)
+Space Complexity: O(M)
