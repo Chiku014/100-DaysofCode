@@ -1,0 +1,90 @@
+Day 161/200: Count Unguarded Cells in the Grid
+
+Problem Statement #2257
+
+Problem Statement Explanation:
+
+You are given the dimensions of a grid, m and n, along with two 2D arrays: guards and walls. 
+Each array contains the [row, col] coordinates for the guards and walls.
+A guard can see in all four cardinal directions (north, east, south, west). 
+Their vision continues in a straight line until it hits a wall, another guard, or the edge of the grid. 
+Any cell a guard can see is considered guarded.
+The goal is to calculate and return the total number of unoccupied cells (cells that are not a guard or a wall) that are not guarded.
+
+Solution Approach:
+
+The most straightforward approach is to simulate the guards' vision directly on a 2D grid. We use a simulation matrix to track the state of every cell.
+Initialize a Grid: Create an int[m][n] matrix, let's call it grid. We'll use integer codes to represent the state of each cell:
+0: Empty and unguarded
+1: Guarded
+2: An obstacle (a wall or a guard)
+
+Mark Obstacles: Iterate through both the walls and guards arrays. For each coordinate, mark its position in our grid with 2. This is crucial because walls and other guards block a guard's line of sight.
+Simulate Guard Vision: Iterate through the guards array one more time. For each guard's position [r, c]:
+Define the four cardinal directions (e.g., using dr = {0, 0, 1, -1} and dc = {1, -1, 0, 0}).
+For each of the four directions:
+Start a "beam" from the guard's position, moving one step at a time in the current direction.
+Use a while loop that continues as long as the beam is within the grid boundaries.
+Inside the loop, check the next cell:
+If the cell is an obstacle (grid[nr][nc] == 2), the vision is blocked. break this direction's loop.
+If the cell is not an obstacle (it's 0 or 1), mark it as guarded (grid[nr][nc] = 1).
+Continue moving the beam (nr += dr[i], nc += dc[i]).
+Count Unguarded Cells: After simulating all guards, iterate through the entire m x n grid. Count every cell that still has a value of 0. 
+This is our final answer, as these are the cells that are unoccupied and were never reached by a guard's vision.
+
+Here's the code:
+
+class Solution {
+    public int countUnguarded(int m, int n, int[][] guards, int[][] walls) {
+        int[][] grid = new int[m][n];
+
+        for (int[] wall : walls) {
+            grid[wall[0]][wall[1]] = 2;
+        }
+        for (int[] guard : guards) {
+            grid[guard[0]][guard[1]] = 2;
+        }
+
+        int[] dr = {0, 0, 1, -1};
+        int[] dc = {1, -1, 0, 0};
+
+        for (int[] guard : guards) {
+            int r = guard[0];
+            int c = guard[1];
+
+            for (int i = 0; i < 4; i++) {
+                int nr = r + dr[i];
+                int nc = c + dc[i];
+
+                while (nr >= 0 && nr < m && nc >= 0 && nc < n) {
+                    if (grid[nr][nc] == 2) {
+                        break;
+                    }
+                    grid[nr][nc] = 1;
+                    nr += dr[i];
+                    nc += dc[i];
+                }
+            }
+        }
+
+        int unguardedCount = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 0) {
+                    unguardedCount++;
+                }
+            }
+        }
+
+        return unguardedCount;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(m×n)
+Space Complexity: O(m×n)
+
+
+
+
