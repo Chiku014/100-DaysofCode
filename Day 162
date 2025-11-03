@@ -1,0 +1,49 @@
+Day 162/200: Minimum Time to Make Rope Colorful
+
+Problem Statement #1578
+
+Problem Statement Explanation:
+
+A string colors, where each character represents the color of a balloon.
+An integer array neededTime, where neededTime[i] is the time required to remove the i-th balloon.
+You need to remove some balloons so that no two adjacent balloons have the same color.
+Removing a balloon costs its corresponding neededTime[i].
+Return the minimum total time required to make the rope colorful.
+
+Example:
+
+Input: colors = "abaac", neededTime = [1,2,3,4,5]
+Output: 3
+Explanation: Remove the second 'a' (cost = 3) → final string = "abac"
+
+Solution Approach:
+
+Traverse through the colors string.
+If two consecutive balloons have the same color, remove the one with the smaller neededTime.
+Keep the balloon with the larger neededTime for future comparisons.
+Accumulate the removal times to get the total minimum cost.
+This is a greedy approach, as at each step we make the locally optimal decision — removing the cheaper balloon — which leads to the globally optimal result.
+
+Here's the code:
+
+class Solution {
+    public int minCost(String colors, int[] neededTime) {
+        int totalTime = 0;
+        int n = colors.length();
+        for (int i = 1; i < n; i++) {
+            if (colors.charAt(i) == colors.charAt(i - 1)) {
+                totalTime += Math.min(neededTime[i], neededTime[i - 1]);
+                neededTime[i] = Math.max(neededTime[i], neededTime[i - 1]);
+            }
+        }
+        return totalTime;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+
+
