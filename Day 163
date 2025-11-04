@@ -1,0 +1,123 @@
+Day 163/200: Find X‑Sum of All K‑Long Subarrays I
+
+Problem Statement #3318
+
+Problem Statement Explanation:
+
+You are given an array nums of n integers and two integers k and x.
+Define the x-sum of an array as follows:
+Count the occurrences of all elements in the array.
+Keep only the occurrences of the top x most frequent elements. If two elements have the same frequency, the one with the larger value is considered “more frequent”. 
+The x-sum is the sum of each of those kept elements multiplied by its count (i.e., sum over value * frequency for the kept ones).
+If the array has fewer than x distinct elements, you sum all the elements in that array. 
+Return an integer array answer of length n – k + 1 where answer[i] is the x-sum of the subarray nums[i .. i + k − 1].
+
+Solution Approach:
+
+We use a sliding window of size k moving through nums. 
+For each window, we need to compute the x-sum: keep the top x most frequent elements (with tie broken by larger value) and sum over their frequency * value.
+Key challenge: maintaining the top x frequent elements efficiently as the window slides (i.e., an element leaves on the left, a new one enters on the right).
+General steps:
+
+Maintain a frequency map count of current window elements.
+Maintain two data-structures (e.g., balanced trees / TreeSets) or heaps:
+One (call it top) for the current top x elements (by freq then value) which contribute to the x-sum.
+One (call it bot) for the remaining elements not in the top x.
+Also maintain a running sum windowSum which is the sum of value * frequency for elements in top.
+On adding a new element or removing an old one, update count, then remove the old (freq, value) tuple from whichever set it was in, and insert the new tuple.
+After every update, rebalance top and bot so that top has at most x elements (or fewer if fewer distinct). 
+That involves possibly moving largest from bot into top (if top.size() < x) or swapping between sets if some in bot should be in top.
+Once the window is fully formed (i.e., index i >= k-1), record windowSum into answer[i−k+1].
+This approach ensures each slide of window updates in roughly O(log k) time (for tree operations) and we avoid recomputing from scratch each window. 
+
+Here's the code:
+
+import java.util.*;
+
+class Solution {
+    private long windowSum = 0;
+
+    public int[] findXSum(int[] nums, int k, int x) {
+        int n = nums.length;
+        int[] ans = new int[n - k + 1];
+        Map<Integer, Integer> count = new HashMap<>();
+
+        Comparator<Pair> cmp = (a, b) -> {
+            if (a.freq != b.freq) return Integer.compare(a.freq, b.freq);
+            return Integer.compare(a.val, b.val);
+        };
+
+        TreeSet<Pair> top = new TreeSet<>(cmp);
+        TreeSet<Pair> bot = new TreeSet<>(cmp);
+
+        for (int i = 0; i < n; i++) {
+            update(nums[i], +1, count, top, bot, x);
+            if (i >= k) update(nums[i - k], -1, count, top, bot, x);
+            if (i >= k - 1) ans[i - k + 1] = (int) windowSum;
+        }
+        return ans;
+    }
+
+    private void update(int num, int delta, Map<Integer, Integer> count,
+                        TreeSet<Pair> top, TreeSet<Pair> bot, int x) {
+        int oldFreq = count.getOrDefault(num, 0);
+        if (oldFreq > 0) {
+            Pair oldPair = new Pair(oldFreq, num);
+            if (!bot.remove(oldPair)) {
+                top.remove(oldPair);
+                windowSum -= (long) oldFreq * num;
+            }
+        }
+        int newFreq = oldFreq + delta;
+        if (newFreq > 0) {
+            Pair newPair = new Pair(newFreq, num);
+            bot.add(newPair);
+        }
+        count.put(num, newFreq);
+
+        while (!bot.isEmpty() && top.size() < x) {
+            Pair pair = bot.pollLast();
+            top.add(pair);
+            windowSum += (long) pair.freq * pair.val;
+        }
+
+        while (!bot.isEmpty() && !top.isEmpty() && comparatorGreater(bot.last(), top.first())) {
+            Pair pb = bot.pollLast();
+            Pair pt = top.pollFirst();
+            top.add(pb);
+            bot.add(pt);
+            windowSum += (long) pb.freq * pb.val;
+            windowSum -= (long) pt.freq * pt.val;
+        }
+    }
+
+    private boolean comparatorGreater(Pair a, Pair b) {
+        if (a.freq != b.freq) return a.freq > b.freq;
+        return a.val > b.val;
+    }
+
+    private static class Pair {
+        int freq;
+        int val;
+        Pair(int f, int v) { freq = f; val = v; }
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Pair)) return false;
+            Pair p = (Pair) o;
+            return freq == p.freq && val == p.val;
+        }
+        @Override
+        public int hashCode() {
+            return Objects.hash(freq, val);
+        }
+    }
+}
+
+Complexity:
+
+Time Complexity: ~ O(n · log k)
+Space Complexity: O(n)
+
+
+
