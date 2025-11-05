@@ -1,0 +1,158 @@
+Day 164/200: Find X-Sum of All K-Long Subarrays II
+
+Problem Statement #3321
+
+Problem Statement Explanation:
+
+You are given an integer array nums, and two integers k and x.
+For each contiguous subarray (window) of length k, you must calculate its x-sum.
+
+The x-sum of a window is calculated as follows:
+Count the occurrences of all distinct elements in that window.
+Choose the top x most frequent elements.
+If two elements have the same frequency, the larger value is considered more frequent.
+Compute the sum of all occurrences of those top-x elements.
+If the window contains fewer than x distinct elements, use the sum of the entire window instead.
+Return an array answer where answer[i] is the x-sum of the subarray nums[i..i + k - 1].
+
+Input:
+nums = [1,2,3,1,2,2,4], k = 3, x = 2
+
+Output:
+[6, 7, 8, 8, 8]
+
+Explanation:
+For the window [1,2,3], top 2 frequent = {1,2,3} (all unique, < x), so sum = 6
+For [2,3,1], same reasoning → 6
+For [3,1,2], → 6
+For [1,2,2], top 2 frequent = {2,1}, sum = 8
+For [2,2,4], top 2 frequent = {2,4}, sum = 8
+
+Solution Approach:
+
+This problem requires maintaining element frequencies efficiently for each sliding window.
+A naive approach would recalculate frequencies for every window (O(k × n)), which is too slow.
+Instead, we use a sliding window + balanced data structure approach:
+
+Step-by-Step Logic:
+Maintain a HashMap count → to store the frequency of each element in the current window.
+Use two TreeSets (topSet and restSet) with a custom comparator that sorts by:
+
+Frequency (ascending)
+Value (ascending, to handle ties)
+
+Keep:
+topSet → contains the top-x most frequent elements.
+restSet → contains the remaining elements.
+Maintain two running sums:
+sumWindow → sum of all elements in the current window.
+sumTopSet → sum of (value × count) for all elements in topSet.
+
+For each iteration:
+Add the new element (increment frequency, adjust sets).
+Remove the outgoing (leftmost) element once the window exceeds size k.
+
+Balance the sets:
+If topSet.size() < x, promote from restSet.
+If topSet.size() > x, demote the smallest in topSet.
+
+Compute:
+If topSet.size() == x, result = sumTopSet.
+Else, result = sumWindow (because distinct count < x).
+This efficiently maintains all updates in O(log k) time using TreeSet operations.
+
+Here's the code:
+
+import java.util.*;
+
+public class Solution {
+    private static class Elem implements Comparable<Elem> {
+        int val;
+        int cnt;
+        Elem(int v, int c) { val = v; cnt = c; }
+        public int compareTo(Elem o) {
+            if (this.cnt != o.cnt) return this.cnt - o.cnt;
+            return this.val - o.val;
+        }
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof Elem)) return false;
+            Elem e = (Elem) o;
+            return this.val == e.val && this.cnt == e.cnt;
+        }
+        @Override
+        public int hashCode() {
+            return Objects.hash(val, cnt);
+        }
+    }
+
+    public long[] findXSum(int[] nums, int k, int x) {
+        int n = nums.length;
+        long[] ans = new long[n - k + 1];
+        Map<Integer, Integer> count = new HashMap<>();
+        TreeSet<Elem> topSet = new TreeSet<>();
+        TreeSet<Elem> restSet = new TreeSet<>();
+        long sumWindow = 0, sumTopSet = 0;
+
+        for (int i = 0; i < n; ++i) {
+            int v = nums[i];
+            sumWindow += v;
+            int prevCnt = count.getOrDefault(v, 0);
+            if (prevCnt > 0) {
+                Elem oldElem = new Elem(v, prevCnt);
+                if (topSet.remove(oldElem)) sumTopSet -= (long) v * prevCnt;
+                else restSet.remove(oldElem);
+            }
+            int newCnt = prevCnt + 1;
+            count.put(v, newCnt);
+            Elem newElem = new Elem(v, newCnt);
+            if (!topSet.isEmpty() && newElem.compareTo(topSet.first()) > 0) {
+                topSet.add(newElem);
+                sumTopSet += (long) v * newCnt;
+            } else restSet.add(newElem);
+
+            if (i >= k) {
+                int leftVal = nums[i - k];
+                sumWindow -= leftVal;
+                int leftPrevCnt = count.get(leftVal);
+                Elem leftOldElem = new Elem(leftVal, leftPrevCnt);
+                if (topSet.remove(leftOldElem)) sumTopSet -= (long) leftVal * leftPrevCnt;
+                else restSet.remove(leftOldElem);
+                int leftNewCnt = leftPrevCnt - 1;
+                if (leftNewCnt == 0) count.remove(leftVal);
+                else {
+                    count.put(leftVal, leftNewCnt);
+                    Elem leftNewElem = new Elem(leftVal, leftNewCnt);
+                    if (!topSet.isEmpty() && leftNewElem.compareTo(topSet.first()) > 0) {
+                        topSet.add(leftNewElem);
+                        sumTopSet += (long) leftVal * leftNewCnt;
+                    } else restSet.add(leftNewElem);
+                }
+            }
+
+            if (i >= k - 1) {
+                while (topSet.size() < x && !restSet.isEmpty()) {
+                    Elem move = restSet.pollLast();
+                    topSet.add(move);
+                    sumTopSet += (long) move.val * move.cnt;
+                }
+                while (topSet.size() > x) {
+                    Elem move = topSet.pollFirst();
+                    sumTopSet -= (long) move.val * move.cnt;
+                    restSet.add(move);
+                }
+                int startIdx = i - k + 1;
+                if (topSet.size() == x) ans[startIdx] = sumTopSet;
+                else ans[startIdx] = sumWindow;
+            }
+        }
+        return ans;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n log k)
+Space Complexity: O(k)
+
+
