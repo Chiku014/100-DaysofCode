@@ -1,0 +1,114 @@
+Day 165/200:  Power Grid Maintenance
+
+Problem Statement #3607
+
+Problem Statement Explanation:
+
+We are managing a power grid with c stations (labeled 1 to c). 
+These stations are connected by fixed, undirected cables, forming several connected components (sub-grids). 
+Initially, all stations are online.
+
+We need to process a sequence of queries:
+Type 1 (Maintenance Check): Given station x, we need to find an active (online) station in the same sub-grid to perform maintenance. The rules are:
+If station x is currently online, it can perform its own maintenance (return x).
+If station x is offline, we must find the online station with the smallest ID in the same sub-grid.
+If no stations in that sub-grid are online, return -1.
+Type 2 (Failure Event): Station x goes offline permanently.
+
+Solution Approach:
+
+The connections between stations are static, meaning the structure of the sub-grids never changes. 
+Only the status (online/offline) of individual stations changes.
+We can solve this efficiently by combining two data structures:
+Disjoint Set Union (DSU): Used to quickly determine which sub-grid a station belongs to. We process all static connections initially to build these components.
+
+Hash Map of TreeSets:
+We use a HashMap to store the state of each sub-grid, where the key is the component's root ID (from DSU).
+The value is a TreeSet containing the IDs of all currently online stations in that component. 
+A TreeSet is chosen because it keeps elements sorted, allowing O(1) or O(logN) access to the minimum element (first()), and efficient O(logN) removal of elements.
+
+Algorithm Steps
+Initialize DSU for c stations.
+Process all connections using dsu.union(u, v) to form the base components.
+Populate the grids map: For every station i, find its root and add i to the corresponding TreeSet.
+
+Process queries:
+Type 1: Check if station x is online. If yes, result is x. If no, find its root and get the TreeSet for that component. Return .first() if the set is not empty, otherwise -1.
+Type 2: Mark station x as offline globally. Find its root and .remove(x) from the corresponding component's TreeSet.
+
+Here's the code:
+
+import java.util.*;
+
+class Solution {
+    public int[] processQueries(int c, int[][] connections, int[][] queries) {
+        DSU dsu = new DSU(c + 1);
+        for (int[] conn : connections) {
+            dsu.union(conn[0], conn[1]);
+        }
+
+        Map<Integer, TreeSet<Integer>> grids = new HashMap<>();
+        boolean[] isOnline = new boolean[c + 1];
+        
+        for (int i = 1; i <= c; i++) {
+            int root = dsu.find(i);
+            grids.putIfAbsent(root, new TreeSet<>());
+            grids.get(root).add(i);
+            isOnline[i] = true;
+        }
+
+        List<Integer> results = new ArrayList<>();
+
+        for (int[] query : queries) {
+            int type = query[0];
+            int x = query[1];
+
+            if (type == 1) {
+                if (isOnline[x]) {
+                    results.add(x);
+                } else {
+                    int root = dsu.find(x);
+                    TreeSet<Integer> grid = grids.get(root);
+                    if (grid.isEmpty()) {
+                        results.add(-1);
+                    } else {
+                        results.add(grid.first());
+                    }
+                }
+            } else {
+                if (isOnline[x]) {
+                    isOnline[x] = false;
+                    int root = dsu.find(x);
+                    grids.get(root).remove(x);
+                }
+            }
+        }
+
+        return results.stream().mapToInt(i -> i).toArray();
+    }
+
+    class DSU {
+        int[] parent;
+        public DSU(int n) {
+            parent = new int[n];
+            for (int i = 0; i < n; i++) parent[i] = i;
+        }
+        public int find(int x) {
+            if (parent[x] != x) parent[x] = find(parent[x]);
+            return parent[x];
+        }
+        public void union(int x, int y) {
+            int rootX = find(x);
+            int rootY = find(y);
+            if (rootX != rootY) parent[rootX] = rootY;
+        }
+    }
+}
+
+Complexity:
+
+Time Complexity: O(M⋅α(N)+NlogN+QlogN)
+Space Complexity: O(N)
+
+
+
