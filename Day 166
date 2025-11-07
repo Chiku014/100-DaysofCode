@@ -1,0 +1,90 @@
+Day 166/200: Maximize the Minimum Powered City
+
+Problem Statement #2528
+
+Problem Statement Explanation:
+
+Stations[i]: the number of power stations located in city i.
+Each power station affects all cities within distance r.
+So a station at index i gives power to all cities in the range [i - r, i + r].
+You are allowed to add at most k new power stations anywhere.
+For every city, its total power is the sum of all stations (existing and added) that affect it.
+
+Goal:
+Maximize the minimum power among all cities after adding up to k stations optimally.
+This means we want all cities to have as high a minimum power value as possible.
+
+Solution Approach:
+
+1. Precompute the current power of each city
+For each city, calculate its current total power from all existing stations.
+We can do this efficiently using a prefix sum array because each station affects a fixed continuous segment.
+
+2. Binary Search on the answer
+We want the maximum minimum power, so we use binary search on the possible answer range:
+Minimum power = 0
+Maximum power = total existing power + k
+For each candidate value mid, check if it's possible to make every city have at least mid power.
+
+3. Feasibility check using a difference array
+To check if a city can reach the required power:
+Track running increase from added stations using a difference array (range increment).
+If a city’s power is below the target, add enough stations to reach the target.
+Adding x stations increases the power of all cities in [i, i + 2r].
+
+We must ensure:
+Total added stations ≤ k
+All cities reach at least the target
+If yes → mid is feasible
+If not → reduce the search space.
+
+Here's the code:
+
+class Solution {
+    public long maxPower(int[] stations, int r, long k) {
+        int n = stations.length;
+        long[] pref = new long[n + 1];
+        for (int i = 0; i < n; i++) pref[i + 1] = pref[i] + stations[i];
+
+        long[] base = new long[n];
+        for (int i = 0; i < n; i++) {
+            int L = Math.max(0, i - r), R = Math.min(n - 1, i + r);
+            base[i] = pref[R + 1] - pref[L];
+        }
+
+        long left = 0, right = pref[n] + k, ans = 0;
+        while (left <= right) {
+            long mid = left + (right - left) / 2;
+            if (can(base, r, k, mid)) { ans = mid; left = mid + 1; }
+            else right = mid - 1;
+        }
+        return ans;
+    }
+
+    private boolean can(long[] base, int r, long k, long target) {
+        int n = base.length;
+        long[] diff = new long[n + 1];
+        long add = 0, used = 0;
+        for (int i = 0; i < n; i++) {
+            add += diff[i];
+            long cur = base[i] + add;
+            if (cur < target) {
+                long need = target - cur;
+                used += need;
+                if (used > k) return false;
+                add += need;
+                int end = (int)Math.min(n - 1L, i + 2L * r);
+                diff[end + 1] -= need;
+            }
+        }
+        return true;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n log S)
+Space Complexity: O(n)
+
+
+
