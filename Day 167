@@ -1,0 +1,83 @@
+Day 167/200: Minimum One-Bit Operations to Make Integers Zero
+
+Problem Statement #1611
+
+Problem Statement Explantion:
+
+Given an integer n, you must transform it to 0 using the following operations:
+Change the rightmost (0th) bit in the binary representation of n.
+Change the i-th bit in the binary representation of n if the (i−1)-th bit is set to 1 and the (i−2)-th through 0th bits are set to 0.
+Return the minimum number of operations to transform n to 0.
+
+Solution Approach:
+
+The Gray Code Connection
+This problem, which seems complex at first, has an elegant solution based on Gray codes.
+
+A Gray code is an ordering of binary numerals such that two successive values differ in only one bit. The operations described in the problem are, in effect, moving a number along the standard (binary-reflected) Gray code sequence.
+
+0 ↔ 1 (1 op)
+
+1 ↔ 3 (01 ↔ 11) (1 op)
+
+3 ↔ 2 (11 ↔ 10) (1 op)
+
+2 ↔ 6 (010 ↔ 110) (1 op)
+
+The sequence of operations 0→1→3→2→6→7→5→4→… is the Gray code sequence.
+
+The problem "find the minimum operations to get from n to 0" is equivalent to "find the index of n in the Gray code sequence." This index is simply the standard binary integer that generates n as its Gray code.
+
+Therefore, the problem simplifies to: Convert n (as a Gray code) to its corresponding binary integer.
+
+Approach 1: Iterative (Gray Code to Binary Conversion)
+The standard algorithm for converting a Gray code g to its binary representation.
+We can implement this by repeatedly XOR-ing the result with n as we right-shift n until it becomes 0.
+
+Approach 2: Recursive (Problem-Specific Logic)
+We can also find a direct recursive pattern. Let f(n) be the minimum operations to change n to 0.
+
+Base Case: f(0)=0.
+
+Highest Bit (n=2k): Consider n=4 (100).
+To flip the 1 at the 2nd bit, we must get to state 010 (2).
+The path is: 100 → 101 → 111 → 110 → 010.
+This path from 2k to 2k−1 is the reverse of 0→2 k−1, which takes f(2k−1) steps, plus one operation (2k→2k+2k−1).
+So, the full path is 2k→⋯→2k−1→⋯→0.
+This gives the recurrence f(2k)=f(2k−1)+1+f(2k−1)=2⋅f(2k−1)+1.
+
+This resolves to f(2k)=2k+1−1. (e.g., f(1)=1, f(2)=3, f(4)=7).
+General Case (n=2k+m): Consider n=6 (110). k=2, m=2.
+We have 110. We must clear the 2nd bit (1). To do this, we must reach state 010.
+The path from 110 → 010 is the reverse of the path 010 → 110.
+This is equivalent to the path 0 → m (which is 0 → 10), but with the highest bit set.
+The number of steps from n→2 k is f(m).
+The recurrence is: f(n)=f(2k)−f(m).
+
+Example f(6):
+Highest bit 2 k is 4 (100). m=6⊕4=2 (010).
+f(4)=2⋅4−1=7.
+f(2)=2⋅2−1=3.
+f(6)=f(4)−f(2)=7−3=4.
+This recursive logic provides an alternative, elegant solution.
+
+Here's the code:
+
+class Solution {
+    public int minimumOneBitOperations(int n) {
+        int result = 0;
+
+        while (n > 0) {
+            result ^= n;
+            n >>= 1;
+        }
+        return result;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(logn)
+Space Complexity: O(1)
+
+
