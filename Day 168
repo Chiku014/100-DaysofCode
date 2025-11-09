@@ -1,0 +1,77 @@
+Day 168/200: Count Operations to Obtain Zero
+
+Problem Statemnt #2169
+
+Problem Statement Explanation:
+
+You are given two non-negative integers, num1 and num2.
+In one operation, if num1 >= num2, you must subtract num2 from num1. 
+Otherwise, you must subtract num1 from num2.
+For example, if num1 = 5 and num2 = 3, you subtract 3 from 5, and the new values are num1 = 2 and num2 = 3.\
+The process is repeated until either num1 or num2 becomes 0. 
+Return the total number of operations performed.
+
+Solution Approach:
+
+We present two approaches: a direct simulation and an optimized solution using the modulus operator.
+
+Approach 1: Direct Simulation
+This approach follows the problem description exactly.
+Initialize an operations counter to 0.
+Create a while loop that continues as long as both num1 and num2 are not equal to 0.
+
+Inside the loop:
+Check if num1 >= num2.
+If true, update num1 = num1 - num2.
+If false, update num2 = num2 - num1.
+Increment the operations counter.
+Once the loop terminates (because one of the numbers is 0), return the operations count.
+This solution is straightforward but inefficient for large inputs, as it may require millions of subtraction steps.
+
+Approach 2: Optimized using Modulus (Euclidean Algorithm)
+The "Direct Simulation" is slow because repeated subtraction is mathematically equivalent to division.
+For example, if num1 = 100 and num2 = 3:
+The simulation would subtract 3 from 100 thirty-three times (100, 97, 94, ..., 4, 1). This takes 33 operations.
+We can get this result in one step: 100 / 3 = 33 operations.
+The new value of num1 would be the remainder: 100 % 3 = 1.
+This optimization is the core principle of the Euclidean algorithm.
+Initialize an operations counter to 0.
+Create a while loop that continues as long as both num1 and num2 are not equal to 0.
+
+Inside the loop:
+If num1 >= num2:
+Calculate how many times num2 fits into num1: int steps = num1 / num2.
+Add these steps to the total operations.
+Set num1 to the remainder: num1 = num1 % num2.
+
+Else (num1 < num2):
+Calculate int steps = num2 / num1.
+Add steps to operations.
+Set num2 to the remainder: num2 = num2 % num1.
+Return the operations count.
+This approach is significantly faster and avoids the "Time Limit Exceeded" (TLE) error on LeetCode.
+
+Here's the code:
+
+class Solution {
+    public int countOperations(int num1, int num2) {
+        int operations = 0;
+        while (num1 != 0 && num2 != 0) {
+            if (num1 >= num2) {
+                num1 = num1 - num2;
+            } else {
+                num2 = num2 - num1;
+            }
+            operations++;
+        }
+        return operations;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(max(num1,num2))
+Space Complexity: O(1)
+
+
+
