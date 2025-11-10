@@ -1,0 +1,91 @@
+Day 169/200: Minimum Operations to Convert All Elements to Zero
+
+Problem Statement #3542
+
+Problem Statement Explanaiton:
+
+You are given a non-negative integer array nums. 
+You can perform the following operation:
+Choose any subarray [i, j] of nums.
+Find the minimum non-zero element within that subarray.
+Set all occurrences of that minimum element within the subarray [i, j] to 0.
+Your goal is to find the minimum number of operations required to make all elements in the original nums array equal to 0.
+
+Example: nums = [3, 1, 2, 1]
+Operation 1: Select subarray [0, 3] (the whole array). 
+The minimum non-zero value is 1. Set all 1s in this range to 0.
+nums becomes [3, 0, 2, 0]
+
+Operation 2: Select subarray [2, 2]. 
+The minimum is 2. Set it to 0.
+nums becomes [3, 0, 0, 0]
+
+Operation 3: Select subarray [0, 0]. 
+The minimum is 3. Set it to 0.
+nums becomes [0, 0, 0, 0]
+The minimum operations needed is 3.
+
+Solution Approach:
+
+This problem can be solved efficiently by counting the number of times we are forced to start a new operation. 
+We can track this using a monotonic (increasing) stack.
+The stack will store the values of "active" operations. 
+When we encounter a new number, we compare it to the top of the stack.
+
+Initialization:
+Initialize operations = 0.
+Initialize a stack and push 0 onto it. 
+This 0 acts as a "base" or "ground" to simplify edge cases.
+
+Iterate through nums:
+For each num in the array:
+Case 1: num < stack.peek()
+If the current number is smaller than the top of the stack, it means the operations for those larger numbers are "closed" or "completed." 
+A smaller number can't be part of an operation started by a larger number.
+We pop from the stack as long as stack.peek() > num. 
+This effectively ends the operations associated with those popped numbers.
+
+Case 2: num > stack.peek()
+After popping (if necessary), if the current number is greater than the new top of the stack, it means this num is not covered by any existing, active operation.
+This requires a new operation to be started.
+We increment operations and push num onto the stack to mark the start of this new operation.
+
+Case 3: num == stack.peek()
+If the number is equal to the top, it's part of the currently active operation. 
+We do nothing and simply move to the next number.
+This process correctly counts only the "peaks" or starting points of each new operation, which gives the minimum number required.
+
+Here's the code:
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+
+class Solution {
+    public int minOperations(int[] nums) {
+        int operations = 0;
+        Deque<Integer> stack = new ArrayDeque<>();
+        
+        stack.push(0);
+
+        for (int num : nums) {
+            while (!stack.isEmpty() && stack.peek() > num) {
+                stack.pop();
+            }
+
+            if (stack.isEmpty() || stack.peek() < num) {
+                operations++;
+                stack.push(num);
+            }
+        }
+
+        return operations;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(N)
+
+
+
