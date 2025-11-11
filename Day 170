@@ -1,0 +1,50 @@
+Day 170/200: Ones an Zeros
+
+Problem Statement #474
+
+Problem Statement Explanation:
+
+You are given an array of binary strings strs and two integers m and n.
+Your task is to determine the maximum number of strings you can select from strs such that the total number of zeros used does not exceed m, and the total number of ones used does not exceed n.
+Each string can be chosen at most once.
+Each string consumes a certain number of zeros and ones. 
+You need to pick a subset of strings where the total zeros ≤ m and total ones ≤ n, while maximizing the count of selected strings.
+This is equivalent to a 2-dimensional 0/1 knapsack problem, where:
+Weight1 = number of zeros
+Weight2 = number of ones
+Value = 1 (each string contributes 1 to the total count)
+
+Solution Approah:
+
+Use a 2D dynamic programming (DP) table dp[m+1][n+1], where dp[i][j] represents the maximum number of strings that can be formed using at most i zeros and j ones.
+For each string, count its zeros and ones. 
+Then iterate backward over the DP table to avoid reusing the same string more than once.
+Update the DP cell by choosing the maximum between not taking the string and taking the string.
+
+Here's the code:
+
+class Solution {
+    public int findMaxForm(String[] strs, int m, int n) {
+        int[][] dp = new int[m + 1][n + 1];
+
+        for (String s : strs) {
+            int zeros = 0, ones = 0;
+            for (char c : s.toCharArray()) {
+                if (c == '0') zeros++;
+                else ones++;
+            }
+
+            for (int i = m; i >= zeros; i--) {
+                for (int j = n; j >= ones; j--) {
+                    dp[i][j] = Math.max(dp[i][j], dp[i - zeros][j - ones] + 1);
+                }
+            }
+        }
+        return dp[m][n];
+    }
+}
+
+Complexity:
+
+Time Complexity: O(k * m * n)
+Space Complexity: O(m * n)
