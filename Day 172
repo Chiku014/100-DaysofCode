@@ -1,0 +1,68 @@
+Day 172/200: Maximum Number of Operations to Move Ones to the End
+
+Problem Statement #3228
+
+Problem Statement Explantion:
+
+You are given a binary string s.
+In one operation, you may choose any index i such that:
+s[i] == '1', and
+there exists at least one '0' somewhere to the right of index i.
+You can then move this '1' to the end of the string.
+Your task is to return the maximum number of such operations that can be performed.
+A '1' can be moved to the end only when a '0' exists on its right.
+However, the tricky part is:
+Each zero can enable multiple ones (that are to its left) to be moved.
+
+Not all zeros are useful. A zero becomes "useful" only when:
+It is the last character, or
+It is followed by a '1'.
+
+Why?
+Because these positions ensure that pushing a 1 behind that zero remains valid and does not block future moves.
+Therefore, the optimal strategy is:
+Traverse the string from left to right.
+Keep a running count of how many '1's we have seen so far.
+Every time we encounter a "useful zero", we add ones to the answer.
+This means each earlier '1' can be shifted using this zero.
+This greedy approach guarantees the maximum number of operations.
+
+Solution Approach:
+
+Greedy + Counting
+Maintain a counter ones = number of '1's seen so far.
+For each '0':
+If it is last OR next char is '1',
+→ add ones to the answer.
+Return the total count.
+This ensures maximum valid moves.
+
+Here's the code:
+
+class Solution {
+    public int maxOperations(String s) {
+        int ans = 0;
+        int ones = 0;
+        int n = s.length();
+
+        for (int i = 0; i < n; ++i) {
+            if (s.charAt(i) == '1') {
+                ++ones;              
+            } else {
+                if (i == n - 1 || s.charAt(i + 1) == '1') {
+                    ans += ones;
+                }
+            }
+        }
+        return ans;
+    }
+}
+
+Complexity:
+
+Time Complexity: 0(n)
+Space Complexity: 0(1)
+
+
+
+
