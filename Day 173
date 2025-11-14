@@ -1,0 +1,102 @@
+Day 173/200: Increment Submatrices by One
+
+Problem Statement #2536
+
+Problem Statement Explantion:
+
+You are given a positive integer n, indicating that we initially have an n x n 0-indexed integer matrix mat filled with zeroes.
+
+You are also given a 2D integer array queries. For each queries[i] = [row1i, col1i, row2i, col2i], you should do the following operation:
+
+Add 1 to every element in the submatrix with the top left corner (row1i, col1i) and the bottom right corner (row2i, col2i). That is, add 1 to mat[x][y] for all row1i <= x <= row2i and col1i <= y <= col2i.
+Return the matrix mat after performing every query.
+
+Example 1:
+
+Input: n = 3, queries = [[1,1,2,2],[0,0,1,1]]
+Output: [[1,1,0],[1,2,1],[0,1,1]]
+Explanation:
+Initially, mat = [[0,0,0],[0,0,0],[0,0,0]]
+After query [1,1,2,2]: [[0,0,0],[0,1,1],[0,1,1]]
+After query [0,0,1,1]: [[1,1,0],[1,2,1],[0,1,1]]
+Example 2:
+
+Input: n = 2, queries = [[0,0,1,1]]
+Output: [[1,1],[1,1]]
+Constraints:
+1 <= n <= 500
+1 <= queries.length <= 10^4
+0 <= row1i <= row2i < n
+0 <= col1i <= col2i < n
+
+Solution Approach:
+
+Naive Approach (TLE)
+The straightforward approach would be to iterate through each query and increment every cell in the specified submatrix. This has a time complexity of O(n² × m) where m is the number of queries, which causes Time Limit Exceeded.
+
+Optimized Approach: Difference Array + Prefix Sum
+We use the difference array technique to efficiently handle range updates:
+
+Key Insight: Instead of updating every cell in a range, we only mark the boundaries and then use prefix sum to propagate the changes.
+
+Algorithm Steps:
+
+Mark Boundaries: For each query, instead of incrementing all cells in the submatrix:
+For each row in the range [row1, row2]:
+Add +1 at column col1 (start of increment)
+Add -1 at column col2 + 1 (end of increment)
+Calculate Prefix Sum: For each row, compute the prefix sum from left to right. This propagates the increments across the entire range.
+Why it works: When we add 1 at col1 and subtract 1 at col2+1, the prefix sum operation effectively adds 1 to all positions from col1 to col2 inclusive.
+
+Visualization:
+
+
+Query: [1,1,2,2]
+After marking boundaries for rows 1-2:
+Row 1: [0, +1, 0, -1]
+Row 2: [0, +1, 0, -1]
+
+After prefix sum:
+Row 1: [0, 1, 1, 0]
+Row 2: [0, 1, 1, 0]
+
+Here's the code:
+
+class Solution {
+    public int[][] rangeAddQueries(int n, int[][] queries) {
+        int[][] mat = new int[n][n];
+        
+        for (int[] query : queries) {
+            int row1 = query[0];
+            int col1 = query[1];
+            int row2 = query[2];
+            int col2 = query[3];
+            
+            for (int r = row1; r <= row2; r++) {
+                mat[r][col1]++;
+                if (col2 + 1 < n) {
+                    mat[r][col2 + 1]--;
+                }
+            }
+        }
+        
+        for (int r = 0; r < n; r++) {
+            for (int c = 1; c < n; c++) {
+                mat[r][c] += mat[r][c - 1];
+            }
+        }
+        
+        return mat;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n × m + n²)
+Space Complexity: O(1)
+
+
+
+
+
+
