@@ -1,0 +1,75 @@
+Day 175/200: Number of Substrings With Only 1s
+
+Problem Statement Explanation:
+
+Given a binary string s, return the number of substrings with all characters 1's.
+Since the answer may be too large, return it modulo 10^9 + 7.
+
+Examples:
+
+Example 1:
+Input: s = "0110111"
+Output: 9
+Explanation: There are 9 substrings with only 1's characters.
+"1" appears 5 times.
+"11" appears 3 times.
+"111" appears 1 time.
+
+Example 2:
+Input: s = "101"
+Output: 2
+Explanation: Substring "1" appears 2 times.
+
+Example 3:
+Input: s = "111111"
+Output: 21
+Explanation: Each substring contains only 1's characters.
+
+Constraints:
+1 <= s.length <= 10^5
+s[i] is either '0' or '1'
+Solution Approach
+The key insight is that for a continuous sequence of n ones, the total number of substrings is n * (n + 1) / 2.
+Instead of calculating this at the end for each group, we use an incremental counting approach:
+
+Solution Approach:
+
+Iterate through the string character by character
+When we encounter a '1':
+Increment a counter that tracks consecutive 1's
+Add the current count to the result (this represents all substrings ending at the current position)
+When we encounter a '0':
+Reset the counter to 0
+Apply modulo operation to prevent overflow
+When we see consecutive 1's:
+
+First '1': adds 1 substring (just "1")
+Second '1': adds 2 substrings ("1" and "11")
+Third '1': adds 3 substrings ("1", "11", "111")
+This incremental addition achieves the same result as the formula n * (n + 1) / 2 but does it in one pass.
+
+Here's the code:
+
+class Solution {
+    public int numSub(String s) {
+        int MOD = 1_000_000_007;
+        long result = 0;
+        int count = 0;
+        
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '1') {
+                count++;
+                result = (result + count) % MOD;
+            } else {
+                count = 0;
+            }
+        }
+        
+        return (int) result;
+    }
+}
+
+Complexity Analysis
+Time Complexity: O(n)
+Space Complexity: O(1)
+
