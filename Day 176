@@ -1,0 +1,70 @@
+Day 176/200: Check If All 1s Are at Least Length K Places Away
+
+Problem Statement #1437
+
+Problem Statement Explantion:
+
+Given a binary array nums (containing only 0s and 1s) and an integer k, return true if all 1s are at least k places away from each other, otherwise return false.
+The "distance" between two 1s is the number of 0s between them.
+
+Example 1:
+Input: nums = [1,0,0,0,1,0,0,1], k = 2
+Output: true
+Explanation: The first 1 and second 1 have three 0s between them. 
+The second 1 and third 1 have two 0s between them. All 1s are at least k=2 places apart.
+
+Example 2:
+Input: nums = [1,0,0,1,0,1], k = 2
+Output: false
+Explanation: The second 1 and third 1 are only separated by one 0, which is less than the required k=2.
+
+Solution Approach:
+
+The most efficient way to solve this is with a single pass through the array. 
+We can keep track of the number of zeros we've seen since the last 1.
+Initialize a counter zeroCount to k.
+This is a clever trick to handle the edge case of the very first 1. 
+Since the first 1 has no preceding 1 to measure against, initializing the count to k ensures it will always pass the check (since k < k is false).
+Iterate through each number num in the nums array.
+
+If num is 1:
+
+We check our counter. 
+If zeroCount is less than k, it means we've found a 1 that is too close to the previous 1. We can immediately return false.
+If the check passes, we reset zeroCount to 0 because we need to start counting the zeros after this new 1.
+
+If num is 0:
+
+We simply increment zeroCount.
+If we finish the entire loop without returning false, it means all 1s were spaced correctly, so we return true.
+
+Here's the code:
+
+class Solution {
+    public boolean kLengthApart(int[] nums, int k) {
+        int zeroCount = k;
+
+        for (int num : nums) {
+            if (num == 1) {
+                if (zeroCount < k) {
+                    return false;
+                }
+                zeroCount = 0;
+            } else {
+                zeroCount++;
+            }
+        }
+
+        return true;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+
+
+
+
