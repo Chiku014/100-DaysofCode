@@ -1,0 +1,58 @@
+Day 177/200: 1-bit and 2-bit Characters
+
+Problem Statement #717
+
+Problem Statement Explanation:
+
+We have two special characters:
+
+The first character can be represented by one bit 0.
+The second character can be represented by two bits (10 or 11).
+Given a binary array bits that ends with 0, return true if the last character must be a one-bit character.
+
+Example 1:
+Input: bits = [1, 0, 0] 
+Output: true Explanation: The only way to decode it is two-bit character 10 followed by one-bit character 0. 
+The last character is 1-bit.
+
+Example 2:
+Input: bits = [1, 1, 1, 0] 
+Output: false Explanation: The only way to decode it is two-bit character 11 followed by two-bit character 10. 
+The last character is NOT 1-bit.
+
+Solution Approach:
+
+The most intuitive way to solve this is to simulate the decoding process from the beginning of the array. 
+Since the decoding rules are deterministic (prefix-free), we can iterate through the bits and advance our pointer based on the current bit's value.
+
+Algorithm
+Initialize a pointer i at index 0.
+Iterate while i is less than the last index (n - 1):
+If bits[i] == 1, it must be the start of a 2-bit character. 
+We increment i by 2 to skip the next bit.
+If bits[i] == 0, it is a 1-bit character. We increment i by 1.
+After the loop finishes, check the value of i.
+If i == n - 1, the pointer landed exactly on the last 0, meaning it is a standalone 1-bit character. Return true.
+If i > n - 1 (i.e., i == n), the pointer skipped over the last 0, meaning that 0 was the second half of a 2-bit character. 
+Return false.
+
+Here's the code:
+
+class Solution {
+    public boolean isOneBitCharacter(int[] bits) {
+        int i = 0;
+        while (i < bits.length - 1) {
+            if (bits[i] == 1) {
+                i += 2;
+            } else {
+                i++;
+            }
+        }
+        return i == bits.length - 1;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(1)
