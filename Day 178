@@ -1,0 +1,63 @@
+Day 178/200: Keep Multiplying Found Values by Two 
+
+Problem Statement: #2154 
+
+Problem Statement Explantion:
+
+You are given an array of integers `nums` and an integer `original`. 
+Your task is to repeatedly multiply `original` by 2 as long as the current value exists in the array. 
+Once the value is no longer found in the array, return the final value.
+
+Example 1:
+
+Input: nums = [5,3,6,1,12], original = 3
+Output: 24
+Explanation: 
+3 is found in nums. 3 * 2 = 6
+6 is found in nums. 6 * 2 = 12
+12 is found in nums. 12 * 2 = 24
+24 is not found in nums. Return 24
+
+Example 2:
+Input: nums = [2,7,9], original = 4
+Output: 4
+Explanation: 
+4 is not found in nums. Return 4
+
+Constraints:
+`1 <= nums.length <= 1000`
+`1 <= nums[i], original <= 1000`
+
+Solution Approach:
+
+The solution uses a HashSet for efficient lookup:
+
+1. Store all values: Add all numbers from the array into a HashSet for O(1) lookup time
+2. Iterate and multiply: While the current `original` value exists in the set, multiply it by 2
+3. Return result: Once the value is not found, return it
+This approach ensures we can quickly check if a value exists without scanning the entire array each time.
+
+Alternative Approach:
+Since the constraints limit values to ≤ 1000, we could use a boolean array of size 1001 for even faster lookup with better cache locality.
+
+Here;s the Code:
+
+class Solution {
+    public int findFinalValue(int[] nums, int original) {
+        Set<Integer> set = new HashSet<>();
+        for (int num : nums) {
+            set.add(num);
+        }
+        
+        while (set.contains(original)) {
+            original *= 2;
+        }
+        
+        return original;
+    }
+}
+
+Complexity Analysis:
+
+Time Complexity: O(n)
+Space Complexity: O(n)
