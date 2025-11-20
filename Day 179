@@ -1,0 +1,84 @@
+Day 179/200: Set Intersection Size At Least Two
+
+Problem Statement #757
+
+Problem Statement Explantion:
+
+You are given a set of intervals intervals, where intervals[i] = [start, end]. 
+The task is to find the minimum size of a containing set S such that for every interval in the input, the intersection between the interval and S has a size of at least 2.
+In simpler terms: We need to pick the fewest number of integers such that every given interval contains at least two of the integers we picked.
+
+Solution Approach: 
+
+Greedy Strategy
+The problem can be solved efficiently using a Greedy Algorithm. 
+The intuition is to always pick points as far to the right (closest to the end) of the current interval as possible. 
+This maximizes the chance that these points will overlap with subsequent intervals, reducing the total number of points needed.
+
+Key Steps:
+Sorting:
+Sort the intervals based on their end points in ascending order.
+Tie-breaker: If two intervals have the same end point, sort them by their start points in descending order. This ensures we process the "shortest" (strictest) interval first.
+
+Iteration & Selection:
+Initialize two variables, p1 and p2, to -1. 
+These represent the two largest values currently added to our set.
+Iterate through the sorted intervals. For each interval [start, end]:
+
+Case 1: 
+No Overlap. 
+If start > p2 (the interval is completely to the right of our selected points), we need two new points. 
+We pick the best possible candidates: end - 1 and end.
+
+Case 2: 
+Partial Overlap. 
+If start > p1 (the interval contains p2 but not p1), we already have one point (p2) covered. 
+We need one more. We pick end to maximize future overlap.
+
+Case 3: 
+Full Overlap. 
+If start <= p1, the interval already contains both p1 and p2. 
+No new points are needed.
+
+Here's the code:
+
+import java.util.Arrays;
+class Solution {
+    public int intersectionSizeTwo(int[][] intervals) {
+        Arrays.sort(intervals, (a, b) ->
+            a[1] != b[1] ? a[1] - b[1] : b[0] - a[0]
+            );
+
+            int p1 = -1;
+            int p2 = -1;
+            int count = 0;
+
+            for (int[] interval : intervals) {
+                int start = interval[0];
+                int end = interval[1];
+
+                if (start > p2) {
+                    count += 2;
+                    p2 = end;
+                    p1 = end - 1;
+                } else if (start > p1) {
+                    count++;
+                    p1 = p2;
+                    p2 = end;
+                }
+            }
+            return count;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(NlogN)
+Space Complexity: O(1)
+
+
+
+
+
+
+
