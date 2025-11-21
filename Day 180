@@ -1,0 +1,65 @@
+Day 180/200: Unique Palindromic Subsequences
+
+Problem Statement #1930
+
+Problem Statement Explantion:
+
+Given a string s, return the number of unique palindromes of length 3 that are a subsequence of s.
+Note that even if there are multiple ways to obtain the same subsequence, it is still only counted once.
+
+Example:
+Input: s = "aabca"
+Output: 3
+Explanation: The 3 unique palindromes are "aba", "aaa", "aca".
+
+Solution Approch:
+
+A palindrome of length 3 always follows the pattern X _ X, where the first and last characters are the same. 
+To solve this efficiently, we avoid generating all subsequences. Instead, we iterate through the alphabet to fix the "outer" characters.
+
+Algorithm:
+Iterate through the alphabet: We check for each character from 'a' to 'z' to see if it can act as the "outer" boundary of a palindrome.
+Find Boundaries: For each character c, find its first occurrence index and last occurrence index in the string s.
+
+Count Middle Characters:
+If the character appears at least twice (first index < last index), any unique character found between these two indices forms a valid palindrome.
+Example: In a...b...c...a, the outer 'a's enclose 'b' and 'c', forming aba and aca.
+Sum Results: Use a Set (or boolean array) to count the unique characters between the first and last index and add this count to the total result.
+
+Here's the code:
+
+class Solution {
+    public int countPalindromicSubsequence(String s) {
+        int result = 0;
+
+        for (char c = 'a'; c <= 'z'; c++) {
+            int first = s.indexOf(c);
+            int last = s.lastIndexOf(c);
+
+            if (first != -1 && last > first + 1) {
+                boolean[] seen = new boolean[26];
+                int uniqueCount = 0;
+
+                for (int i = first + 1; i < last; i++) {
+                    int charIndex = s.charAt(i) - 'a';
+                    if (!seen[charIndex]) {
+                        uniqueCount++;
+                        seen[charIndex] = true;
+                        if (uniqueCount == 26) break;
+                    }
+                }
+                result += uniqueCount;
+            }
+        }
+        
+        return result;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+
+
