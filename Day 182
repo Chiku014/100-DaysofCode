@@ -1,0 +1,84 @@
+Day 182/200: Greatest Sum Divisible by Three
+
+Problem Statement #1262
+
+Problem Statement Explanation:
+
+Given an integer array nums, we need to find the maximum possible sum of elements of the array such that the sum is divisible by 3.
+
+Example:
+Input: nums = [3, 6, 5, 1, 8]
+Output: 18
+Explanation: Pick numbers 3, 6, 1, 8. Their sum is 18, which is divisible by 3.
+
+Solution Approach:
+
+Approach 1: Dynamic Programming (State Tracking)
+This approach maintains the maximum sum found so far for every possible remainder when divided by 3 (0,1,2).
+
+State Definition: We use an array dp of size 3.
+dp[0]: The maximum sum found so far with a remainder of 0.
+dp[1]: The maximum sum found so far with a remainder of 1.
+dp[2]: The maximum sum found so far with a remainder of 2.
+
+Initialization: dp[0] = 0, while dp[1] and dp[2] are initialized to a very small number to represent that these states are initially unreachable.
+Transitions: Iterate through every number in the input array. For each number n, we try adding it to the existing sums in dp.
+
+New Sum = dp[i] + n
+New Remainder = (dp[i] + n) % 3
+Update dp[New Remainder] = max(dp[New Remainder], New Sum)
+Result: After iterating through all numbers, dp[0] contains the maximum sum divisible by 3.
+
+Approach 2: Mathematical / Greedy
+Instead of building the sum up, we calculate the total sum of the array and subtract the smallest subset of numbers necessary to make the remainder 0.
+
+Calculate the totalSum of all elements.
+Check remainder = totalSum % 3.
+If remainder == 0: Return totalSum.
+If remainder == 1: We remove either the smallest number with remainder 1, OR the two smallest numbers with remainder 2.
+If remainder == 2: We remove either the smallest number with remainder 2, OR the two smallest numbers with remainder 1.
+This works because removing two numbers with remainder 1 removes a total remainder of 2 (1+1), and removing two numbers with remainder 2 removes a total remainder of 4 (which is equivalent to 1(mod3)).
+
+Here's the code:
+
+class Solution {
+    public int maxSumDivThree(int[] nums) {
+        int sum = 0;
+        int one1 = 10001, one2 = 10001;
+        int two1 = 10001, two2 = 10001;
+
+        for (int num : nums) {
+            sum += num;
+            if (num % 3 == 1) {
+                if (num < one1) {
+                    one2 = one1;
+                    one1 = num;
+                } else if (num < one2) {
+                    one2 = num;
+                } 
+            } else if (num % 3 == 2) {
+                if (num < two1) {
+                    two2 = two1;
+                    two1 = num;
+                } else if (num < two2) {
+                    two2 = num;
+                }
+            }
+        }
+        if (sum % 3 == 0) return sum;
+
+        if (sum % 3 == 1) {
+            return sum - Math.min(one1, two1 + two2);
+        } else {
+            return sum - Math.min(two1, one1 + one2);
+        }
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(1)
+
+
+
