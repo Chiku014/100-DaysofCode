@@ -1,0 +1,143 @@
+Day 185/200:
+
+# 2435. Paths in Matrix Whose Sum Is Divisible by K
+
+## Problem Statement
+
+You are given a **0-indexed** `m x n` integer matrix `grid` and an integer `k`. You are currently at position `(0, 0)` and you want to reach position `(m - 1, n - 1)` moving only **down** or **right**.
+
+Return the number of paths where the sum of the elements on the path is divisible by `k`. Since the answer may be very large, return it **modulo** `10^9 + 7`.
+
+### Example 1:
+```
+Input: grid = [[5,2,4],[3,0,5],[0,7,2]], k = 3
+Output: 2
+Explanation: There are two paths where the sum of the elements on the path is divisible by k.
+- Path 1: 5 → 2 → 4 → 5 → 2 (sum = 18, divisible by 3)
+- Path 2: 5 → 3 → 0 → 5 → 2 (sum = 15, divisible by 3)
+```
+
+### Example 2:
+```
+Input: grid = [[0,0]], k = 5
+Output: 1
+Explanation: The path shown in red has a sum of 0 + 0 = 0, which is divisible by 5.
+```
+
+### Example 3:
+```
+Input: grid = [[7,3,4,9],[2,3,6,2],[2,3,7,0]], k = 1
+Output: 10
+Explanation: Every integer is divisible by 1, so the sum of the elements on every possible path is divisible by k.
+```
+
+### Constraints:
+- `m == grid.length`
+- `n == grid[i].length`
+- `1 <= m, n <= 5 * 10^4`
+- `1 <= m * n <= 5 * 10^4`
+- `0 <= grid[i][j] <= 100`
+- `1 <= k <= 50`
+
+## Solution Approach
+
+### Intuition
+This is a classic dynamic programming problem with an additional constraint involving divisibility. We need to count paths from top-left to bottom-right where we can only move right or down, and the sum of all elements on the path must be divisible by `k`.
+
+The key insight is to track not just whether we can reach a cell, but also what remainders (when divided by k) are possible for the sum of paths reaching that cell.
+
+### Algorithm
+
+1. **State Definition**: Use 3D DP where `dp[i][j][rem]` represents the number of ways to reach cell `(i, j)` such that the sum of elements on the path has a remainder of `rem` when divided by `k`.
+
+2. **Base Case**: 
+   - Start at `(0, 0)` with the value `grid[0][0]`
+   - `dp[0][0][grid[0][0] % k] = 1`
+
+3. **Transition**:
+   - For each cell `(i, j)`, we can arrive from:
+     - Top cell `(i-1, j)` - if `i > 0`
+     - Left cell `(i, j-1)` - if `j > 0`
+   - For each possible remainder `rem` from the previous cell:
+     - Calculate new remainder: `newRem = (rem + grid[i][j]) % k`
+     - Add the number of paths: `dp[i][j][newRem] += dp[prev_cell][rem]`
+
+4. **Result**: Return `dp[m-1][n-1][0]`, which represents paths to the bottom-right corner with sum divisible by k (remainder = 0).
+
+### Why This Works
+- By tracking remainders, we ensure we only count paths whose total sum is divisible by k
+- The modular arithmetic property: `(a + b) % k = ((a % k) + (b % k)) % k` allows us to build up remainders incrementally
+- Dynamic programming ensures we count all possible paths without redundancy
+
+## Java Solution
+
+```java
+class Solution {
+    public int numberOfPaths(int[][] grid, int k) {
+        int m = grid.length;
+        int n = grid[0].length;
+        int MOD = 1_000_000_007;
+        
+        // dp[i][j][rem] = number of paths to (i,j) with sum % k == rem
+        long[][][] dp = new long[m][n][k];
+        
+        // Base case: starting position
+        dp[0][0][grid[0][0] % k] = 1;
+        
+        // Fill the DP table
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == 0 && j == 0) continue;
+                
+                // For each possible remainder
+                for (int rem = 0; rem < k; rem++) {
+                    // From top cell (i-1, j)
+                    if (i > 0 && dp[i-1][j][rem] > 0) {
+                        int newRem = (rem + grid[i][j]) % k;
+                        dp[i][j][newRem] = (dp[i][j][newRem] + dp[i-1][j][rem]) % MOD;
+                    }
+                    
+                    // From left cell (i, j-1)
+                    if (j > 0 && dp[i][j-1][rem] > 0) {
+                        int newRem = (rem + grid[i][j]) % k;
+                        dp[i][j][newRem] = (dp[i][j][newRem] + dp[i][j-1][rem]) % MOD;
+                    }
+                }
+            }
+        }
+        
+        // Return paths to bottom-right with sum divisible by k (remainder 0)
+        return (int) dp[m-1][n-1][0];
+    }
+}
+```
+
+## Complexity Analysis
+
+### Time Complexity: **O(m × n × k)**
+- We have three nested loops:
+  - Outer loops iterate through all cells: `O(m × n)`
+  - Inner loop iterates through all possible remainders: `O(k)`
+- Each cell is visited once, and for each cell, we process all k remainders
+- Total operations: `m × n × k`
+
+### Space Complexity: **O(m × n × k)**
+- We use a 3D DP array of size `m × n × k`
+- Each element stores the count of paths with a specific remainder
+- No additional significant space is used
+
+### Space Optimization (Optional)
+Since we only need the previous row to compute the current row, we could optimize space to **O(n × k)** by using two 2D arrays (current and previous row). However, given the constraints (`m × n <= 5 × 10^4` and `k <= 50`), the current solution is efficient enough.
+
+## Key Takeaways
+
+1. **Modular Arithmetic**: The problem cleverly uses the property that `(a + b) % k = ((a % k) + (b % k)) % k`
+2. **State Tracking**: Instead of just counting paths, we track the remainder of path sums
+3. **3D DP**: Adding an extra dimension (remainder) allows us to solve divisibility constraints
+4. **MOD Operations**: Always apply modulo to prevent integer overflow when counting paths
+
+## Related Problems
+- 62. Unique Paths
+- 63. Unique Paths II
+- 64. Minimum Path Sum
+- 931. Minimum Falling Path Sum
