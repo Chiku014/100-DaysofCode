@@ -1,0 +1,58 @@
+Day 188/200: Minimum Operttions to Make Array Sum Divisible by K
+
+Problem Statement #3512
+
+Problem Statement Explanation:
+
+You are given an integer array nums and an integer k.
+You are allowed to perform operations on the array, where in one operation, you can change any single element to any integer you want.
+
+Your task is to determine the minimum number of operations required to make:
+sum(nums) % k == 0
+
+There are only two possibilities:
+
+✅ Case 1: r == 0
+The sum is already divisible by k.
+→ No operation needed → answer = 0
+
+✅ Case 2: r != 0
+You can always change one element to fix the remaining amount and make the sum divisible by k, because you can change it to any number.
+
+So the answer is always:
+
+0 if remainder is 0
+1 if remainder is not 0
+
+Solution Approach:
+
+Compute the sum of all elements.
+Check sum % k.
+If remainder = 0 → return 0
+Otherwise → return 1
+This works because modifying a single element is enough to adjust the total sum to the nearest multiple of k.
+
+Here's the code:
+
+class Solution {
+    public int minOperations(int[] nums, int k) {
+        int sum = 0;
+        for (int num : nums) {
+            sum += num;
+        }
+        return sum % k == 0 ? 0 : 1;
+    }
+}
+
+
+Complexity:
+
+Time Xomplexity: O(n)
+Space Complexity: O(1)
+
+
+
+
+
+
+
