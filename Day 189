@@ -1,0 +1,80 @@
+Day 189/200: Make Sum Divisible by P
+
+Problem Statement #1590
+
+Problem Statement Explanation:
+
+You are given an array nums and an integer p.
+Your goal is to remove the smallest subarray from nums such that the sum of the remaining elements becomes divisible by p.
+If the array is already divisible, return 0.
+If it's not possible, return -1.
+The removed subarray cannot be the entire array.
+
+totalSum = sum(nums)
+target = totalSum % p
+
+If target == 0, then the whole array sum is already divisible by p.
+Otherwise, we need to find the shortest subarray whose removal makes the total divisible by p, which means:
+
+(prefix[i] - prefix[j]) % p = target
+
+We use:
+
+Prefix sum modulo:
+HashMap to store prefix mod values
+This helps us find such subarrays in O(n).
+
+Solution Appraoch:
+
+Step-by-step:
+Compute totalSum % p → if 0, return 0.
+Maintain a running prefix sum:
+
+prefix = (prefix + nums[i]) % p
+
+At each index, compute:
+needed = (prefix - target + p) % p
+If needed is already in HashMap → we found a subarray whose removal fixes the divisibility.
+
+Track the minimum length.
+Return the minimum length or -1
+
+Here's the code:
+
+class Solution {
+    public int minSubarray(int[] nums, int p) {
+        long total = 0;
+        for (int n : nums) total += n;
+        
+        int target = (int)(total % p);
+        if (target == 0) return 0; // already divisible
+        
+        HashMap<Integer, Integer> map = new HashMap<>();
+        map.put(0, -1); // prefix mod → index
+        
+        long prefix = 0;
+        int result = nums.length;
+        
+        for (int i = 0; i < nums.length; i++) {
+            prefix = (prefix + nums[i]) % p;
+            int needed = (int)((prefix - target + p) % p);
+
+            if (map.containsKey(needed)) {
+                result = Math.min(result, i - map.get(needed));
+            }
+            
+            map.put((int)prefix, i);
+        }
+        
+        return result == nums.length ? -1 : result;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+
+
+
