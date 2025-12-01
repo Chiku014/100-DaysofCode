@@ -1,0 +1,84 @@
+Day 190/200: Maximum Running Time of N Computers
+
+Problem Statement #2141
+
+Problem Statement Explanation:
+
+You are given an integer n (representing the number of computers) and an integer array batteries where the i-th battery has a specific charge capacity.
+You can run n computers simultaneously using the given batteries.
+You can assign any battery to any computer.
+You can switch batteries between computers at any time instantly.
+A battery cannot power two computers at the same time.
+
+Goal: Calculate the maximum number of minutes you can run all n computers simultaneously.
+
+Solution Approach:
+
+Core Concept: Binary Search on Answer
+The problem asks for a maximum value (time) that satisfies a condition. The possible running time has a monotonic property:
+
+If we can run the computers for T minutes, we can certainly run them for T-1 minutes.
+If we cannot run them for T minutes, we cannot run them for T+1 minutes.
+This suggests we can use Binary Search to find the optimal time.
+
+The Check Function
+For a specific target time target:
+Total Energy Needed: n computers × target time.
+
+Energy Available:
+
+If a battery has charge > target, it can only contribute target minutes (it can't help other computers while it's in use).
+If a battery has charge <= target, it contributes its full charge.
+Validation: If the sum of capped battery contributions ≥ n × target, then running for target minutes is possible.
+
+Here's the code:
+
+class Solution {
+    public long maxRunTime(int n, int[] batteries) {
+        long sum = 0;
+        for (int b : batteries) {
+            sum += b;
+        }
+
+        // Binary Search range
+        long low = 1;
+        long high = sum / n; 
+        long ans = 0;
+
+        while (low <= high) {
+            long mid = low + (high - low) / 2;
+
+            if (canRun(n, batteries, mid)) {
+                ans = mid;      // Store valid answer
+                low = mid + 1;  // Try to find a longer time
+            } else {
+                high = mid - 1; // Time too long, reduce scope
+            }
+        }
+        
+        return ans;
+    }
+
+    private boolean canRun(int n, int[] batteries, long targetTime) {
+        long totalPowerAvailable = 0;
+        long requiredPower = (long) n * targetTime;
+
+        for (int b : batteries) {
+            // A battery contributes at most 'targetTime'
+            totalPowerAvailable += Math.min((long) b, targetTime);
+        }
+
+        return totalPowerAvailable >= requiredPower;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(M⋅log(Sum))
+Space Complexity: O(1)
+
+
+
+
+
+
