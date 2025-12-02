@@ -1,0 +1,76 @@
+Day 191/200: 
+
+Problem Statement #3241
+
+Problem Statement Explanaiton:
+
+We are given a set of points on a 2D Cartesian plane. The task is to find the total number of "horizontal trapezoids" that can be formed using 4 distinct points from the set.
+A horizontal trapezoid is defined as a convex quadrilateral where at least one pair of opposite sides is parallel to the x-axis (i.e., horizontal).
+
+Constraints:
+
+Points are distinct.
+The result can be large, so return the answer modulo 10^9+7.
+
+Solution Approach:
+
+1. Identify the Geometry
+To form a horizontal trapezoid, we need two distinct horizontal segments positioned at different Y-coordinates (heights).
+A horizontal segment is formed by any pair of points that share the exact same Y-coordinate.
+Therefore, the problem reduces to finding how many horizontal segments exist at each Y-level and combining them.
+
+2. Frequency Counting (HashMap)
+We iterate through the input array and count the frequency of each Y-coordinate.
+Key: Y-coordinate.
+Value: Number of points at that Y-coordinate.
+
+3. Calculate Segments per Level
+For a specific Y-level containing k points, the number of ways to form a horizontal segment is the combination formula: kC^2: Segments= 2k×(k−1)
+If a level has fewer than 2 points, no segments can be formed there.
+
+4. Combinatorics & Prefix Sum Optimization
+A trapezoid is formed by choosing one segment from Level A and one segment from Level B.
+Naive Approach: Compare every level with every other level. This results in O(L^2) complexity (where L is the number of unique Y-levels).
+Optimized Approach: We iterate through the calculated segment counts once. We maintain a running_sum of all segments found in previous levels. For the current level, the number of new trapezoids formed is:
+
+Current Segments×Running Sum of Previous Segments
+We then add the current segments to the running sum for the next iteration.
+
+Here's the code:
+
+class Solution {
+    public int countTrapezoids(int[][] points) {
+        Map<Integer, Integer> yCounts = new HashMap<>();
+        for (int[] p : points) {
+            yCounts.put(p[1], yCounts.getOrDefault(p[1], 0) + 1);
+        }
+
+        long MOD = 1_000_000_007;
+        List<Long> segmentCounts = new ArrayList<>();
+
+        for (int count : yCounts.values()) {
+            if (count >= 2) {
+                long segments = (long) count * (count - 1) / 2;
+                segmentCounts.add(segments % MOD);
+            }
+        }
+
+        long totalTrapezoids = 0;
+        long currentSum = 0;
+
+        for (long s : segmentCounts) {
+            totalTrapezoids = (totalTrapezoids + (s * currentSum) % MOD) % MOD;
+            currentSum = (currentSum + s) % MOD;
+        }
+
+        return (int) totalTrapezoids;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(N)
+
+
+
