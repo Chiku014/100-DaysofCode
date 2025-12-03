@@ -1,0 +1,138 @@
+Day 192/200: 
+
+Problem Statement #3625
+
+Problem Statement Explanation:
+
+Given an array of 2D coordinates points where points[i] = [xi, yi], return the number of unique trapezoids that can be formed by choosing exactly 4 points.
+
+Definition:
+
+A Trapezoid is a convex quadrilateral with at least one pair of parallel sides.
+A Parallelogram (which has two pairs of parallel sides) is a special case of a trapezoid and should be counted.
+
+Constraints:
+
+The number of points N≤1000.
+No three points are collinear (implied by typical problem constraints for quadrilaterals).
+The naive approach would be to iterate through all combinations of 4 points, which results in O(N^4) complexity. 
+This is too slow.
+To optimize, we rely on the geometric property of trapezoids: parallel sides.
+We can iterate through all pairs of points to form line segments (O(N^2)).
+Two segments form a trapezoid if they share the same slope but lie on different lines (different intercepts).
+The "Double Counting" Challenge
+A parallelogram has two pairs of parallel sides.
+If we simply count all pairs of parallel segments, every parallelogram will be counted twice (once for the first pair of parallel sides, and once for the second).
+To fix this, we need to subtract the extra counts.
+A parallelogram is formed by two segments that are not only parallel but also have the same length (identical vectors).
+
+Solution Approach:
+
+1. Data Structures
+We use two nested HashMaps to group line segments:
+Slope Map: Groups segments by their slope (reduced dy/dx). Used to find all trapezoid candidates.
+Vector Map: Groups segments by their raw vector (dy,dx). Used to find parallelogram candidates.
+
+2. Normalization
+To avoid floating-point precision issues, we represent slopes and vectors using pairs of integers reduced by their Greatest Common Divisor (GCD).
+Slope Key: (dy/gcd, dx/gcd)
+Intercept: calculated as dy * x - dx * y to distinguish distinct lines.
+
+3. Algorithm
+Iterate through all pairs (i,j) to form segments.
+Compute the slope and normalize it. Store the segment count in Slope Map.
+Compute the raw vector (magnitude + direction). Store the segment count in Vector Map.
+Calculate total pairs for both maps.
+For a specific slope, if we have lines with segment counts c^1,c^2,c^3..., the number of valid pairs is the sum of products.
+
+Here's the code:
+
+import java.util.*;
+
+class Solution {
+    public int countTrapezoids(int[][] points) {
+        int n = points.length;
+        if (n < 4) return 0;
+
+        Map<Long, Map<Long, Integer>> slopeMap = new HashMap<>();
+        Map<Long, Map<Long, Integer>> vectorMap = new HashMap<>();
+
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                int x1 = points[i][0], y1 = points[i][1];
+                int x2 = points[j][0], y2 = points[j][1];
+
+                int dy = y1 - y2;
+                int dx = x1 - x2;
+
+                int g = gcd(Math.abs(dy), Math.abs(dx));
+                int rDy = dy / g;
+                int rDx = dx / g;
+
+                if (rDx < 0 || (rDx == 0 && rDy < 0)) {
+                    rDx = -rDx;
+                    rDy = -rDy;
+                }
+                long slopeKey = ((long) rDy << 32) | (rDx & 0xFFFFFFFFL);
+                
+                long intercept = (long) rDy * x1 - (long) rDx * y1;
+
+                slopeMap.putIfAbsent(slopeKey, new HashMap<>());
+                Map<Long, Integer> slopeIntercepts = slopeMap.get(slopeKey);
+                slopeIntercepts.put(intercept, slopeIntercepts.getOrDefault(intercept, 0) + 1);
+
+                int vDy = dy;
+                int vDx = dx;
+                if (vDx < 0 || (vDx == 0 && vDy < 0)) {
+                    vDx = -vDx;
+                    vDy = -vDy;
+                }
+                long vectorKey = ((long) vDy << 32) | (vDx & 0xFFFFFFFFL);
+                
+                vectorMap.putIfAbsent(vectorKey, new HashMap<>());
+                Map<Long, Integer> vectorIntercepts = vectorMap.get(vectorKey);
+                vectorIntercepts.put(intercept, vectorIntercepts.getOrDefault(intercept, 0) + 1);
+            }
+        }
+
+        long totalParallelPairs = countPairs(slopeMap);
+        long totalParallelogramPairs = countPairs(vectorMap);
+
+        return (int) (totalParallelPairs - (totalParallelogramPairs / 2));
+    }
+
+    private long countPairs(Map<Long, Map<Long, Integer>> mainMap) {
+        long count = 0;
+        for (Map<Long, Integer> intercepts : mainMap.values()) {
+            if (intercepts.size() < 2) continue;
+            
+            long sum = 0;
+            long sqSum = 0;
+            
+            for (int c : intercepts.values()) {
+                sum += c;
+                sqSum += (long) c * c;
+            }
+            
+            count += (sum * sum - sqSum) / 2;
+        }
+        return count;
+    }
+
+    private int gcd(int a, int b) {
+        while (b != 0) {
+            int temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N^2)
+Space Complexity: O(N^2)
+
+
+
