@@ -1,0 +1,70 @@
+Day 193/200: Count Collisions on a Road
+
+Problem Statement #2211
+
+Problem Statement Explanation:
+
+We are given a string directions representing cars on an infinite road. The character at index i represents the direction of the ith car:
+'L': Moving Left
+'R': Moving Right
+'S': Staying Stationary
+
+Collision Rules:
+
+Right meets Left (RL): Both cars collide and become stationary (S). This counts as 2 collisions.
+Right meets Stationary (RS): The moving car collides and becomes stationary. This counts as 1 collision.
+Stationary meets Left (SL): The moving car collides and becomes stationary. This counts as 1 collision.
+The goal is to return the total number of collisions that will eventually occur.
+
+Simulating the movement of cars step-by-step is inefficient. Instead, we can observe the physics of the road to solve this in a single pass:
+Safe Left Cars: Any car moving Left ('L') at the very beginning of the line will never collide because there is no car to its left to hit. It drives off into the void.
+Safe Right Cars: Any car moving Right ('R') at the very end of the line will never collide because there is no car to its right to hit.
+The "Kill Zone": Once we remove the safe cars from the left and right ends, every moving car remaining in the middle is guaranteed to collide.
+They are "sandwiched" between potential collisions. Even if they don't hit immediately, the chain reaction of cars stopping ensures they will eventually hit a stationary pile-up.
+
+Solution Approach:
+
+The algorithm follows a Two-Pointer / Trimming strategy:
+Trim Left: Iterate from the start (index 0) and skip all 'L' characters. These cars escape to the left.
+Trim Right: Iterate backwards from the end (index n-1) and skip all 'R' characters. These cars escape to the right.
+Count the Middle: Iterate through the remaining substring (between the left and right boundaries).
+Any car in this range that is not 'S' (meaning it is 'L' or 'R') contributes 1 to the collision count.
+Note: Even though an RL collision technically counts as 2, our logic handles this naturally because we count the specific 'R' and the specific 'L' individually as they are both non-stationary.
+
+Here's the code:
+
+class Solution {
+    public int countCollisions(String directions) {
+        int n = directions.length();
+        int left = 0;
+        int right = n - 1;
+
+        // 1. Skip cars escaping to the left
+        while (left < n && directions.charAt(left) == 'L') {
+            left++;
+        }
+
+        // 2. Skip cars escaping to the right
+        while (right >= 0 && directions.charAt(right) == 'R') {
+            right--;
+        }
+
+        // 3. Count all moving cars in the middle sandwich
+        int collisions = 0;
+        for (int i = left; i <= right; i++) {
+            if (directions.charAt(i) != 'S') {
+                collisions++;
+            }
+        }
+
+        return collisions;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+
+
