@@ -1,0 +1,60 @@
+Day 194/200:  Count Partitions with Even Sum Difference
+
+Problem Statement #3432
+
+Problem Statement Explantion:
+
+Given an integer array nums of length n, you need to partition it into two non-empty subarrays: Left (indices 0 to i) and Right (indices i+1 to n-1).
+We need to calculate the difference between the sum of the left subarray and the sum of the right subarray:
+difference=sum(left)−sum(right)
+Goal: Return the number of partitions where this difference is even.
+
+Example:
+Input: nums = [2, 4, 6, 8] Output: 3 Explanation: All 3 possible partitions result in an even difference.
+
+Solution Approach:
+
+Algorithm
+Calculate the sum of all elements in the array.
+
+If the total sum is even, every possible partition (n−1 partitions) is valid.
+
+If the total sum is odd, no partition is valid (return 0).
+
+Here's the code:
+
+class Solution {
+    public int countPartitions(int[] nums) {
+        int totalSum = 0;
+        for (int num : nums) {
+            totalSum += num;
+        }
+
+        int leftSum = 0;
+        int count = 0;
+
+        for (int i = 0; i < nums.length - 1; i++) {
+            leftSum += nums[i];
+            int rightSum = totalSum - leftSum;
+
+            if ((leftSum - rightSum) % 2 == 0) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+
+
+
+
+
+
+
