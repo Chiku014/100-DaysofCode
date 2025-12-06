@@ -1,0 +1,91 @@
+Day 195/200: 
+
+Problem Statement #3578
+
+Problem Statement Explanation:
+
+Given an integer array nums and an integer k, the task is to partition the array into one or more contiguous subarrays such that the difference between the maximum and minimum element in each subarray is at most k.
+We need to return the total number of valid ways to partition the array. Since the answer can be very large, return it modulo 10^9 + 7.
+
+Example:
+
+Condition: For every segment [L, R], max(segment) - min(segment) <= k.
+
+Solution Approach:
+
+1. Dynamic Programming
+We define dp[i] as the number of ways to partition the prefix of the array ending at index i-1 (i.e., the first i elements).
+Base Case: dp[0] = 1 (An empty array represents 1 valid partition logic).
+Transition: To calculate dp[i], we consider all valid last segments ending at i-1. If a segment starting at index j and ending at i-1 is valid (i.e., max - min <= k), we add dp[j] to dp[i].
+
+2. Sliding Window Optimization
+A naive DP approach would check all previous indices j for every i, resuting in O(N^2) time complexity. To optimize this to O(N), we use a Sliding Window approach:
+For a current end index i, we find the smallest possible start index left such that the window nums[left...i] satisfies the condition max - min <= k.
+Any index j such that left <= j <= i is a valid start point for the last segment.
+
+3. Monotonic Queues (Deques)
+To efficiently find the maximum and minimum values in the current sliding window, we use two Monotonic Deques:
+Min-Queue: Stores indices of elements in increasing order of their values.
+Max-Queue: Stores indices of elements in decreasing order of their values.
+This allows us to retrieve the current max and min in O(1) time and adjust the left pointer dynamically.
+
+4. Prefix Sum for O(1) Transition
+Instead of iterating from left to i to sum up dp values (which would be slow), we maintain a Prefix Sum array of the dp values.
+The number of ways to form a valid partition ending at i is simply: PrefixSumDp[i] - PrefixSumDp[left].
+
+Here's the code:
+
+using System;
+using System.Collections.Generic;
+
+public class Solution {
+    public int CountPartitions(int[] nums, int k) {
+        int n = nums.Length;
+        long mod = 1_000_000_007;
+        
+        long[] dp = new long[n + 1];
+        dp[0] = 1;
+        
+        long[] prefixSumDp = new long[n + 2];
+        prefixSumDp[0] = 0;
+        prefixSumDp[1] = 1;
+        
+        LinkedList<int> minQ = new LinkedList<int>();
+        LinkedList<int> maxQ = new LinkedList<int>();
+        
+        int left = 0;
+        
+        for (int i = 0; i < n; i++) {
+            while (minQ.Count > 0 && nums[minQ.Last.Value] >= nums[i]) {
+                minQ.RemoveLast();
+            }
+            minQ.AddLast(i);
+            
+            while (maxQ.Count > 0 && nums[maxQ.Last.Value] <= nums[i]) {
+                maxQ.RemoveLast();
+            }
+            maxQ.AddLast(i);
+            
+            while (nums[maxQ.First.Value] - nums[minQ.First.Value] > k) {
+                left++;
+                if (minQ.First.Value < left) minQ.RemoveFirst();
+                if (maxQ.First.Value < left) maxQ.RemoveFirst();
+            }
+            
+            long currentWays = (prefixSumDp[i + 1] - prefixSumDp[left] + mod) % mod;
+            dp[i + 1] = currentWays;
+            
+            prefixSumDp[i + 2] = (prefixSumDp[i + 1] + dp[i + 1]) % mod;
+        }
+        
+        return (int)dp[n];
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(N)
+
+
+
