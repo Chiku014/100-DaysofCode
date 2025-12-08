@@ -1,0 +1,23 @@
+Day 197/200: Count Square Sum Triples
+
+Problem Statement #1925
+
+Problem Statement Explanation:
+
+class Solution {
+    public int countTriples(int n) {
+        int count = 0;
+        for (int a = 1; a <= n; a++) {
+            for (int b = 1; b <= n; b++) {
+                int target = (a * a) + (b * b);
+                int c = (int) Math.sqrt(target);
+                if (c * c == target && c <= n) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+}
+
+
