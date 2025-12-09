@@ -1,0 +1,86 @@
+Day 198/200: Count Special Triplets
+
+Problem Statement #3583
+
+Problem Statement Explanation:
+
+Given an integer array nums, return the number of triplets (i, j, k) such that:
+
+0 <= i < j < k < nums.length
+nums[i] == 2 * nums[j]
+nums[k] == 2 * nums[j]
+
+Since the answer may be very large, return it modulo 10^9 + 7.
+
+Solution Approach:
+
+The brute-force approach would involve three nested loops checking every combination of i, j, and k, resulting in an O(N³) time complexity. This is inefficient for large inputs.
+To optimize this, we fix the middle element (j) and look for valid candidates on its left (i) and right (k).
+
+For any specific number nums[j], if we know:
+How many times 2 * nums[j] appears to its left (countLeft).
+How many times 2 * nums[j] appears to its right (countRight).
+Then the total number of triplets centered at j is simply countLeft * countRight. We sum this up for all valid j.
+
+Frequency Initialization: Create a frequency map (rightMap) containing the counts of all numbers in the array initially.
+Iterate through Middle: Loop through the array from left to right. Let the current element be the middle of the triplet (nums[j]).
+Update Right Counts: Before processing nums[j], remove it from rightMap (since it is no longer on the right side of the current center).
+Check Condition: Calculate the target value target = 2 * nums[j].
+
+Calculate Triplets:
+
+Look up the count of target in leftMap (numbers seen so far).
+Look up the count of target in rightMap (numbers remaining).
+Add leftCount * rightCount to the total result (modulo 10^9 + 7).
+Update Left Counts: Add nums[j] to leftMap so it becomes a "left" candidate for future iterations.
+
+
+Here's the code:
+
+import java.util.HashMap;
+import java.util.Map;
+
+class Solution {
+    public int specialTriplets(int[] nums) {
+        int MOD = 1_000_000_007;
+        Map<Integer, Integer> rightMap = new HashMap<>();
+        
+        for (int num : nums) {
+            rightMap.put(num, rightMap.getOrDefault(num, 0) + 1);
+        }
+        
+        Map<Integer, Integer> leftMap = new HashMap<>();
+        long totalTriplets = 0;
+        
+        for (int j = 0; j < nums.length; j++) {
+            int currentVal = nums[j];
+            
+            rightMap.put(currentVal, rightMap.get(currentVal) - 1);
+            
+            long targetLong = (long) currentVal * 2;
+            
+            if (targetLong >= Integer.MIN_VALUE && targetLong <= Integer.MAX_VALUE) {
+                int target = (int) targetLong;
+                long leftCount = leftMap.getOrDefault(target, 0);
+                long rightCount = rightMap.getOrDefault(target, 0);
+                
+                if (leftCount > 0 && rightCount > 0) {
+                    totalTriplets = (totalTriplets + (leftCount * rightCount)) % MOD;
+                }
+            }
+            
+            leftMap.put(currentVal, leftMap.getOrDefault(currentVal, 0) + 1);
+        }
+        
+        return (int) totalTriplets;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(N)
+
+
+
+
