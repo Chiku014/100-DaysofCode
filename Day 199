@@ -1,0 +1,69 @@
+Day 199/200: Count the Number of Computer Unlocking Permutations
+
+Problem Statement #3577
+
+Problem Statement Explanation:
+
+We are given an integer array complexity of length n, representing the complexity values of n computers labeled from 0 to n-1.
+Initially, only computer 0 is unlocked. 
+To unlock any other computer i, we must pick a computer j that is already unlocked such that:
+
+j < i (The index of the unlocker must be smaller).
+complexity[j] < complexity[i] (The complexity of the unlocker must be strictly smaller).
+
+We need to return the number of valid permutations (orders) in which we can unlock all the remaining computers. 
+If it is impossible to unlock all computers, return 0. 
+The result should be modulo 10^9+7.
+
+The problem simplifies significantly when observing the role of computer 0:
+
+Since j < i is required to unlock i, and computer 0 is the only one unlocked initially, every unlocking chain must effectively stem from computer 0.
+If complexity[0] is strictly smaller than complexity[i] for all other computers, then computer 0 satisfies the unlocking condition for everyone immediately. 
+This means the relative order of the other computers does not matter; computer 0 can always serve as the valid j for any i we choose next.
+
+However, if there is any computer i where complexity[i] <= complexity[0], it is impossible to unlock that computer. 
+To unlock it, we would need a predecessor with even lower complexity, but 0 is the starting baseline. Since no value exists smaller than the start, the chain breaks.
+
+Solution Approach:
+
+Validation Check: 
+
+Iterate through the complexity array starting from index 1. Check if any complexity[i] <= complexity[0].
+
+If this condition is met, return 0 immediately (impossible to unlock).
+
+Calculate Permutations: 
+If the validation passes, it means computer 0 can unlock any other computer directly. The remaining n - 1 computers can be unlocked in any order.
+
+The number of ways to arrange n - 1 items is (n - 1)!.
+Compute the factorial of n - 1 modulo 10^9+7.
+
+here's the code:
+
+class Solution {
+    public int countPermutations(int[] complexity) {
+        int n = complexity.length;
+        long MOD = 1_000_000_007L;
+
+        for (int i = 1; i < n; i++) {
+            if (complexity[i] <= complexity[0]) {
+                return 0;
+            }
+        }
+
+        long ans = 1;
+        for (int i = 1; i < n; i++) {
+            ans = (ans * i) % MOD;
+        }
+
+        return (int) ans;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+
+
