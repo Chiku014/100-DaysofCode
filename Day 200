@@ -1,0 +1,93 @@
+Day 200/200: Count Covered Buildings
+
+Problem Statement #3531
+
+Problem Statmeent Explantion:
+
+We are given an integer n, representing the size of an n×n grid, and an array buildings, where each element represents the coordinates (x,y) of a building.
+
+A building is considered covered if there is at least one other building in all four cardinal directions relative to it:
+
+Above: A building in the same column with a smaller row index.
+Below: A building in the same column with a larger row index.
+Left: A building in the same row with a smaller column index.
+Right: A building in the same row with a larger column index.
+
+The goal is to return the total count of such covered buildings.
+
+Solution Approach:
+
+The naive approach of searching for neighbors for every building would result in a time complexity of O(K^2), where K is the number of buildings. 
+This is inefficient.
+Instead, we can observe that a building at row r and column c has neighbors to its Left and Right if and only if:
+min_col[r]<c<max_col[r]
+
+Similarly, it has neighbors Above and Below if and only if:
+min_row[c]<r<max_row[c]
+
+Algorithm Steps:
+
+Initialize Boundary Arrays: 
+Create arrays to store the minimum and maximum indices for every row and every column. 
+Initialize minimums to infinity and maximums to −1.
+
+Pass 1 (Pre-computation): \
+Iterate through the buildings list. For each building at (r,c), update the min/max values for row r and column c.
+
+Pass 2 (Counting): 
+Iterate through the buildings list again. For each building, check if its coordinates lie strictly between the computed min and max boundaries for its respective row and column.
+Result: If both conditions (horizontal and vertical bounds) are met, increment the count.
+
+Here's the code:
+
+class Solution {
+    public int countCoveredBuildings(int n, int[][] buildings) {
+        int[] minRow = new int[n + 1];
+        int[] maxRow = new int[n + 1];
+        int[] minCol = new int[n + 1];
+        int[] maxCol = new int[n + 1];
+
+        // Initialize min arrays to MAX_VALUE and max arrays to MIN_VALUE
+        Arrays.fill(minRow, Integer.MAX_VALUE);
+        Arrays.fill(maxRow, Integer.MIN_VALUE);
+        Arrays.fill(minCol, Integer.MAX_VALUE);
+        Arrays.fill(maxCol, Integer.MIN_VALUE);
+
+        // First Pass: Determine boundaries
+        for (int[] b : buildings) {
+            int r = b[0];
+            int c = b[1];
+
+            if (c < minRow[r]) minRow[r] = c;
+            if (c > maxRow[r]) maxRow[r] = c;
+
+            if (r < minCol[c]) minCol[c] = r;
+            if (r > maxCol[c]) maxCol[c] = r;
+        }
+
+        int coveredCount = 0;
+
+        // Second Pass: Check coverage
+        for (int[] b : buildings) {
+            int r = b[0];
+            int c = b[1];
+
+            boolean hasHorizontalCover = (c > minRow[r] && c < maxRow[r]);
+            boolean hasVerticalCover = (r > minCol[c] && r < maxCol[c]);
+
+            if (hasHorizontalCover && hasVerticalCover) {
+                coveredCount++;
+            }
+        }
+
+        return coveredCount;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(K+N)
+Space Complexity: O(N)
+
+
+
