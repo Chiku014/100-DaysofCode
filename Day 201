@@ -1,0 +1,115 @@
+Day 201/250:  Count Mentions Per User
+
+Problem Statement #3433
+
+Problem Statement Explantion:
+
+You are given an integer numberOfUsers and a list of events occurring on a timeline. 
+The events can be of two types:
+
+MESSAGE: A message is sent with a mention string.
+"ALL": Mentions every user.
+"HERE": Mentions all users who are currently online.
+"id0 id1 ...": Mentions specific users by ID.
+OFFLINE: A specific user goes offline at a given timestamp for 60 seconds. 
+After 60 seconds (strictly), they automatically come back online.
+
+Rules:
+
+All users start online.
+If an OFFLINE event and a MESSAGE event happen at the exact same timestamp, the OFFLINE status change happens before the message is processed.
+Users returning online at time T are considered online for any messages occurring at time T.
+
+Solution Approach:
+
+The core challenge is processing events in the correct chronological order while handling implicit state changes (users automatically coming back online).
+
+Event Sorting:
+
+The input events list is not guaranteed to be sorted.
+We sort all events primarily by timestamp (ascending).
+
+Tie-Breaking: 
+If timestamps are equal, OFFLINE events must be processed before MESSAGE events to ensure status updates are reflected immediately.
+
+Managing Online Status:
+
+We use a boolean array isOnline to track the current status of all users.
+To handle the automatic "return online" logic, we use a Min-Heap (PriorityQueue).
+The heap stores pairs of {returnTimestamp, userId}.
+Before processing any event at time T, we check the heap: any user with returnTimestamp <= T is marked back as true (Online).
+
+Processing Messages:
+
+"ALL": Iterate 0 to N−1 and increment all counts.
+"HERE": Iterate 0 to N−1 and increment counts only for users where isOnline[i] is true.
+"id...": Parse the string, extract the ID integers, and increment specific counts
+
+Here's the code:
+
+import java.util.*;
+
+class Solution {
+    public int[] countMentions(int numberOfUsers, List<List<String>> events) {
+        int[] mentions = new int[numberOfUsers];
+        boolean[] isOnline = new boolean[numberOfUsers];
+        Arrays.fill(isOnline, true);
+        
+        PriorityQueue<int[]> offlineQueue = new PriorityQueue<>((a, b) -> Integer.compare(a[0], b[0]));
+        
+        Collections.sort(events, (a, b) -> {
+            int timeA = Integer.parseInt(a.get(1));
+            int timeB = Integer.parseInt(b.get(1));
+            if (timeA != timeB) {
+                return Integer.compare(timeA, timeB);
+            }
+            return b.get(0).compareTo(a.get(0));
+        });
+
+        for (List<String> event : events) {
+            String type = event.get(0);
+            int time = Integer.parseInt(event.get(1));
+            String payload = event.get(2);
+
+            while (!offlineQueue.isEmpty() && offlineQueue.peek()[0] <= time) {
+                isOnline[offlineQueue.poll()[1]] = true;
+            }
+
+            if (type.equals("OFFLINE")) {
+                int userId = Integer.parseInt(payload);
+                if (isOnline[userId]) {
+                    isOnline[userId] = false;
+                    offlineQueue.offer(new int[]{time + 60, userId});
+                }
+            } else if (type.equals("MESSAGE")) {
+                if (payload.equals("ALL")) {
+                    for (int i = 0; i < numberOfUsers; i++) {
+                        mentions[i]++;
+                    }
+                } else if (payload.equals("HERE")) {
+                    for (int i = 0; i < numberOfUsers; i++) {
+                        if (isOnline[i]) {
+                            mentions[i]++;
+                        }
+                    }
+                } else {
+                    String[] ids = payload.split(" ");
+                    for (String idStr : ids) {
+                        int userId = Integer.parseInt(idStr.substring(2));
+                        mentions[userId]++;
+                    }
+                }
+            }
+        }
+        
+        return mentions;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(ElogE+E⋅N)
+Space Complexity: O(N)
+
+
+
