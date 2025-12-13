@@ -1,0 +1,111 @@
+Day 202/250: Validate Coupons
+
+Problem Statement #3606
+
+Problem Statement Explanation:
+
+You are given three arrays representing coupon details:
+code: A list of strings representing the coupon codes.
+businessLine: A list of strings representing the business category for each coupon.
+isActive: A list of booleans indicating if the coupon is currently active.
+A coupon is considered valid only if it meets all of the following criteria:
+
+Active: The isActive flag is true.
+Valid Business: The businessLine must be one of the following: "electronics", "grocery", "pharmacy", or "restaurant".
+Valid Code: The code must not be empty and must contain only alphanumeric characters (A-Z, a-z, 0-9) or underscores (_).
+Output: Return a list of valid coupon codes sorted by the following priority:
+
+Business Line Priority:
+
+electronics (Highest)
+grocery
+pharmacy
+restaurant (Lowest)
+
+Lexicographical Order: If two coupons have the same business line, sort them alphabetically by their code.
+
+Solution Apporach:
+
+The problem requires a two-step process: Filtering and Sorting.
+
+1. Filtering Phase
+We iterate through all coupons and check the validity conditions. 
+To make the sorting phase efficient later, we need to map the business lines to integer priorities (e.g., Electronics=0, Restaurant=3).
+We use a HashMap to store the priority of each valid business line.
+We iterate through the input arrays. If a coupon is inactive, has an invalid business line, or has a malformed code (checked via a helper function), it is skipped.
+We store the indices of the valid coupons to avoid duplicating string data during the sort.
+
+2. Sorting Phase
+Once we have the list of valid indices, we sort them using a custom comparator:
+Primary Sort: Compare the priority values of the business lines associated with the indices.
+Secondary Sort: If priorities are equal, compare the actual string code values lexicographically.
+
+3. Result Construction
+Finally, we map the sorted indices back to their corresponding coupon codes to form the result list.
+
+Here's the code:
+
+import java.util.*;
+
+class Solution {
+    public List<String> validateCoupons(String[] code, String[] businessLine, boolean[] isActive) {
+        Map<String, Integer> priorityMap = new HashMap<>();
+        priorityMap.put("electronics", 0);
+        priorityMap.put("grocery", 1);
+        priorityMap.put("pharmacy", 2);
+        priorityMap.put("restaurant", 3);
+
+        List<Integer> validIndices = new ArrayList<>();
+        int n = code.length;
+
+        for (int i = 0; i < n; i++) {
+            if (!isActive[i]) continue;
+
+            String bLine = businessLine[i];
+            if (!priorityMap.containsKey(bLine)) continue;
+
+            String c = code[i];
+            if (isValidCode(c)) {
+                validIndices.add(i);
+            }
+        }
+
+        Collections.sort(validIndices, (a, b) -> {
+            int priorityA = priorityMap.get(businessLine[a]);
+            int priorityB = priorityMap.get(businessLine[b]);
+
+            if (priorityA != priorityB) {
+                return Integer.compare(priorityA, priorityB);
+            } else {
+                return code[a].compareTo(code[b]);
+            }
+        });
+
+        List<String> result = new ArrayList<>();
+        for (int idx : validIndices) {
+            result.add(code[idx]);
+        }
+
+        return result;
+    }
+
+    private boolean isValidCode(String s) {
+        if (s == null || s.isEmpty()) return false;
+        for (char c : s.toCharArray()) {
+            boolean isAlpha = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+            boolean isDigit = (c >= '0' && c <= '9');
+            if (!isAlpha && !isDigit && c != '_') {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(NlogN)
+Space Complexity: O(N)
+
+
+
