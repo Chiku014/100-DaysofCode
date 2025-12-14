@@ -1,0 +1,74 @@
+Day 203/250: Number of Ways to Divide a Long Corridor
+
+Problem Statement #2147
+
+Problem Statement Explanation:
+
+We are given a string corridor consisting of letters 'S' (seats) and 'P' (plants). 
+The goal is to divide the corridor into non-overlapping sections by placing dividers.
+
+The Rules:
+
+Each section must contain exactly two seats.
+Dividers can only be placed in the positions between indices.
+We need to find the total number of ways to divide the corridor satisfying the condition.
+Since the answer may be large, return it modulo 10^9 + 7.
+Example: Input: corridor = "SSPPSS" Output: 3 Explanation: There are 2 pairs of seats. The plants between the 2nd and 3rd seat allow for 3 possible divider positions.
+
+Solution Approach:
+
+The core observation is that we only care about the "gap" between the end of one pair of seats and the start of the next pair.
+Identify Seats: Traverse the string and store the indices of all seats ('S').
+
+Validity Check:
+
+If there are no seats, or if the total count of seats is odd, it is impossible to divide them into pairs. Return 0.
+
+Calculate Combinations:
+
+Iterate through the seat indices with a step of 2.
+For every adjacent pair of seat groups (e.g., the gap between the 2nd seat and the 3rd seat), the number of valid divider placements is the distance between them (index_next_start - index_prev_end).
+Multiply this distance to the running total result.
+Modulo Arithmetic: Apply modulo 10^9 + 7 at every multiplication step to handle large numbers.
+
+Here's the code:
+
+import java.util.ArrayList;
+import java.util.List;
+
+class Solution {
+    public int numberOfWays(String corridor) {
+        List<Integer> seatIndices = new ArrayList<>();
+        
+        for (int i = 0; i < corridor.length(); i++) {
+            if (corridor.charAt(i) == 'S') {
+                seatIndices.add(i);
+            }
+        }
+        
+        if (seatIndices.size() == 0 || seatIndices.size() % 2 != 0) {
+            return 0;
+        }
+        
+        long ways = 1;
+        long MOD = 1_000_000_007;
+        
+        for (int i = 1; i < seatIndices.size() - 1; i += 2) {
+            int previousPairEnd = seatIndices.get(i);
+            int nextPairStart = seatIndices.get(i + 1);
+            
+            ways = (ways * (nextPairStart - previousPairEnd)) % MOD;
+        }
+        
+        return (int) ways;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(N)
+
+
+
+
