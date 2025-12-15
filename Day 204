@@ -1,0 +1,52 @@
+Day 204/250: Number of Smooth Descent Periods of a Stock
+
+Problem Statement: #2110
+
+Problem Statement Explanation:
+
+You are given an integer array prices representing the daily price history of a stock, where prices[i] is the stock price on the i-th day.
+A smooth descent period of a stock is defined as a contiguous subarray of days (at least one day long) where the price on each day is exactly 1 less than the price on the preceding day. 
+The first day of the period does not need to satisfy this condition.
+
+Return the number of smooth descent periods.
+
+Solution Approach:
+
+The problem asks us to count all contiguous subarrays that are strictly decreasing by 1. A brute-force approach checking every subarray would take O(N^2), which is inefficient for large inputs.
+Instead, we can use a Linear Scan / Dynamic Programming approach:
+
+Streak Counting: We iterate through the array while maintaining a variable, currentStreak. This variable counts the length of the smooth descent ending at the current index.
+Condition Check: For every price at index i:
+
+If prices[i] == prices[i-1] - 1, it means the current day extends the previous descent sequence. We increment currentStreak by 1.
+Otherwise, the sequence is broken, and we reset currentStreak to 1 (the current day itself starts a new period).
+Accumulate Result: At every step, we add currentStreak to our total count.
+Why? If a sequence has length k ending at index i, there are exactly k valid subarrays ending at i. (e.g., if the sequence is [3, 2, 1], subarrays ending at 1 are [1], [2, 1], and [3, 2, 1]).
+
+Here's the code:
+
+class Solution {
+    public long getDescentPeriods(int[] prices) {
+        long totalPeriods = 1;
+        long currentStreak = 1;
+
+        for (int i = 1; i < prices.length; i++) {
+            if (prices[i] == prices[i - 1] - 1) {
+                currentStreak++;
+            } else {
+                currentStreak = 1;
+            }
+            totalPeriods += currentStreak;
+        }
+
+        return totalPeriods;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N)
+Space Complexity: O(1)
+
+
+
