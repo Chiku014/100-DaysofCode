@@ -1,0 +1,130 @@
+Day 205/250: Best Time to Buy and Sell Stock (Tree DP)
+
+Problem Statement #3562
+
+Problem Statement Explanation:
+
+You are given a tree structure representing an employee hierarchy where node 0 is the root (CEO). Each node i has:
+A current price (present[i]) to buy stock.
+A future selling price (future[i]).
+A parent-child relationship defined by hierarchy.
+
+Rules:
+
+You have a total budget to buy stocks.
+Discount Logic: If you buy a parent node's stock, you can buy their direct children's stock at half price (floor(present[child] / 2)).
+If you do not buy a parent node, the children must be bought at full price.
+Goal: Maximize the total profit (Sum of future[i] - cost[i] for all selected nodes) without exceeding the budget.
+
+Solution Approach:
+
+This problem is a combination of Tree Dynamic Programming (DFS) and the Knapsack Problem.
+
+1. Tree Traversal (DFS)
+We process the tree from the bottom up (post-order traversal). 
+For every node u, we need to decide whether to buy it or not, but this decision affects the cost of its children. 
+Therefore, each node returns two possibilities to its parent:
+noDiscount: The best profit subtree u can generate if u pays full price (parent did not buy).
+hasDiscount: The best profit subtree u can generate if u pays half price (parent did buy).
+
+2. Knapsack Merging
+Since we have a limited budget, we treat the profit arrays as knapsack DP tables where dp[w] = max profit for cost w.
+When moving up from children to a parent, we merge the children's DP tables.
+If we choose NOT to buy node u: We simply sum up the results of children assuming they paid full price.
+If we choose TO buy node u: We pay the cost for u (full or half depending on the state), gain the profit, and sum up the results of children assuming they paid half price.
+
+3. State Transitions
+For each node u and budget b:
+State 1 (Parent didn't buy): Max of (Don't buy u, Buy u at full price).
+State 2 (Parent did buy): Max of (Don't buy u, Buy u at half price).
+
+Here's the code:
+
+import java.util.*;
+
+class Solution {
+    private List<List<Integer>> adj;
+    private int[] present;
+    private int[] future;
+    private int budget;
+
+    public int maxProfit(int n, int[] present, int[] future, int[][] hierarchy, int budget) {
+        this.present = present;
+        this.future = future;
+        this.budget = budget;
+        
+        adj = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            adj.add(new ArrayList<>());
+        }
+        for (int[] edge : hierarchy) {
+            int u = edge[0] - 1;
+            int v = edge[1] - 1;
+            adj.get(u).add(v);
+        }
+
+        int[] result = dfs(0)[0];
+        
+        int maxProfit = 0;
+        for (int p : result) {
+            maxProfit = Math.max(maxProfit, p);
+        }
+        return maxProfit;
+    }
+
+    private int[][] dfs(int u) {
+        int[] childSumNoBuy = new int[budget + 1];
+        int[] childSumBuy = new int[budget + 1];
+        
+        for (int v : adj.get(u)) {
+            int[][] childRes = dfs(v);
+            childSumNoBuy = merge(childSumNoBuy, childRes[0]);
+            childSumBuy = merge(childSumBuy, childRes[1]);
+        }
+
+        int[] noDiscount = new int[budget + 1];
+        int[] hasDiscount = new int[budget + 1];
+
+        int costFull = present[u];
+        int profitFull = future[u] - costFull;
+        
+        int costHalf = present[u] / 2;
+        int profitHalf = future[u] - costHalf;
+
+        for (int b = 0; b <= budget; b++) {
+            int optionSkip = childSumNoBuy[b];
+            
+            int optionBuyFull = -1;
+            if (b >= costFull) {
+                optionBuyFull = profitFull + childSumBuy[b - costFull];
+            }
+            noDiscount[b] = Math.max(optionSkip, optionBuyFull);
+
+            int optionBuyHalf = -1;
+            if (b >= costHalf) {
+                optionBuyHalf = profitHalf + childSumBuy[b - costHalf];
+            }
+            hasDiscount[b] = Math.max(optionSkip, optionBuyHalf);
+        }
+
+        return new int[][]{noDiscount, hasDiscount};
+    }
+
+    private int[] merge(int[] dp1, int[] dp2) {
+        int[] newDp = new int[budget + 1];
+        for (int i = 0; i <= budget; i++) {
+            for (int j = 0; j <= budget - i; j++) {
+                newDp[i + j] = Math.max(newDp[i + j], dp1[i] + dp2[j]);
+            }
+        }
+        return newDp;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N×Budget^2)
+Space Complexity: O(N×Budget)
+
+
+
