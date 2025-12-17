@@ -1,0 +1,92 @@
+Day 206/250: Best Time to Buy and Sell Stock V
+
+Problem Statement #3573
+
+Problem Statement Explantion:
+
+You are given an integer array prices where prices[i] is the price of a given stock on the i-th day, and an integer k. 
+You can perform at most k transactions.
+Unlike standard stock problems, you have two types of transactions:
+Long Position (Normal): Buy on day i, Sell on day j (i<j). Profit =prices[j]−prices[i].
+Short Position (Short Selling): Sell on day i, Buy back on day j (i<j). Profit =prices[i]−prices[j].
+
+Constraints:
+
+Transactions must be non-overlapping.
+Gap Constraint: You cannot open a new transaction on the same day you close an old one. 
+If you close a transaction on day i, the earliest you can open a new one is day i+1.
+
+
+Solution Approach:
+
+This problem is solved using Dynamic Programming. Since we need to track the number of transactions (k) and the current state of our portfolio, we define three specific states for each transaction count j:
+
+sold[j]: Max profit after completing exactly j transactions. We are currently flat (holding nothing).
+holdBuy[j]: Max profit after starting the j-th transaction with a Long Position (we bought a stock and are waiting to sell).
+holdShort[j]: Max profit after starting the j-th transaction with a Short Position (we shorted a stock and are waiting to buy back).
+
+State Transitions (Day i)
+To enforce the Gap Constraint, we calculate the potential new "Hold" states using the sold values from the previous day.
+
+Starting a Long Position: sold[j-1] - prices[i]
+Starting a Short Position: sold[j-1] + prices[i]
+Closing a Long Position: holdBuy[j] + prices[i]
+Closing a Short Position: holdShort[j] - prices[i]
+
+We iterate through every price and every transaction count up to k, updating these states to find the maximum possible profit.
+
+Here's the code:
+
+import java.util.Arrays;
+
+class Solution {
+    public long maximumProfit(int[] prices, int k) {
+        int n = prices.length;
+        if (n < 2) return 0;
+
+        long[] sold = new long[k + 1];
+        long[] holdBuy = new long[k + 1];
+        long[] holdShort = new long[k + 1];
+
+        Arrays.fill(holdBuy, Long.MIN_VALUE / 2);
+        Arrays.fill(holdShort, Long.MIN_VALUE / 2);
+        Arrays.fill(sold, Long.MIN_VALUE / 2);
+        sold[0] = 0; 
+
+        for (int price : prices) {
+            long[] nextSold = sold.clone();
+            long[] nextHoldBuy = holdBuy.clone();
+            long[] nextHoldShort = holdShort.clone();
+            
+            for (int j = 1; j <= k; j++) {
+                nextHoldBuy[j] = Math.max(holdBuy[j], sold[j - 1] - price);
+                nextHoldShort[j] = Math.max(holdShort[j], sold[j - 1] + price);
+                
+                long profitFromBuy = holdBuy[j] + price;
+                long profitFromShort = holdShort[j] - price;
+                
+                nextSold[j] = Math.max(sold[j], Math.max(profitFromBuy, profitFromShort));
+            }
+            
+            sold = nextSold;
+            holdBuy = nextHoldBuy;
+            holdShort = nextHoldShort;
+        }
+        
+        long maxProfit = 0;
+        for (long val : sold) {
+            maxProfit = Math.max(maxProfit, val);
+        }
+        
+        return maxProfit;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N⋅K)
+Space Complexity: O(K)
+
+
+
+
