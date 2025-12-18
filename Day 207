@@ -1,0 +1,78 @@
+Day 207/250:  Maximize Profit with Strategy Modification
+
+Problem Statement #3562
+
+Problem Statement Explanation:
+
+You are given an array prices of length n and an array strategy of the same length, where strategy[i] represents your action on day i (e.g., Buy, Hold, or Sell).
+
+You are allowed to apply a modification to exactly one consecutive window of size k. Within this window:
+
+The first half (k/2 days) is forced to Hold (0).
+The second half (k/2 days) is forced to Sell (1).
+
+Your goal is to find the maximum possible profit after applying this modification to the most optimal window.
+
+Solution Approach:
+
+To solve this problem efficiently in O(n) time, we use a linear scan combined with pre-calculated sums.
+
+1. Pre-calculation
+We calculate two prefix sum arrays:
+
+prefixProfit: Stores the cumulative profit based on the original strategy.
+prefixPriceSum: Stores the cumulative sum of prices, which allows us to calculate the profit of the "Forced Sell" part of our window in O(1).
+
+2. Sliding Window Logic
+We slide a window of size k across the array. For each starting position i:
+Outside the window: The profit remains unchanged.
+Inside the window: * The first k/2 elements contribute 0 profit (Hold).
+The second k/2 elements contribute the sum of prices (Sell).
+
+Formula:
+
+Potential Profit=Total Original Profit−Original Window Profit+New Window Profit
+3. Edge Cases & Constraints
+Integer Overflow: We use long for all profit calculations to handle cases where n=10^5 and prices are large.
+Best Case: We initialize maxProfit with the originalTotal in case no modification improves the outcome.
+
+Here's the code:
+
+class Solution {
+    public long maxProfit(int[] prices, int[] strategy, int k) {
+        int n = prices.length;
+        long[] prefixProfit = new long[n + 1];
+        long[] prefixPriceSum = new long[n + 1];
+
+        for (int i = 0; i < n; i++) {
+            prefixProfit[i + 1] = prefixProfit[i] + (long) prices[i] * strategy[i];
+            prefixPriceSum[i + 1] = prefixPriceSum[i] + (long) prices[i];
+        }
+
+        long originalTotal = prefixProfit[n];
+        long maxProfit = originalTotal;
+
+        for (int i = 0; i <= n - k; i++) {
+            int mid = i + k / 2;
+            int end = i + k;
+            
+            long currentWindowOriginal = prefixProfit[end] - prefixProfit[i];
+            long currentWindowNew = prefixPriceSum[end] - prefixPriceSum[mid];
+            
+            long potentialProfit = originalTotal - currentWindowOriginal + currentWindowNew;
+            if (potentialProfit > maxProfit) {
+                maxProfit = potentialProfit;
+            }
+        }
+
+        return maxProfit;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+
+
