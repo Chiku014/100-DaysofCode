@@ -1,0 +1,111 @@
+Day 208/250: Find All People With Secret
+
+Problem Statement #2092
+
+Problem Statement Explanation:
+
+You are given an integer n indicating there are n people numbered from 0 to n - 1. 
+You are also given a 2D integer array meetings where meetings[i] = [xi, yi, timei] indicates that person xi and person yi have a meeting at timei. 
+A person may attend multiple meetings at the same time. Finally, you are given an integer firstPerson.
+
+Person 0 has a secret and shares it with firstPerson at time 0. This secret is then shared every time a meeting takes place with a person who has the secret. 
+More formally, if person xi has the secret at timei, then they will share the secret with person yi, and vice versa.
+The secrets are shared instantaneously. 
+That is, a person may receive the secret and share it with people in other meetings within the same time frame.
+Return a list of all the people who have the secret after all the meetings have taken place.
+
+Solution Approach:
+
+The key difficulty in this problem is the instantaneous nature of secret sharing. 
+If person A meets person B at 10:00, and person B meets person C at 10:00, A can pass the secret to C through B immediately.
+
+1. Sorting
+We first sort the meetings array based on the time in ascending order. 
+This allows us to process the timeline chronologically.
+
+2. Processing Groups of Meetings
+We process all meetings that occur at the same timestamp as a single batch.
+Union: For every meeting [u, v, t], we connect person u and v in a Union-Find data structure.
+Verification: After processing all meetings for that specific time, we must check who actually learned the secret. 
+A person only "keeps" the secret if they are now connected to Person 0.
+Reset (The Critical Step): If someone was in a meeting at the current time but is not connected to Person 0, we must "undo" their union. 
+This is because they participated in a meeting but no one in their connected component knew the secret. 
+We reset their parent pointer in the Union-Find structure to themselves.
+
+3. Final Collection
+After iterating through all time groups, we check every person from 0 to n-1. 
+If find(i) == find(0), they know the secret.
+
+Here's the code:
+
+import java.util.*;
+
+class Solution {
+    class UnionFind {
+        int[] parent;
+        public UnionFind(int n) {
+            parent = new int[n];
+            for (int i = 0; i < n; i++) parent[i] = i;
+        }
+        public int find(int i) {
+            if (parent[i] == i) return i;
+            return parent[i] = find(parent[i]);
+        }
+        public void union(int i, int j) {
+            int rootI = find(i);
+            int rootJ = find(j);
+            if (rootI != rootJ) parent[rootI] = rootJ;
+        }
+        public void reset(int i) {
+            parent[i] = i;
+        }
+        public boolean connected(int i, int j) {
+            return find(i) == find(j);
+        }
+    }
+
+    public List<Integer> findAllPeople(int n, int[][] meetings, int firstPerson) {
+        // 1. Sort meetings by time
+        Arrays.sort(meetings, (a, b) -> Integer.compare(a[2], b[2]));
+
+        UnionFind uf = new UnionFind(n);
+        uf.union(0, firstPerson);
+
+        int i = 0;
+        int m = meetings.length;
+        while (i < m) {
+            int currentTime = meetings[i][2];
+            List<Integer> peopleAtTime = new ArrayList<>();
+            
+            // 2. Process all meetings at the same timestamp
+            int j = i;
+            while (j < m && meetings[j][2] == currentTime) {
+                uf.union(meetings[j][0], meetings[j][1]);
+                peopleAtTime.add(meetings[j][0]);
+                peopleAtTime.add(meetings[j][1]);
+                j++;
+            }
+
+            // 3. Reset people who didn't learn the secret at this time
+            for (int person : peopleAtTime) {
+                if (!uf.connected(person, 0)) {
+                    uf.reset(person);
+                }
+            }
+            i = j;
+        }
+
+        // 4. Collect everyone connected to person 0
+        List<Integer> result = new ArrayList<>();
+        for (int k = 0; k < n; k++) {
+            if (uf.connected(k, 0)) result.add(k);
+        }
+        return result;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(MlogM+M⋅α(N))
+Space Complexityt: O(N+M)
+
