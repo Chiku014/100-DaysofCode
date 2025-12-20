@@ -1,0 +1,60 @@
+Day 209/250: Delete Columns to Make Sorted
+
+Problem Statement #944
+
+Problem Statement Explanation:
+
+You are given an array of n strings strs, all of the same length.
+The strings can be arranged such that there is one on each row, making a grid. 
+For example, if strs = ["abc", "bce", "cae"], it looks like this:
+
+Plaintext
+
+abc
+bce
+cae
+
+
+You want to delete the columns that are not sorted lexicographically. 
+In the example above (0-indexed), columns 0 ('a', 'b', 'c') and 2 ('c', 'e', 'e') are sorted, while column 1 ('b', 'c', 'a') is not, so you would delete column 1.
+Return the number of columns that you will delete.
+
+To determine if a column is sorted, we compare each character with the character directly above it.
+
+In the grid:
+
+Sorted Column: Every character at strs[row][col] must be greater than or equal to strs[row-1][col].
+Unsorted Column: If we find even one instance where strs[row][col] < strs[row-1][col], the entire column is invalid.
+
+Solution Approach:
+
+Identify Dimensions: Get the number of rows (array length) and the number of columns (length of the first string).
+Outer Loop (Columns): Iterate through each column index from 0 to K-1.
+Inner Loop (Rows): Iterate through each row starting from index 1.
+Comparison: Compare the character at the current row with the character at the previous row for that specific column.
+Counting: If the order is broken, increment our deletionCount and break the inner loop immediately (we don't need to check the rest of a column once it's marked for deletion).
+
+Here's the code:
+
+class Solution {
+    public int minDeletionSize(String[] strs) {
+        int deletionCount = 0;
+        int rowCount = strs.length;
+        int colCount = strs[0].length();
+
+        for (int col = 0; col < colCount; col++) {
+            for (int row = 1; row < rowCount; row++) {
+                if (strs[row].charAt(col) < strs[row - 1].charAt(col)) {
+                    deletionCount++;
+                    break; 
+                }
+            }
+        }
+        return deletionCount;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N×K)
+Space Complexity: O(1)
