@@ -1,0 +1,36 @@
+Day 210/250: 
+
+class Solution {
+    public int minDeletionSize(String[] strs) {
+        int n = strs.length;
+        int m = strs[0].length();
+        int deletions = 0;
+        
+        // isSorted[i] is true if strs[i] < strs[i+1]
+        boolean[] isSorted = new boolean[n - 1];
+        
+        for (int j = 0; j < m; j++) {
+            int i;
+            // Check if this column 'j' is valid
+            for (i = 0; i < n - 1; i++) {
+                // If not already sorted and current char is smaller than previous
+                if (!isSorted[i] && strs[i].charAt(j) > strs[i + 1].charAt(j)) {
+                    deletions++;
+                    break;
+                }
+            }
+            
+            // If we didn't break, it means the column is valid/keepable
+            if (i == n - 1) {
+                // Update isSorted for the next column's check
+                for (int k = 0; k < n - 1; k++) {
+                    if (strs[k].charAt(j) < strs[k + 1].charAt(j)) {
+                        isSorted[k] = true;
+                    }
+                }
+            }
+        }
+        
+        return deletions;
+    }
+}
