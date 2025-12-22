@@ -1,0 +1,70 @@
+Day 211/250: Delete Columns to Make Sorted III
+
+Problem Statement #960
+
+Problem Statement Explanation:
+
+You are given an array of n strings strs, all of the same length.
+We may choose any subset of indices, and delete all the characters in each string at these indices.
+For example, if we have strs = ["abcdef","uvwxyz"] and we choose indices {0, 2, 3}, then the final array after deletions is ["bef", "vyz"].
+Suppose we chose a set of deletion indices such that after deletions, the final array has every one of its rows in lexicographical order. 
+Return the minimum number of deletion indices needed.
+
+Solution Approach:
+
+The problem asks for the minimum deletions to make every row sorted. 
+This is equivalent to finding the Longest Common Subsequence of columns that are sorted for every single row.
+
+Key Insight
+
+This is a variation of the Longest Increasing Subsequence (LIS) problem. 
+Instead of comparing single integers, we compare entire columns.
+Condition for "Increasing": Column j can precede column i if and only if: strs[k].charAt(j) <= strs[k].charAt(i) for all rows k.
+DP State: Let dp[i] be the length of the longest valid subsequence of columns ending at index i.
+Transition: For each column i, look at all previous columns j<i. If column j and i satisfy the sorted condition for all rows, then:
+dp[i]=max(dp[i],dp[j]+1)
+
+Final Answer: If the length of the longest valid subsequence is maxLen, the minimum deletions required is:
+Total Columns−maxLen
+
+Here's the code:
+
+class Solution {
+    public int minDeletionSize(String[] strs) {
+        int m = strs.length;    // Number of rows
+        int n = strs[0].length(); // Number of columns
+        
+        // dp[i] = Longest valid subsequence of columns ending at index i
+        int[] dp = new int[n];
+        int maxLen = 0;
+        
+        for (int i = 0; i < n; i++) {
+            dp[i] = 1; // Minimum length is the column itself
+            for (int j = 0; j < i; j++) {
+                if (isSorted(strs, j, i)) {
+                    dp[i] = Math.max(dp[i], dp[j] + 1);
+                }
+            }
+            maxLen = Math.max(maxLen, dp[i]);
+        }
+        
+        // Result is total columns - longest valid subsequence
+        return n - maxLen;
+    }
+    
+    // Helper to check if column j can come before column i for all rows
+    private boolean isSorted(String[] strs, int j, int i) {
+        for (String s : strs) {
+            if (s.charAt(j) > s.charAt(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(N^2⋅M)
+Space Complexity: O(N)
+
