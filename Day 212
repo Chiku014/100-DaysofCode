@@ -1,0 +1,86 @@
+Day 212/250: Two Best Non-Overlapping Events
+
+Problem Statement #2054
+
+Problem Statement Explanation:
+
+You are given a 2D integer array events where events[i] = [startTimei, endTimei, valuei]. 
+Each events[i] represents an event that starts at startTimei and ends at endTimei with a value of valuei.
+You can choose at most two non-overlapping events to attend such that the sum of their values is maximized.
+
+Two events i and j are non-overlapping if:
+endTimei < startTimej OR endTimej < startTimei.
+Return the maximum sum of values that you can obtain.
+
+Solution Approach:
+
+The challenge is to efficiently find the best "second" event for every "first" event without checking every possible pair (O(n^2)), which would exceed the time limit.
+
+1. Sorting
+We sort the events by their start time. This allows us to use binary search to find the next available events that start after the current event ends.
+
+2. Suffix Maximum Array
+Once we find the range of events that don't overlap with our current one, we need to know the maximum value in that range instantly.
+We precompute a maxVal array where maxVal[i] stores the maximum value among all events from index i to the end of the list.
+
+3. Binary Search
+For each event i:
+
+Check its value as a standalone event.
+Use Binary Search to find the index j of the first event whose startTime is strictly greater than events[i].endTime.
+If such an event exists, the potential max sum is events[i].value + maxVal[j]
+
+Here's the code:
+
+import java.util.Arrays;
+
+class Solution {
+    public int maxTwoEvents(int[][] events) {
+        Arrays.sort(events, (a, b) -> Integer.compare(a[0], b[0]));
+
+        int n = events.length;
+        int[] maxVal = new int[n];
+        maxVal[n - 1] = events[n - 1][2];
+        for (int i = n - 2; i >= 0; i--) {
+            maxVal[i] = Math.max(events[i][2], maxVal[i + 1]);
+        }
+
+        int res = 0;
+
+        for (int i = 0; i < n; i++) {
+            res = Math.max(res, events[i][2]);
+
+            int nextEventIndex = findNext(events, events[i][1], i + 1);
+            if (nextEventIndex != -1) {
+                res = Math.max(res, events[i][2] + maxVal[nextEventIndex]);
+            }
+        }
+
+        return res;
+    }
+
+    private int findNext(int[][] events, int currentEnd, int left) {
+        int right = events.length - 1;
+        int ans = -1;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (events[mid][0] > currentEnd) {
+                ans = mid;
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return ans;
+    }
+}
+
+Complexity:
+
+Time Complexity:	O(nlogn)	
+Space Complexity:	O(n)
+
+
+
+
