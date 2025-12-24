@@ -1,0 +1,54 @@
+Day 213/250: Apple Redistribution into Boxes
+
+Problem Statement #3074
+
+Problem Statement Explanation:
+
+You are given an array apple of size n and an array capacity of size m. There are n packs of apples, where the ith pack contains apple[i] apples. 
+There are also m empty boxes, where the jth box has a capacity of capacity[j] apples.
+Return the minimum number of boxes you need to select to redistribute these n packs of apples into boxes. 
+Note that apples from the same pack can be distributed into different boxes.
+
+Solution Approach:
+
+To minimize the number of boxes used, we apply a Greedy Strategy:
+
+Sum Total Apples: First, calculate the total count of all apples across all packs. 
+Since we can split packs, the individual sizes in the apple array don't matter as much as the total sum.
+Maximize Box Usage: To use the fewest boxes, we must use the ones with the largest capacities first.
+Sort and Iterate: Sort the capacity array in ascending order. 
+Iterate from the end of the array (the largest boxes) and subtract the box capacity from the total apple sum until the sum becomes zero or negative
+
+Here's the code:
+
+import java.util.Arrays;
+
+class Solution {
+    public int minimumBoxes(int[] apple, int[] capacity) {
+        int totalApples = 0;
+        for (int a : apple) {
+            totalApples += a;
+        }
+
+        Arrays.sort(capacity);
+        
+        int boxesUsed = 0;
+        for (int i = capacity.length - 1; i >= 0; i--) {
+            totalApples -= capacity[i];
+            boxesUsed++;
+
+            if (totalApples <= 0) {
+                break;
+            }
+        }
+
+        return boxesUsed;
+    }
+}
+
+Complexity:
+
+Time Complexity:	O(n+mlogm)
+Space Complexity:	O(1)
+
+
