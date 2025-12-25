@@ -1,0 +1,54 @@
+Day 214/250: Maximize Happiness Greedy
+
+Problem Statement #3075
+
+Problem Statement Explantion:
+
+You are given an array happiness of size n, and a positive integer k. 
+There are n children standing in a queue, where the ith child has a happiness value happiness[i].
+You want to select k children from these n children in k turns. 
+In each turn, when you select a child, the happiness value of all the children that have not been selected yet decreases by 1. 
+Note that the happiness value cannot become negative and is only decremented if it is positive.
+Return the maximum sum of the happiness values of the selected children you can achieve by selecting exactly k children.
+
+Solution Approach:
+
+To maximize the total happiness, we should always pick the child with the highest available happiness value at each step.
+Sorting: We sort the happiness array in ascending order. This allows us to easily access the largest values from the end of the array.
+
+Decremented Values: In the ith turn (starting from i=0), the happiness value of the chosen child will have decreased by i units.
+Calculation: Pick the largest remaining value: happiness[n - 1 - i].
+Subtract the number of turns passed: happiness[n - 1 - i] - i.
+If the resulting value is positive, add it to the total. If it reaches 0 or less, we stop or add 0 because happiness cannot be negative.
+Efficiency: Sorting takes O(nlogn), and the selection takes O(k), making this approach highly efficient.
+
+Here's the code:
+
+import java.util.Arrays;
+
+class Solution {
+    public long maximumHappinessSum(int[] happiness, int k) {
+        Arrays.sort(happiness);
+        
+        long totalHappiness = 0;
+        int n = happiness.length;
+        
+        for (int i = 0; i < k; i++) {
+            int currentHappiness = happiness[n - 1 - i] - i;
+            
+            if (currentHappiness > 0) {
+                totalHappiness += currentHappiness;
+            } else {
+                break;
+            }
+        }
+        
+        return totalHappiness;
+    }
+}
+
+Complexity:
+
+Time Complexity: O(nlogn)
+Space Complexity: O(1)
+
