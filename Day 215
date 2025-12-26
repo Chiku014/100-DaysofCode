@@ -1,0 +1,60 @@
+Day 215/250:  Minimum Penalty for a Shop
+
+Problem Statement #2483
+
+Problem Statement Explantion:
+
+You are given the customer visit log of a shop represented by a 0-indexed string customers consisting only of characters 'N' and 'Y':
+
+If the ith character is 'Y', it means that customers come at the ith hour.
+If the ith character is 'N', it means no customers come at the ith hour.
+If the shop closes at the jth hour (0≤j≤n), the penalty is calculated as follows:
+For every hour when the shop is open and no customers come, the penalty increases by 1.
+For every hour when the shop is closed and customers come, the penalty increases by 1.
+Return the earliest hour at which the shop must be closed to have a minimum penalty.
+
+Solution Approach:
+
+A naive approach would calculate the total penalty for every possible closing hour, resulting in O(n^2) time. 
+However, we can solve this in O(n) by observing how the penalty changes incrementally.
+
+Logic:
+Baseline: Assume we close at hour 0. We don't know the exact penalty yet, so we treat it as 0.
+Iterative Adjustment: As we iterate through the hours (i=0 to n−1):
+If customers[i] == 'Y': Closing at i+1 is better than closing at i because we serve a customer who would have otherwise contributed to the "closed but customers came" penalty. We decrement our relative penalty.
+If customers[i] == 'N': Closing at i+1 is worse than closing at i because the shop was open while no one came. We increment our relative penalty.
+Tracking the Minimum: We keep track of the lowest relative penalty encountered and the specific hour (i + 1) that produced it.
+
+Here's the code:
+
+class Solution {
+    public int bestClosingTime(String customers) {
+        int minPenalty = 0;
+        int currentPenalty = 0;
+        int bestHour = 0;
+
+        for (int i = 0; i < customers.length(); i++) {
+            if (customers.charAt(i) == 'Y') {
+                currentPenalty--;
+            } else {
+                currentPenalty++;
+            }
+
+            if (currentPenalty < minPenalty) {
+                minPenalty = currentPenalty;
+                bestHour = i + 1;
+            }
+        }
+
+        return bestHour;
+    }
+}
+
+Complexity:
+
+Time Complexity	O(n)
+Space Complexity	O(1)
+
+
+
+
